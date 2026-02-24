@@ -24,8 +24,8 @@ export default function CashierPage() {
   ];
   const [lookupResetKey, setLookupResetKey] = useState(0);
 function handleOtpSuccess() {
-  setSelectedCustomer(null);              // 🔥 remove customer
-  setLookupResetKey((prev) => prev + 1);  // 🔥 reset lookup input
+  setSelectedCustomer(null);              
+  setLookupResetKey((prev) => prev + 1);  
 }
   return (
     <CashierLayout
@@ -33,7 +33,7 @@ function handleOtpSuccess() {
         <CustomerPanel
   onCustomerChange={setSelectedCustomer}
   resetKey={lookupResetKey}
-  onOtpSuccess={handleOtpSuccess}   // 👈 ADD THIS
+  onOtpSuccess={handleOtpSuccess}   
 />
       }
       right={

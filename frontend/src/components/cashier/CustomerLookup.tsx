@@ -55,7 +55,7 @@ useEffect(() => {
 
   return (
     <div>
-      <h2 className="text-xl font-semibold mb-6">Customer Details</h2>
+      <h2 className="text-xl font-semibold mb-6 dark:text-black">Customer Details</h2>
 
       {/* Input */}
       <div className="relative">
@@ -65,7 +65,7 @@ useEffect(() => {
           placeholder="Enter Customer Phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
-          className="w-full px-6 py-4 rounded-2xl bg-[#efefef] focus:outline-none text-lg"
+          className="w-full px-6 py-4 rounded-2xl bg-[#efefef] focus:outline-none text-lg dark:text-black"
         />
 
         {phone && (
@@ -101,7 +101,7 @@ useEffect(() => {
 
           <div className="flex items-center gap-3 mt-2">
             <span className="text-gray-400 text-lg">↳</span>
-            <span className="text-lg font-semibold">
+            <span className="text-lg font-semibold dark:text-black">
               {result.phone}
             </span>
           </div>
@@ -124,7 +124,7 @@ useEffect(() => {
             </div>
 
             <div>
-              <p className="font-semibold">Add New Customer</p>
+              <p className="font-semibold dark:text-black">Add New Customer</p>
               <p className="text-sm text-gray-500">
                 {phone}
               </p>

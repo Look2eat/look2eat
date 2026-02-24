@@ -81,13 +81,13 @@ export default function RedeemOtpModal({
                 onOpenChange(nextOpen);
             }}
         >
-            <DialogContent className="sm:max-w-md">
+            <DialogContent className="sm:max-w-md dark:bg-white dark:text-black">
                 <div className="flex flex-col items-center gap-3">
 
 
 
                     <DialogHeader>
-                        <DialogTitle className="text-center text-2xl font-bold">
+                        <DialogTitle className="text-center text-2xl font-bold dark:text-black">
                             {isValid ? <p className="p-2 pb-4">Congratulations 🎉</p> : "Redeem Reward"}
                         </DialogTitle>
 
@@ -131,17 +131,17 @@ export default function RedeemOtpModal({
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <div className="flex justify-center">
+                        <div className="flex justify-center ">
                             <OTPInput
                                 ref={inputRef}
                                 value={value}
                                 onChange={setValue}
                                 maxLength={4}
-                                containerClassName="flex items-center gap-3"
+                                containerClassName="flex items-center gap-3 "
                                 render={({ slots }) => (
-                                    <div className="flex gap-2">
+                                    <div className="flex gap-2 ">
                                         {slots.map((slot, idx) => (
-                                            <Slot key={idx} {...slot} />
+                                            <Slot key={idx} {...slot}  />
                                         ))}
                                     </div>
                                 )}
@@ -171,7 +171,7 @@ function Slot(props: SlotProps) {
     return (
         <div
             className={cn(
-                "flex size-10 items-center justify-center rounded-lg border border-input bg-background font-medium text-foreground shadow-sm transition-shadow",
+                "flex size-10 items-center justify-center rounded-lg border border-input bg-background font-medium text-foreground shadow-[0_0_20px_rgba(0,0,0,0.10)] transition-shadow dark:bg-white dark:text-black",
                 { "ring-2 ring-ring": props.isActive }
             )}
         >

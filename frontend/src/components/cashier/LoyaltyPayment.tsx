@@ -43,9 +43,9 @@ export default function BillAmountModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md dark:bg-white dark:text-black">
         <DialogHeader>
-          <DialogTitle className="text-center text-2xl font-bold">
+          <DialogTitle className="text-center text-2xl font-bold dark:bg-white dark:text-black">
             Enter Bill Amount
           </DialogTitle>
 
@@ -61,7 +61,11 @@ export default function BillAmountModal({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="₹0.00 (Enter bill amount after discount)"
-            className="w-full bg-gray-100 rounded-xl px-4 py-4 text-lg focus:outline-none"
+            className="w-full bg-gray-100 rounded-xl px-4 py-4 text-lg 
+             focus:outline-none dark:text-black
+             [appearance:textfield]
+             [&::-webkit-outer-spin-button]:appearance-none
+             [&::-webkit-inner-spin-button]:appearance-none"
           />
 
           <Button
