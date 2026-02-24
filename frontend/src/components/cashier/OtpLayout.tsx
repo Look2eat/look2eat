@@ -1,0 +1,181 @@
+"use client";
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogClose,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { OTPInput, SlotProps } from "input-otp";
+import { useEffect, useRef, useState } from "react";
+import { hover } from "framer-motion";
+
+interface Props {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    rewardName: string;
+    rewardPoints: number;
+    name: string
+    onConfirm: () => void;
+    color?: string;
+     billAmount: string;
+}
+
+const MOCK_OTP = "5678"; // 🔥 Replace with backend OTP later
+
+export default function RedeemOtpModal({
+    open,
+    onOpenChange,
+    rewardName,
+    rewardPoints,
+    onConfirm,
+    name,
+    color = "bg-[#322424]",
+    billAmount
+}: Props) {
+    const [value, setValue] = useState("");
+    const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
+    const [redirecting, setRedirecting] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+    useEffect(() => {
+        if (isValid) {
+            closeButtonRef.current?.focus();
+        }
+    }, [isValid]);
+
+    async function handleSubmit(code?: string) {
+        const otp = code ?? value;
+
+        inputRef.current?.select();
+        await new Promise((r) => setTimeout(r, 100));
+
+        const correct = otp === MOCK_OTP;
+        setIsValid(correct);
+
+        if (correct) {
+            if (redirecting) {
+                onConfirm();
+            } // 🔥 Deduct points here later
+        }
+
+        setValue("");
+    }
+
+    return (
+        <Dialog
+            open={open}
+            onOpenChange={(nextOpen) => {
+                if (!nextOpen) {
+                    if (isValid) {
+                        onConfirm();        // ← call confirm if OTP verified
+                    }
+                    setIsValid(undefined);
+                    setValue("");
+                }
+                onOpenChange(nextOpen);
+            }}
+        >
+            <DialogContent className="sm:max-w-md">
+                <div className="flex flex-col items-center gap-3">
+
+
+
+                    <DialogHeader>
+                        <DialogTitle className="text-center text-2xl font-bold">
+                            {isValid ? <p className="p-2 pb-4">Congratulations 🎉</p> : "Redeem Reward"}
+                        </DialogTitle>
+
+                        <DialogDescription className="text-center text-neutral-700 text-xl">
+                            {isValid
+                                ? <p>
+                                    <strong>{name}</strong> have successfully redeemed{" "}
+                                    <strong>{rewardName}</strong> for{" "}
+                                    <strong>{rewardPoints} PTS!</strong><br className="p-1"/>
+                                    Earned Poitns <strong>{Math.floor(parseInt(billAmount) / 10)}</strong>.
+                                </p>
+                                : `Enter OTP to redeem reward`}
+                        </DialogDescription>
+                    </DialogHeader>
+                </div>
+
+                {/* Reward Info */}
+                {!isValid && (
+                    <div className={cn("p-4 rounded-xl text-center text-white", color)}>
+                        <p className="font-bold text-md">{rewardPoints} PTS</p>
+                        <p className="text-sm">{rewardName}</p>
+                    </div>
+                )}
+
+                {isValid ? (
+                    <div className="text-center">
+                        <DialogClose asChild>
+                            <Button className={cn(color, "hover:bg-[#3b2a26] border-0")}
+                                ref={closeButtonRef}
+                                onClick={() => {
+
+                                    onConfirm();
+                                    setIsValid(undefined);
+                                    onOpenChange(false);
+
+                                }}
+                            >
+                                Next Customer
+                            </Button>
+                        </DialogClose>
+                    </div>
+                ) : (
+                    <div className="space-y-4">
+                        <div className="flex justify-center">
+                            <OTPInput
+                                ref={inputRef}
+                                value={value}
+                                onChange={setValue}
+                                maxLength={4}
+                                containerClassName="flex items-center gap-3"
+                                render={({ slots }) => (
+                                    <div className="flex gap-2">
+                                        {slots.map((slot, idx) => (
+                                            <Slot key={idx} {...slot} />
+                                        ))}
+                                    </div>
+                                )}
+                                onComplete={(code) => handleSubmit(code)}
+                            />
+                        </div>
+
+                        {isValid === false && (
+                            <p className="text-center text-xs text-red-500">
+                                Invalid OTP. Please try again.
+                            </p>
+                        )}
+
+                        <p className="text-center text-sm">
+                            <button className="underline hover:no-underline">
+                                Resend OTP
+                            </button>
+                        </p>
+                    </div>
+                )}
+            </DialogContent>
+        </Dialog>
+    );
+}
+
+function Slot(props: SlotProps) {
+    return (
+        <div
+            className={cn(
+                "flex size-10 items-center justify-center rounded-lg border border-input bg-background font-medium text-foreground shadow-sm transition-shadow",
+                { "ring-2 ring-ring": props.isActive }
+            )}
+        >
+            {props.char !== null && <div>{props.char}</div>}
+        </div>
+    );
+}
