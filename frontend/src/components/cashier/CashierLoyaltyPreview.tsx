@@ -34,7 +34,7 @@ const [billAmount, setBillAmount] = useState("");
 
     return (
         <div>
-            <h2 className="text-xl font-semibold mb-6">Loyalty Program</h2>
+            <h2 className="text-xl font-semibold mb-6 dark:text-black">Loyalty Program</h2>
 
             {/* If no user */}
             {!name && (

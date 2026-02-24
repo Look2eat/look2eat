@@ -43,7 +43,14 @@ export default function BillAmountModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md dark:bg-white dark:text-black">
+      <DialogContent className="sm:max-w-md
+    dark:bg-white
+    dark:text-black
+    fixed
+    top-[10%] sm:top-1/2
+    translate-y-0 sm:-translate-y-1/2
+    max-h-[90vh]
+    overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold dark:bg-white dark:text-black">
             Enter Bill Amount
