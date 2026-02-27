@@ -5,32 +5,40 @@ import { useState } from "react";
 import RedeemOtpModal from "./OtpLayout";
 import BillAmountModal from "./LoyaltyPayment";
 interface Props extends Customer {
-  rewards: {
-    id: string;
-    pointsRequired: number;
-    description: string;
-  }[];
-  onOtpSuccess?: () => void;
+    rewards: {
+        id: string;
+        pointsRequired: number;
+        description: string;
+    }[];
+    promotionalrewards?: {
+        id: string,
+        description: string;
+        expiry: Date;
+    }[]
+    onOtpSuccess?: () => void;
 }
 
 export default function CashierLoyaltyPreview({
-  name,
-  points,
-  rewards,
-  expiryDate,
-  negativeReview,
-  lastVisit,
-  onOtpSuccess,
-  
-}: Props) {
-const [selectedReward, setSelectedReward] = useState<{
-  description: string;
-  pointsRequired: number;
-} | null>(null);
+    name,
+    points,
+    rewards,
+    expiryDate,
+    negativeReview,
+    lastVisit,
+    promotionalrewards = [],
+    onOtpSuccess,
 
-const [billModalOpen, setBillModalOpen] = useState(false);
-const [otpModalOpen, setOtpModalOpen] = useState(false);
-const [billAmount, setBillAmount] = useState("");
+}: Props) {
+    const [selectedReward, setSelectedReward] = useState<{
+        description: string;
+        pointsRequired: number;
+    } | null>(null);
+
+    const [billModalOpen, setBillModalOpen] = useState(false);
+    const [otpModalOpen, setOtpModalOpen] = useState(false);
+    const [billAmount, setBillAmount] = useState("");
+    const [promoOpen, setPromoOpen] = useState(false);
+
 
     return (
         <div>
@@ -69,6 +77,7 @@ const [billAmount, setBillAmount] = useState("");
 
                         if (!name || (points === undefined)) return null;
 
+
                         // 1️⃣ Sort rewards ascending
                         const sortedRewards = [...rewards].sort(
                             (a, b) => a.pointsRequired - b.pointsRequired
@@ -91,7 +100,7 @@ const [billAmount, setBillAmount] = useState("");
                             remaining = nextReward.pointsRequired - points;
                         }
                         console.log(expiryDate)
-                        
+
 
                         return (
                             <>
@@ -127,6 +136,61 @@ const [billAmount, setBillAmount] = useState("");
                                                 : "Reward Unlocked 🎉"}
                                         </p>
                                     </div>
+                                    {promotionalrewards.length > 0 && (
+                                        <div >
+                                            {/* Header */}
+                                            <div
+                                                onClick={() => setPromoOpen(!promoOpen)}
+                                                className="bg-white text-black p-5 rounded-2xl font-bold cursor-pointer flex justify-between items-center"
+                                            >
+                                                <span>Promotional Offers</span>
+                                                <span
+                                                    className={`transition-transform duration-300 ${promoOpen ? "rotate-180" : ""
+                                                        }`}
+                                                >
+                                                    ▼
+                                                </span>
+                                            </div>
+
+                                            {/* Dropdown Body */}
+                                            <div
+                                                className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 ${promoOpen ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
+                                                    }`}
+                                            >
+                                                {promotionalrewards.map((promo, index) => (
+                                                    <div key={promo.id}>
+                                                        <div className="p-4 flex justify-between items-center text-black">
+                                                            <div>
+                                                                <p className="font-semibold">{promo.description}</p>
+                                                                <p className="text-xs opacity-70">
+                                                                    Expires {new Date(promo.expiry).toLocaleDateString()}
+                                                                </p>
+                                                            </div>
+
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSelectedReward({
+                                                                        description: promo.description,
+                                                                        pointsRequired: 0,
+                                                                    });
+                                                                    setBillModalOpen(true);
+                                                                }}
+                                                                className="bg-[#3b2a26] text-white px-4 py-1 rounded-lg text-sm"
+                                                            >
+                                                                Redeem
+                                                            </button>
+                                                        </div>
+
+                                                        {/* Separator (except last item) */}
+                                                        {index !== promotionalrewards.length - 1 && (
+                                                            <div className="border-t border-gray-200 mx-4" />
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
 
                                     {lastVisit && <div className="bg-[#FFD178] text-black p-5 rounded-2xl font-bold text-center" >Last Visit {lastVisit} ago</div>}
 
@@ -148,17 +212,17 @@ const [billAmount, setBillAmount] = useState("");
                                             </div>
 
                                             <button
-  onClick={() => {
-  setSelectedReward({
-    description: reward.description,
-    pointsRequired: reward.pointsRequired,
-  });
-  setBillModalOpen(true); // 🔥 open bill modal first
-}}
-  className="bg-[#3b2a26] text-white px-4 py-1 rounded-lg text-sm"
->
-  Redeem
-</button>
+                                                onClick={() => {
+                                                    setSelectedReward({
+                                                        description: reward.description,
+                                                        pointsRequired: reward.pointsRequired,
+                                                    });
+                                                    setBillModalOpen(true); // 🔥 open bill modal first
+                                                }}
+                                                className="bg-[#3b2a26] text-white px-4 py-1 rounded-lg text-sm"
+                                            >
+                                                Redeem
+                                            </button>
                                         </div>
                                     ))}
                                 </div>
@@ -180,36 +244,37 @@ const [billAmount, setBillAmount] = useState("");
                                     </div>
                                 ))}
                                 <BillAmountModal
-  open={billModalOpen}
-  onOpenChange={setBillModalOpen}
-  customerName={name}
-  onContinue={(amount) => {
-    setBillAmount(amount);
-    setBillModalOpen(false);
+                                    open={billModalOpen}
+                                    onOpenChange={setBillModalOpen}
+                                    customerName={name}
+                                    onContinue={(amount) => {
+                                        setBillAmount(amount);
+                                        setBillModalOpen(false);
 
-    // Small delay for smooth transition
-    setTimeout(() => {
-      setOtpModalOpen(true);
-    }, 200);
-  }}
-/>
-                               <RedeemOtpModal
-  open={otpModalOpen}
-  onOpenChange={(open) => {
-    if (!open) {
-      setOtpModalOpen(false);
-      setSelectedReward(null);
-    }}}
-  rewardName={selectedReward?.description || ""}
-  rewardPoints={selectedReward?.pointsRequired || 0}
-  name={name}
-  billAmount={billAmount}
-  onConfirm={() => {
-    console.log("Redeem confirmed!");
-    onOtpSuccess?.()
-    // 🔥 deduct points here later
-  }}
-/>
+                                        // Small delay for smooth transition
+                                        setTimeout(() => {
+                                            setOtpModalOpen(true);
+                                        }, 200);
+                                    }}
+                                />
+                                <RedeemOtpModal
+                                    open={otpModalOpen}
+                                    onOpenChange={(open) => {
+                                        if (!open) {
+                                            setOtpModalOpen(false);
+                                            setSelectedReward(null);
+                                        }
+                                    }}
+                                    rewardName={selectedReward?.description || ""}
+                                    rewardPoints={selectedReward?.pointsRequired || 0}
+                                    name={name}
+                                    billAmount={billAmount}
+                                    onConfirm={() => {
+                                        console.log("Redeem confirmed!");
+                                        onOtpSuccess?.()
+                                        // 🔥 deduct points here later
+                                    }}
+                                />
                             </>
                         );
                     })()}

@@ -22,7 +22,7 @@ interface Props {
     name: string
     onConfirm: () => void;
     color?: string;
-     billAmount: string;
+    billAmount: string;
 }
 
 const MOCK_OTP = "5678"; // 🔥 Replace with backend OTP later
@@ -48,7 +48,13 @@ export default function RedeemOtpModal({
             closeButtonRef.current?.focus();
         }
     }, [isValid]);
-
+    useEffect(() => {
+        if (open) {
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 100);
+        }
+    }, [open]);
     async function handleSubmit(code?: string) {
         const otp = code ?? value;
 
@@ -81,7 +87,18 @@ export default function RedeemOtpModal({
                 onOpenChange(nextOpen);
             }}
         >
-            <DialogContent className="sm:max-w-md dark:bg-white dark:text-black">
+            <DialogContent className="!w-[92vw]
+    !max-w-none
+    sm:!max-w-md
+    rounded-2xl
+    p-6
+    dark:bg-white dark:text-black
+
+    top-[30%] translate-y-0
+    sm:top-1/2 sm:-translate-y-1/2
+
+    max-h-[85dvh]
+    overflow-y-auto">
                 <div className="flex flex-col items-center gap-3">
 
 
@@ -92,14 +109,26 @@ export default function RedeemOtpModal({
                         </DialogTitle>
 
                         <DialogDescription className="text-center text-neutral-700 text-xl">
-                            {isValid
-                                ? <p>
-                                    <strong>{name}</strong> have successfully redeemed{" "}
-                                    <strong>{rewardName}</strong> for{" "}
-                                    <strong>{rewardPoints} PTS!</strong><br className="p-1"/>
-                                    Earned Poitns <strong>{Math.floor(parseInt(billAmount) / 10)}</strong>.
+                            {isValid ? (
+                                <p>
+                                    <strong>{name}</strong> has successfully redeemed{" "}
+                                    <strong>{rewardName}</strong>
+
+                                    {rewardPoints !== 0 && (
+                                        <>
+                                            {" "}for <strong>{rewardPoints} PTS</strong>
+                                        </>
+                                    )}
+                                    !
+                                    <br className="p-1" />
+                                    Points Earned{" "}
+                                    <strong>
+                                        {Math.floor(Number(billAmount || 0) / 10)}
+                                    </strong>
                                 </p>
-                                : `Enter OTP to redeem reward`}
+                            ) : (
+                                "Enter OTP to redeem reward"
+                            )}
                         </DialogDescription>
                     </DialogHeader>
                 </div>
@@ -107,7 +136,7 @@ export default function RedeemOtpModal({
                 {/* Reward Info */}
                 {!isValid && (
                     <div className={cn("p-4 rounded-xl text-center text-white", color)}>
-                        <p className="font-bold text-md">{rewardPoints} PTS</p>
+                        {rewardPoints !== 0 && <p className="font-bold text-md">{rewardPoints} PTS</p>}
                         <p className="text-sm">{rewardName}</p>
                     </div>
                 )}
@@ -137,11 +166,14 @@ export default function RedeemOtpModal({
                                 value={value}
                                 onChange={setValue}
                                 maxLength={4}
+                                inputMode="numeric"
+                                type="number"
+                                autoFocus
                                 containerClassName="flex items-center gap-3 "
                                 render={({ slots }) => (
                                     <div className="flex gap-2 ">
                                         {slots.map((slot, idx) => (
-                                            <Slot key={idx} {...slot}  />
+                                            <Slot key={idx} {...slot} />
                                         ))}
                                     </div>
                                 )}

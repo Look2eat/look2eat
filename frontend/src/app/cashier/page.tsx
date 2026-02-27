@@ -22,6 +22,11 @@ export default function CashierPage() {
     { id: "3", pointsRequired: 1000, description: "Get ₹500 off" },
     { id: "4", pointsRequired: 2000, description: "Get ₹1000 off" },
   ];
+
+  const promoReward=[
+    {id:"1", description:"Get ₹50 Off",expiry: new Date("2026-03-31")},
+    {id:"2", description:"Get Free Chaat worth ₹100",expiry: new Date("2026-03-2")},
+  ] 
   const [lookupResetKey, setLookupResetKey] = useState(0);
 function handleOtpSuccess() {
   setSelectedCustomer(null);              
@@ -41,6 +46,7 @@ function handleOtpSuccess() {
           name={selectedCustomer?.name ?? ""}
           points={selectedCustomer?.points ?? 0}
           rewards={mockRewards}
+          promotionalrewards={promoReward}
           expiryDate="3 Aug, 2026"
           phone={selectedCustomer?.phone ?? ""}
           negativeReview={selectedCustomer?.negativeReview ?? false}

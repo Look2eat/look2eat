@@ -38,7 +38,14 @@ export default function RedeemConfirmationModal({
         onOpenChange(nextOpen);
       }}
     >
-      <DialogContent className="sm:max-w-md dark:bg-white dark:text-black">
+      <DialogContent className="!w-[90vw]
+    !max-w-none
+    sm:!max-w-md
+    rounded-2xl
+    p-6
+    dark:bg-white dark:text-black
+    max-h-[90vh]
+    overflow-y-auto">
         <div className="flex flex-col items-center gap-4 text-center">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center dark:text-black">
