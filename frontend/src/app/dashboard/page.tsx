@@ -8,6 +8,8 @@ import {
   fetchDashboardStats,
   DashboardStats
 } from "@/lib/mockDashboardApi"
+import LoyaltyCard from "@/components/dashboard/LoyaltyCard"
+import FeedbackCard from "@/components/dashboard/FeedbackCard"
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
@@ -28,6 +30,20 @@ export default function DashboardPage() {
 
 
       <DashboardGrid stats={stats} />
+      <LoyaltyCard
+        pointsRedeemed={5900}
+        pointsEarned={1200}
+        profileComplete={60}
+        revenueGain={50000}
+        redemptionRate={22.39}
+      />
+
+      <FeedbackCard
+        totalFeedbacks={2}
+        averageRating={1.5}
+        positiveFeedback={80}
+        negativeFeedback={10}
+      />
     </div>
   )
 }
