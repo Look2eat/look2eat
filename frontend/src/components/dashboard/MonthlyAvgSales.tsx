@@ -46,7 +46,7 @@ export function MonthlyAvgSales({ sales }: Props) {
             ref={containerRef}
             onMouseEnter={handleContainerEnter}
             onMouseLeave={handleContainerLeave}
-            className="h-65 group relative w-full p-6 rounded-2xl bg-muted/60 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1] flex flex-col gap-4"
+            className="h-70 group relative w-full p-6 rounded-2xl bg-muted/60 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1] flex flex-col gap-4"
         >
             {/* Header */}
             <div className="flex items-center justify-between mb-6">

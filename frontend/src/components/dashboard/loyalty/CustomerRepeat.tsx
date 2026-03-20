@@ -27,7 +27,7 @@ export default function CustomerRepeatRateCard({ data }: Props) {
         data.visit6plus
 
     return (
-        <div className="p-6 rounded-2xl bg-muted/60 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1] h-65 flex flex-col gap-6">
+        <div className="p-6 rounded-2xl bg-muted/60 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1] h-70 flex flex-col gap-6">
 
             <h3 className="text-md font-bold">
                 Customer Repeat Rate

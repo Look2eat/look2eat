@@ -1,6 +1,7 @@
 "use client"
 
 import { Gift } from "lucide-react"
+import { cn } from "@/lib/utils";
 
 interface Props {
 
@@ -9,16 +10,23 @@ interface Props {
   profileComplete: number
   pointsEarned?: number
   pointsRedeemed: number
+  clickable?: boolean
+  className?: string
 }
 
 export default function LoyaltyCard({
   pointsRedeemed,
   revenueGain,
   pointsEarned,
-  profileComplete
+  profileComplete, clickable = true, className
 }: Props) {
   return (
-    <div className="p-8 rounded-2xl dark:bg-[#1a1209] bg-[#fbeede]  flex flex-col gap-10 my-8 mt-10">
+    <div
+      className={cn(
+        "p-8 rounded-2xl dark:bg-[#271909] bg-[#fbeede] flex flex-col gap-10 my-8 mt-10",
+        className
+      )}
+    >
 
       {/* Header */}
       <div className="flex items-center gap-3 text-2xl font-semibold">
@@ -52,9 +60,10 @@ export default function LoyaltyCard({
       </div>
 
       {/* Footer */}
-      <button className="underline text-lg font-medium w-fit hover:opacity-70">
-        View More
-      </button>
+      {clickable &&
+        <button className="underline text-lg font-medium w-fit hover:opacity-70" >
+          View More
+        </button>}
 
     </div>
   )

@@ -15,11 +15,14 @@ import {
   Home,
   IndianRupee,
   LifeBuoy,
+  LucideSmile,
   Map,
+  MessageCircleHeart,
   PieChart,
   Send,
   Settings2,
   SquareTerminal,
+  UsersRound,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -42,7 +45,7 @@ import { AnimateIcon } from "./animate-ui/icons/icon"
 import { ChartColumnIncreasing } from "./animate-ui/icons/chart-column-increasing"
 import { LayoutDashboard } from "./animate-ui/icons/layout-dashboard"
 import { ThemeToggle } from "./theme-toggle"
-import { useRouter} from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const data = {
   user: {
@@ -182,19 +185,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Acme Inc</span>
+                  <span className="truncate font-medium">Look2Eat</span>
                   <span className="truncate text-xs">Enterprise</span>
                 </div>
               </a>
             </SidebarMenuButton>
             <SidebarMenuItem>
-            <SidebarMenuButton asChild className="my-2 h-11 rounded-xl px-4 py-3">
-                <button className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full " onClick={()=>{router.push("dashboard/cashierPortal");}}>
+              <SidebarMenuButton asChild className="my-2 h-11 rounded-xl px-4 py-3">
+                <button className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full " onClick={() => { router.push("dashboard/cashierPortal"); }}>
                   <IndianRupee className="w-4 h-4" />
                   <span>Cashier Portal</span>
                 </button>
               </SidebarMenuButton>
-              </SidebarMenuItem>
+            </SidebarMenuItem>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
@@ -202,66 +205,66 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="overflow-y-auto overflow-x-hidden">
         {/* Core Navigation */}
 
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild isActive={pathname === "/dashboard"} className="h-11 rounded-xl px-4 py-3">
-                  <Link href="/dashboard">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild isActive={pathname === "/dashboard"} className="h-11 rounded-xl px-4 py-3">
+              <Link href="/dashboard">
 
-                  <LayoutDashboard animateOnHover/>
-                  <span className="text-[14px]">Dashboard</span>
+                <LayoutDashboard animateOnHover />
+                <span className="text-[14px]">Dashboard</span>
 
-                    
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === "/dashboard/loyalty"}
-                  className="h-11 rounded-xl px-4 py-3"
-                >
-                  <Link href="/dashboard/loyalty">
-                    <Calendar1 />
-                    <span>Loyalty Program</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === "/dashboard/reviews"}
-                  className="h-11 rounded-xl px-4 py-3"
-                >
-                  <Link href="/dashboard/reviews">
-                    <Calendar1 />
-                    <span>Reviews</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname === "/dashboard/customer"}
-                  className="h-11 rounded-xl px-4 py-3"
-                >
-                  <Link href="/dashboard/customer">
-                    <Calendar1 />
-                    <span>Customer Insight</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
 
-                
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === "/dashboard/loyalty"}
+              className="h-11 rounded-xl px-4 py-3"
+            >
+              <Link href="/dashboard/loyalty">
+                <MessageCircleHeart />
+                <span>Loyalty Program</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === "/dashboard/reviews"}
+              className="h-11 rounded-xl px-4 py-3"
+            >
+              <Link href="/dashboard/reviews">
+                <LucideSmile />
+                <span>Reviews</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname === "/dashboard/customer"}
+              className="h-11 rounded-xl px-4 py-3"
+            >
+              <Link href="/dashboard/customer">
+                <UsersRound />
+                <span>Customer Insight</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
 
-              </SidebarMenuItem>
-              
-              </SidebarMenu>
-              
-            </SidebarContent>
-<SidebarFooter>
- <ThemeToggle/>
-              </SidebarFooter>
+
+
+          </SidebarMenuItem>
+
+        </SidebarMenu>
+
+      </SidebarContent>
+      <SidebarFooter>
+        <ThemeToggle />
+      </SidebarFooter>
     </Sidebar>
   )
 }

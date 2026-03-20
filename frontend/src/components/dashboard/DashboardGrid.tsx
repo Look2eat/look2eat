@@ -8,7 +8,7 @@ import RedemptionRateCard from "./RedemptionRateCard"
 import StatCard from "./StatCard"
 import { DashboardStats } from "@/lib/mockDashboardApi"
 
-import CustomerRepeatRateCard from "./CustomerRepeat"
+import CustomerRepeatRateCard from "./loyalty/CustomerRepeat"
 
 interface Props {
     stats: DashboardStats
