@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.outletRouter = void 0;
+const express_1 = require("express");
+const outlet_controller_1 = require("./outlet.controller");
+const validation_middleware_1 = require("../../common/middleware/validation.middleware");
+const auth_middleware_1 = require("../../common/middleware/auth.middleware");
+const outlet_validation_1 = require("./outlet.validation");
+const enums_1 = require("../../generated/prisma/enums");
+exports.outletRouter = (0, express_1.Router)();
+exports.outletRouter.post("/", auth_middleware_1.authenticateJwt, (0, auth_middleware_1.authorizeRoles)([enums_1.Role.OWNER]), (0, validation_middleware_1.validateRequest)(outlet_validation_1.createOutletSchema), outlet_controller_1.outletController.createOutlet);
+exports.outletRouter.get("/", auth_middleware_1.authenticateJwt, (0, auth_middleware_1.authorizeRoles)([enums_1.Role.OWNER, enums_1.Role.OUTLET_MANAGER]), outlet_controller_1.outletController.getOutlets);

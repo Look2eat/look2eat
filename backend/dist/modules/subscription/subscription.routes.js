@@ -1,0 +1,12 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.subscriptionRouter = void 0;
+const express_1 = require("express");
+const subscription_controller_1 = require("./subscription.controller");
+const auth_middleware_1 = require("../../common/middleware/auth.middleware");
+const validation_middleware_1 = require("../../common/middleware/validation.middleware");
+const subscription_validation_1 = require("./subscription.validation");
+const client_1 = require("@prisma/client");
+exports.subscriptionRouter = (0, express_1.Router)();
+exports.subscriptionRouter.post("/", auth_middleware_1.authenticateJwt, (0, auth_middleware_1.authorizeRoles)([client_1.Role.OWNER]), (0, validation_middleware_1.validateRequest)(subscription_validation_1.createSubscriptionSchema), subscription_controller_1.subscriptionController.createSubscription);
+exports.subscriptionRouter.get("/:outletId", auth_middleware_1.authenticateJwt, subscription_controller_1.subscriptionController.getSubscription);

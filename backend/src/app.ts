@@ -20,7 +20,7 @@ export function createApp(): Express {
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/outlets", outletRouter);
 
-  app.get("/debug", (_req, res) => res.json({ 
+  app.get("/debug", (_req, res) => res.json({
     databaseUrl: process.env.DATABASE_URL ? "SET" : "NOT SET",
     databaseUrlValue: process.env.DATABASE_URL?.substring(0, 50) + "...",
     jwtSecret: process.env.JWT_SECRET ? "SET" : "NOT SET"
