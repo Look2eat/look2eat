@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Brand {
+  id                String   @id @default(uuid())
+  name              String
+  slug              String   @unique
+  email             String
+  phoneNumber       String
+  logoUrl           String?
+  primaryColor      String?
+  bannerImageUrl    String?
+  description       String?
+  termsText         String?
+  isActive          Boolean  @default(true)
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  users             AdminUser[]
+  outlets           Outlet[]
+}
+
+model AdminUser {
+  id              String   @id @default(uuid())
+  brandId         String?
+  name            String
+  email           String   @unique
+  phoneNumber     String
+  passwordHash    String
+  role            Role
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  brand           Brand?    @relation(fields: [brandId], references: [id])
+
+  @@unique([brandId, email])
+}
+
+model Outlet {
+  id           String   @id @default(uuid())
+  brandId      String
+  name         String
+  address      String?
+  phoneNumber  String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  brand        Brand    @relation(fields: [brandId], references: [id])
+}
+
+
+enum Role {
+  OWNER
+  OUTLET_MANAGER
+  CASHIER
+}
