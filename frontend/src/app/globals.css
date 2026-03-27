@@ -47,6 +47,33 @@
   --color-destructive-foreground: var(--destructive-foreground);
   --color-color-destructive-foreground: var(----color-destructive-foreground);
   --color-color-color-destructive-foreground: var(----color-color-destructive-foreground);
+  --animate-skeleton: skeleton 2s -1s infinite linear;
+  @keyframes skeleton {
+  to {
+    background-position: -200% 0;
+    }
+  }
+  @keyframes fadeSlideIn {
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0px);
+    }
+  }
+  @keyframes slideRightIn {
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateX(0px);
+    }
+  }
+  @keyframes testimonialIn {
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0px) scale(1);
+    }
+  }
 }
 
 :root {

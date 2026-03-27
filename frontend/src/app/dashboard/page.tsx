@@ -10,6 +10,7 @@ import {
 } from "@/lib/mockDashboardApi"
 import LoyaltyCard from "@/components/dashboard/LoyaltyCard"
 import FeedbackCard from "@/components/dashboard/FeedbackCard"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
@@ -23,7 +24,48 @@ export default function DashboardPage() {
     load()
   }, [])
 
-  if (!stats) return <p className="p-10">Loading dashboard...</p>
+  if (!stats) {
+    return (
+      <div className="p-10 min-h-screen space-y-6">
+
+        {/* Top Grid Skeleton */}
+        <div className="grid grid-cols-2 gap-6">
+
+          {/* LEFT COLUMN */}
+          <div className="flex flex-col gap-6">
+
+            <div className="grid grid-cols-2 gap-6">
+              <Skeleton className="h-40 rounded-2xl" />
+              <Skeleton className="h-40 rounded-2xl" />
+            </div>
+
+            <Skeleton className="h-65 rounded-2xl" />
+
+          </div>
+
+          {/* RIGHT COLUMN */}
+          <div className="flex flex-col gap-6">
+
+            <Skeleton className="h-65 rounded-2xl" />
+
+            <div className="grid grid-cols-2 gap-6">
+              <Skeleton className="h-40 rounded-2xl" />
+              <Skeleton className="h-40 rounded-2xl" />
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* Loyalty + Feedback Cards */}
+        <div className="grid grid-cols-2 gap-6">
+          <Skeleton className="h-[300px] rounded-2xl" />
+          <Skeleton className="h-[300px] rounded-2xl" />
+        </div>
+
+      </div>
+    )
+  }
 
   return (
     <div className="p-10  min-h-screen">

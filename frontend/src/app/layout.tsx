@@ -10,7 +10,7 @@ const geistSans = Geist({
 });
 const poppins = Poppins({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-poppins",
   display: "swap",
 });
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-      {/* <link
+        {/* <link
           href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&display=swap"
           rel="stylesheet"
         /> */}
@@ -40,11 +40,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
       ><ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-    >
-        {children}
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+      >
+          {children}
         </ThemeProvider>
       </body>
     </html>

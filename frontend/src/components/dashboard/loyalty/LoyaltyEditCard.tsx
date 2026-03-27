@@ -36,22 +36,23 @@ export default function LoyaltyEditCard({
                 </h1>
 
                 {subtitle && (
-                    <p className="text-2xl font-semibold text-white/80">
+                    <p className="text-2xl font-semibold text-muted-foreground">
                         {subtitle}
                     </p>
                 )}
 
                 {description && (
-                    <p className="text-xl text-white/70">
+                    <p className="text-xl text-muted-foreground">
                         {description}
                     </p>
                 )}
-
+            </div>
+            <div className="flex flex-col gap-6 mt-6 z-10 pt-20">
                 {/* Buttons */}
                 <div className="flex gap-6 mt-4">
                     <button
                         onClick={onPrimaryClick}
-                        className="px-8 py-3 rounded-2xl bg-white text-black font-semibold text-lg hover:opacity-90 transition"
+                        className="px-8 py-3 rounded-2xl dark:bg-white dark:text-black font-semibold text-lg  hover:opacity-90 transition bg-neutral-800 text-white"
                     >
                         {primaryButtonText}
                     </button>
@@ -66,9 +67,9 @@ export default function LoyaltyEditCard({
             </div>
 
             {/* RIGHT IMAGE */}
-            <div className="absolute right-0 -bottom-50 top-0 flex items-center pr-6">
+            <div className="absolute right-0 -bottom-50 top-0 flex items-center pr-6 pointer-events-none">
 
-                <div className="relative w-55 h-[460px] -rotate-18 rounded-[40px] overflow-hidden bg-muted/50">
+                <div className="relative w-55 h-[460px] -rotate-18 rounded-[40px] overflow-hidden bg-muted/50 shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
                     <Image
                         src={imageUrl}
                         alt="Loyalty Preview"
