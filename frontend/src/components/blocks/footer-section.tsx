@@ -27,11 +27,10 @@ const footerLinks: FooterSection[] = [
 	{
 		label: 'Policy',
 		links: [
-			{ title: 'Terms & Conditions', href: '/terms-and-conditions' },
-			{ title: 'About Us', href: '/about' },
-			{ title: 'Privacy Policy', href: '/privacy-policy' },
-			{ title: 'Data Protection Policy', href: '/data-protection-policy' },
-			{ title: 'Refund Policy', href: '/refund-policy' },
+			{ title: 'Terms & Conditions', href: '/policy/terms-and-conditions' },
+			{ title: 'Privacy Policy', href: '/policy/privacy-policy' },
+			{ title: 'Data Protection Policy', href: '/policy/data-protection-policy' },
+			{ title: 'Refund Policy', href: '/policy/refund-policy' },
 		],
 	},
 	// {
