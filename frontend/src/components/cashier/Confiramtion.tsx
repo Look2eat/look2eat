@@ -14,7 +14,7 @@ import {
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-purchaseAmount: string;
+  purchaseAmount: string;
   customerName: string;
   onConfirm: () => void;
   color?: string;
@@ -23,7 +23,7 @@ purchaseAmount: string;
 export default function RedeemConfirmationModal({
   open,
   onOpenChange,
-    purchaseAmount,
+  purchaseAmount,
   customerName,
   onConfirm,
   color = "bg-[#322424]",
@@ -54,7 +54,7 @@ export default function RedeemConfirmationModal({
 
             <DialogDescription className="text-neutral-700 text-lg mt-2">
               <strong>{customerName}</strong> has successfully earned{" "}
-                <strong>{Math.floor(parseInt(purchaseAmount)/ 10)} PTS!</strong>
+              <strong>{Math.floor(parseInt(purchaseAmount) / 10)} PTS!</strong>
             </DialogDescription>
           </DialogHeader>
 
@@ -69,7 +69,7 @@ export default function RedeemConfirmationModal({
             <p className="text-sm">{rewardName}</p>
           </div> */}
 
-          <DialogClose asChild>
+          <DialogClose>
             <Button
               className={cn(color, "hover:bg-[#3b2a26] border-0 w-full")}
               onClick={() => {

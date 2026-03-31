@@ -143,7 +143,7 @@ export default function RedeemOtpModal({
 
                 {isValid ? (
                     <div className="text-center">
-                        <DialogClose asChild>
+                        <DialogClose >
                             <Button className={cn(color, "hover:bg-[#3b2a26] border-0")}
                                 ref={closeButtonRef}
                                 onClick={() => {
