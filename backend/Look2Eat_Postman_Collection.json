@@ -1,0 +1,403 @@
+{
+  "info": {
+    "name": "Look2Eat Unified API",
+    "description": "Updated collection with only the 10 required endpoints for Admin-as-Cashier flow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Look2Eat Unified Flow",
+      "description": "The single folder containing all 10 required endpoints.",
+      "item": [
+        {
+          "name": "1. Register Owner",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"brandName\": \"Pizza Palace\", \"slug\": \"pizza-palace\", \"name\": \"Rajendra Kumar\", \"email\": \"owner@look2eat.com\", \"password\": \"SecurePass123!\", \"phone\": \"9876543210\"}"
+            },
+            "description": "Register a new owner account. Required fields: brandName, slug (lowercase-letters-numbers-hyphens), name, email, password (min 8 chars), phone (10-15 digits). Save the ownerId from response.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/register-owner",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register-owner"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Login (Admin/Cashier)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"phone\": \"9876543210\", \"password\": \"SecurePass123!\"}"
+            },
+            "description": "Login to get JWT token. Save as jwt_token in environment variables.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.token) {",
+                  "    pm.environment.set(\"jwt_token\", jsonData.token);",
+                  "    pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
+                  "}",
+                  "if (jsonData.user && jsonData.user.brandId) {",
+                  "    pm.environment.set(\"brandId\", jsonData.user.brandId);",
+                  "    pm.collectionVariables.set(\"brandId\", jsonData.user.brandId);",
+                  "}",
+                  "if (jsonData.data && jsonData.data.user && jsonData.data.user.brandId) {",
+                  "    pm.collectionVariables.set(\"brandId\", jsonData.data.user.brandId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "3. Set Coin Ratio",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"brandId\": \"{{brandId}}\", \"coinRatioValue\": 0.5}"
+            },
+            "description": "Set how many coins customers earn per rupee spent. Example: 0.5 means 1 rupee = 0.5 coins. Uses brandId (NOT outletId)",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/brands/coin-ratio",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "brands",
+                "coin-ratio"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Create Reward Milestone",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"brandId\": \"{{brandId}}\", \"name\": \"20 Cashback\", \"coinsRequired\": 200, \"cashbackAmount\": 20}"
+            },
+            "description": "Create a reward tier. Example: 200 coins = 20 rupees cashback. Save milestoneId. Uses brandId (NOT outletId)",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/milestones",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "milestones"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set(\"milestoneId\", jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "5. Dashboard KPIs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "Get dashboard KPIs and graph metrics",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/dashboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "brands",
+                "{{brandId}}",
+                "dashboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "6. Customer Lookup",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "description": "PROTECTED ENDPOINT - Requires cashier JWT token. Get customer wallet balance and available rewards.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/customer/9123456789?brandId={{brandId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cashier",
+                "customer",
+                "9123456789"
+              ],
+              "query": [
+                {
+                  "key": "brandId",
+                  "value": "{{brandId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "7. Process Purchase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"brandId\": \"{{brandId}}\", \"purchaseAmount\": 100}"
+            },
+            "description": "PROTECTED ENDPOINT - Process a customer purchase. Coins calculated = purchaseAmount * coinRatio. Customer receives WhatsApp notification.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/transaction/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cashier",
+                "transaction",
+                "purchase"
+              ]
+            }
+          }
+        },
+        {
+          "name": "8. Request OTP (For Redemption)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"brandId\": \"{{brandId}}\"}"
+            },
+            "description": "PUBLIC ENDPOINT - Cashier requests OTP for customer. Customer phone must start with country code digit. OTP will be sent to customer via WhatsApp.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/request-customer-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cashier",
+                "request-customer-otp"
+              ]
+            }
+          }
+        },
+        {
+          "name": "9. Verify OTP (For Redemption)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"otp\": \"123456\", \"brandId\": \"{{brandId}}\"}"
+            },
+            "description": "PUBLIC ENDPOINT - Verify customer OTP. Replace OTP with the one received by customer on WhatsApp.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/verify-customer-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cashier",
+                "verify-customer-otp"
+              ]
+            }
+          }
+        },
+        {
+          "name": "10. Process Redemption",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"brandId\": \"{{brandId}}\", \"milestoneId\": \"{{milestoneId}}\", \"purchaseAmount\": 80}"
+            },
+            "description": "PROTECTED ENDPOINT - Customer redeems coins for cashback. Coins deducted and cashback applied. Customer receives WhatsApp notification.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/transaction/redeem",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cashier",
+                "transaction",
+                "redeem"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "brandId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "outletId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cashierJwt",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cashierId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "tempPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "milestoneId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

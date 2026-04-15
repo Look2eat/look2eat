@@ -11,8 +11,20 @@ export interface AuthPayload {
   outletId?: string;
 }
 
+export interface CashierAuthPayload {
+  cashierId: string;
+  phoneNumber: string;
+  outletId: string;
+  brandId: string;
+  name: string;
+}
+
 export interface AuthRequest extends Request {
   auth: AuthPayload;
+}
+
+export interface CashierAuthRequest extends Request {
+  cashierAuth: CashierAuthPayload;
 }
 
 export function authenticateJwt(req: Request, res: Response, next: NextFunction) {
@@ -51,4 +63,36 @@ export function requireOutletScope(req: Request, res: Response, next: NextFuncti
     throw new AppError("Outlet scope is required", 403);
   }
   next();
+}
+
+export function authenticateCashierJwt(req: Request, res: Response, next: NextFunction) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    throw new AppError("Missing authorization token", 401);
+  }
+
+  const token = authHeader.split(" ")[1];
+  const secret = process.env.JWT_SECRET;
+  if (!secret) throw new AppError("JWT_SECRET is not set", 500);
+
+  try {
+    const payload = jwt.verify(token, secret) as any;
+
+    if (payload.role && payload.role === Role.OWNER) {
+      (req as CashierAuthRequest).cashierAuth = {
+        cashierId: payload.sub,
+        phoneNumber: payload.phoneNumber || "ADMIN",
+        outletId: "ADMIN_OUTLET", 
+        brandId: payload.brandId,
+        name: payload.name || "Admin",
+      };
+    } else {
+
+      (req as CashierAuthRequest).cashierAuth = payload as CashierAuthPayload;
+    }
+
+    next();
+  } catch (err) {
+    throw new AppError("Invalid or expired token", 401);
+  }
 }

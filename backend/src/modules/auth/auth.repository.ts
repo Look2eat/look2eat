@@ -7,6 +7,11 @@ export const authRepository = {
       where: { email },
     }),
 
+  findByPhoneNumber: (phoneNumber: string) =>
+    prisma.adminUser.findFirst({
+      where: { phoneNumber },
+    }),
+
   findBrandBySlug: (slug: string) =>
     prisma.brand.findUnique({
       where: { slug },

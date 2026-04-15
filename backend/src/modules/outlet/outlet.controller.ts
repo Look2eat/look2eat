@@ -6,7 +6,7 @@ export const outletController = {
   async createOutlet(req: Request, res: Response) {
     const { name, address, phoneNumber } = req.body;
     const authReq = req as AuthRequest;
-    
+
     const brandId = authReq.auth.brandId; 
 
     const outlet = await outletService.createOutlet(brandId, {

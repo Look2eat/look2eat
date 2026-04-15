@@ -15,6 +15,11 @@ async function main() {
 
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
+
+    import("./modules/cashier/reminder.job").then(({ startReminderJob }) => {
+      startReminderJob();
+      console.log('22-hour reminder background job started.');
+    });
   });
 }
 

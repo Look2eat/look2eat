@@ -31,6 +31,10 @@ model Brand {
 
   users             AdminUser[]
   outlets           Outlet[]
+  settings          BrandSettings?
+  rewardMilestones  RewardMilestone[]
+  coinWallets       CoinWallet[]
+  whatsappMessages  WhatsAppMessage[]
 }
 
 model AdminUser {
@@ -62,11 +66,171 @@ model Outlet {
   updatedAt    DateTime @updatedAt
 
   brand        Brand    @relation(fields: [brandId], references: [id])
+  cashiers     Cashier[]
 }
 
+// Cashier login credentials
+model Cashier {
+  id              String   @id @default(uuid())
+  outletId        String
+  phoneNumber     String
+  name            String
+  passwordHash    String  // Hashed password for login
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  outlet          Outlet   @relation(fields: [outletId], references: [id], onDelete: Cascade)
+  sessions        CashierSession[]
+
+  @@unique([outletId, phoneNumber])
+}
+
+// Cashier session & OTP management
+model CashierSession {
+  id              String   @id @default(uuid())
+  cashierId       String
+  otp             String
+  otpExpiresAt    DateTime // 15 minutes from creation
+  verifiedAt      DateTime?
+  lastActivityAt  DateTime @default(now())
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  cashier         Cashier  @relation(fields: [cashierId], references: [id], onDelete: Cascade)
+
+  @@index([cashierId, isActive])
+}
+
+// Customer OTP session for phone verification
+model CustomerOTPSession {
+  id              String   @id @default(uuid())
+  brandId         String
+  phoneNumber     String
+  otp             String
+  expiresAt       DateTime // 15 minutes from creation
+  verified        Boolean  @default(false)
+  verifiedAt      DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([brandId, phoneNumber, verified])
+}
+
+// Brand settings (coin ratio, expiry dates)
+model BrandSettings {
+  id              String   @id @default(uuid())
+  brandId         String   @unique
+  coinRatioValue  Float    @default(1.0) // 1 rupee = X coins
+  pilotStartDate  DateTime?
+  pilotEndDate    DateTime? // 19 April afternoon for pilot
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+// Reward milestones (e.g., 200 coins = 50 rs cashback)
+model RewardMilestone {
+  id              String   @id @default(uuid())
+  brandId         String
+  name            String
+  coinsRequired   Int
+  cashbackAmount  Int    // in rupees
+  isActive        Boolean @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+}
+
+// Customer coin wallet per brand
+model CoinWallet {
+  id              String   @id @default(uuid())
+  brandId         String
+  phoneNumber     String
+  currentCoins    Int      @default(0)
+  totalCoinsEarned Int    @default(0)
+  expiryDate      DateTime? // When coins expire (19 April in pilot)
+  isActive        Boolean  @default(true)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  transactions    Transaction[]
+
+  @@unique([brandId, phoneNumber])
+  @@index([brandId, isActive])
+}
+
+// All transactions (purchases and redemptions)
+model Transaction {
+  id              String   @id @default(uuid())
+  walletId        String
+  type            TransactionType // PURCHASE or REDEMPTION
+  purchaseAmount  Int? // in rupees (for purchase)
+  coinsEarned     Int? // coins earned from purchase
+  coinsRedeemed   Int? // coins used for redemption
+  cashbackApplied Int? // cashback in rupees
+  milestoneId     String? // which milestone was redeemed
+  cashierPhoneNumber String? // which cashier made the transaction
+  whatsappSent    Boolean  @default(false)
+  whatsappError   String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  wallet          CoinWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt])
+  @@index([type])
+}
+
+// WhatsApp message logs
+model WhatsAppMessage {
+  id              String   @id @default(uuid())
+  brandId         String
+  phoneNumber     String
+  templateName    String
+  variables       String   @db.Text // JSON stringified variables
+  status          MessageStatus @default(PENDING)
+  messageId       String?
+  errorMessage    String?
+  sentAt          DateTime?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId, status])
+  @@index([phoneNumber, status])
+}
 
 enum Role {
   OWNER
   OUTLET_MANAGER
   CASHIER
+}
+
+enum TransactionType {
+  PURCHASE
+  REDEMPTION
+}
+
+enum MessageStatus {
+  PENDING
+  SENT
+  FAILED
+  FAILED_INVALID_NUMBER
 }

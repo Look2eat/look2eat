@@ -4,6 +4,8 @@ import cors from "cors";
 import morgan from "morgan";
 import { authRouter } from "./modules/auth/auth.routes";
 import { outletRouter } from "./modules/outlet/outlet.routes";
+import { adminRouter } from "./modules/admin/admin.routes";
+import { cashierRouter } from "./modules/cashier/cashier.routes";
 import { errorHandler } from "./common/middleware/errorHandler.middleware";
 
 export function createApp(): Express {
@@ -19,6 +21,8 @@ export function createApp(): Express {
 
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/outlets", outletRouter);
+  app.use("/api/v1/admin", adminRouter);
+  app.use("/api/v1/cashier", cashierRouter);
 
   app.get("/debug", (_req, res) => res.json({
     databaseUrl: process.env.DATABASE_URL ? "SET" : "NOT SET",

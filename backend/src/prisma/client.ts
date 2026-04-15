@@ -1,5 +1,3 @@
-/// <reference types="node" />
-
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";

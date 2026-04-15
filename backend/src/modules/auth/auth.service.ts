@@ -22,7 +22,7 @@ export const authService = {
     if (existingBrand) throw new AppError("Brand slug already in use", 409);
 
     const passwordHash = await bcrypt.hash(input.password, SALT_ROUNDS);
-    
+
     return authRepository.createBrandAndOwner({
       brandName: input.brandName,
       slug: input.slug,
@@ -33,8 +33,8 @@ export const authService = {
     });
   },
 
-  async login(email: string, password: string) {
-    const user = await authRepository.findByEmail(email);
+  async login(phone: string, password: string) {
+    const user = await authRepository.findByPhoneNumber(phone);
     if (!user) throw new AppError("Invalid credentials", 401);
 
     const match = await bcrypt.compare(password, user.passwordHash);
@@ -45,6 +45,8 @@ export const authService = {
       email: user.email,
       role: user.role,
       brandId: user.brandId,
+      phoneNumber: user.phoneNumber,
+      name: user.name,
     });
 
     return { token, user };
@@ -55,6 +57,8 @@ export const authService = {
     email: string;
     role: Role;
     brandId?: string | null;
+    phoneNumber?: string;
+    name?: string;
   }) {
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new AppError("JWT_SECRET is not set", 500);

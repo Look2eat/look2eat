@@ -7,7 +7,7 @@ export const authController = {
       console.log('Register owner request:', req.body);
       const { brandName, slug, name, email, password, phone } = req.body;
       console.log('Calling authService.registerOwner with:', { brandName, slug, name, email, password: '[HIDDEN]', phone });
-      
+
       const { brand, owner } = await authService.registerOwner({
         brandName,
         slug,
@@ -16,11 +16,11 @@ export const authController = {
         password,
         phone,
       });
-      
+
       console.log('Brand and Owner created successfully:', { brandId: brand.id, ownerId: owner.id });
-      
+
       const { passwordHash, ...ownerWithoutPassword } = owner;
-      
+
       res.status(201).json({ 
         data: { 
           brand, 
@@ -34,11 +34,11 @@ export const authController = {
   },
 
   async login(req: Request, res: Response) {
-    const { email, password } = req.body;
-    const { token, user } = await authService.login(email, password);
-    
+    const { phone, password } = req.body;
+    const { token, user } = await authService.login(phone, password);
+
     const { passwordHash, ...userWithoutPassword } = user;
-    
+
     res.json({ token, user: userWithoutPassword });
   },
 };
