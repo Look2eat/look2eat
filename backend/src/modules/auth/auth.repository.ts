@@ -1,5 +1,5 @@
 import { prisma } from "../../prisma/client";
-import { Role } from "../../generated/prisma/enums";
+import { Role } from "@prisma/client";
 
 export const authRepository = {
   findByEmail: (email: string) =>

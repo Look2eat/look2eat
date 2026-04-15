@@ -3,7 +3,7 @@ import { outletController } from "./outlet.controller";
 import { validateRequest } from "../../common/middleware/validation.middleware";
 import { authenticateJwt, authorizeRoles } from "../../common/middleware/auth.middleware";
 import { createOutletSchema } from "./outlet.validation";
-import { Role } from "../../generated/prisma/enums";
+import { Role } from "@prisma/client";
 
 export const outletRouter = Router();
 

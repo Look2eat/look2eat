@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { AppError } from "../../common/errors/AppError";
 import { authRepository } from "./auth.repository";
-import { Role } from "../../generated/prisma/enums";
+import { Role } from "@prisma/client";
 
 const SALT_ROUNDS = 10;
 

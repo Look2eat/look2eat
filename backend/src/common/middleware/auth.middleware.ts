@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { AppError } from "../errors/AppError";
-import { Role } from "../../generated/prisma/enums";
+import { Role } from "@prisma/client";
 
 export interface AuthPayload {
   sub: string;
