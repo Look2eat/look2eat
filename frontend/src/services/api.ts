@@ -36,20 +36,20 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
 }
 
 export const adminLogin = async (phoneNumber: string, password: string, fcmToken?: string) => {
-  return fetchApi<any>('/auth/login', {
+  return fetchApi<unknown>('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ phoneNumber, password, fcmToken }),
   });
 };
 
 export const getDashboardKpis = async (brandId: string) => {
-  return fetchApi<any>(`/admin/brands/${brandId}/dashboard`, {
+  return fetchApi<unknown>(`/admin/brands/${brandId}/dashboard`, {
     method: 'GET',
   });
 };
 
 export const lookupCustomer = async (customerPhoneNumber: string, brandId: string) => {
-  return fetchApi<any>(`/cashier/customer/${customerPhoneNumber}?brandId=${brandId}`, {
+  return fetchApi<unknown>(`/cashier/customer/${customerPhoneNumber}?brandId=${brandId}`, {
     method: 'GET',
   });
 };
@@ -59,14 +59,14 @@ export const processStandardPurchase = async (
   brandId: string, 
   purchaseAmount: number
 ) => {
-  return fetchApi<any>('/cashier/transaction/purchase', {
+  return fetchApi<unknown>('/cashier/transaction/purchase', {
     method: 'POST',
     body: JSON.stringify({ customerPhoneNumber, brandId, purchaseAmount }),
   });
 };
 
 export const requestCustomerOtp = async (customerPhoneNumber: string, brandId: string) => {
-  return fetchApi<any>('/cashier/request-customer-otp', {
+  return fetchApi<unknown>('/cashier/request-customer-otp', {
     method: 'POST',
     body: JSON.stringify({ customerPhoneNumber, brandId }),
   });
@@ -77,7 +77,7 @@ export const verifyCustomerOtp = async (
   brandId: string, 
   otp: string
 ) => {
-  return fetchApi<any>('/cashier/verify-customer-otp', {
+  return fetchApi<unknown>('/cashier/verify-customer-otp', {
     method: 'POST',
     body: JSON.stringify({ customerPhoneNumber, brandId, otp }),
   });
@@ -89,7 +89,7 @@ export const processRedemption = async (
   milestoneId: string, 
   purchaseAmount: number
 ) => {
-  return fetchApi<any>('/cashier/transaction/redeem', {
+  return fetchApi<unknown>('/cashier/transaction/redeem', {
     method: 'POST',
     body: JSON.stringify({ customerPhoneNumber, brandId, milestoneId, purchaseAmount }),
   });
