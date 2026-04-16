@@ -53,8 +53,22 @@ export default function DashboardGrid({ stats }: Props) {
                         className="h-40"
                     />
                 </div>
+                <div className="grid grid-cols-2 gap-6">
 
-                <MonthlyAvgSales sales={sales} />
+                    <StatCard
+                        title="Avg Feedback"
+                        value={`${stats.avgFeedback} ⭐`}
+                        className="h-40"
+                    />
+
+                    <StatCard
+                        title="Redemption Rate"
+                        value={`${stats.redemptionRate}%`}
+                        className="h-40"
+                    />
+
+                </div>
+                {/* <MonthlyAvgSales sales={sales} /> */}
 
             </div>
 
@@ -71,7 +85,7 @@ export default function DashboardGrid({ stats }: Props) {
                     data={repeat}
                 />
 
-                <div className="grid grid-cols-2 gap-6">
+                {/* <div className="grid grid-cols-2 gap-6">
 
                     <StatCard
                         title="Avg Feedback"
@@ -85,7 +99,7 @@ export default function DashboardGrid({ stats }: Props) {
                         className="h-40"
                     />
 
-                </div>
+                </div> */}
 
             </div>
 

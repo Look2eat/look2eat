@@ -27,13 +27,13 @@ export default function CustomerRepeatRateCard({ data }: Props) {
         data.visit6plus
 
     return (
-        <div className="p-6 rounded-2xl bg-muted/60 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1] h-70 flex flex-col gap-6">
+        <div className="p-6 rounded-2xl bg-muted/60 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1] h-86 flex flex-col gap-10">
 
-            <h3 className="text-md font-bold">
+            <h3 className="text-md font-bold  tracking-wide uppercase">
                 Customer Repeat Rate
             </h3>
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-10">
 
                 {rows.map((row) => {
 

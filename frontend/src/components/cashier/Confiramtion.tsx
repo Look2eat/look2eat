@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useEffect, useRef } from "react";
 
 interface Props {
   open: boolean;
@@ -28,6 +29,21 @@ export default function RedeemConfirmationModal({
   onConfirm,
   color = "bg-[#322424]",
 }: Props) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (open && videoRef.current) {
+      videoRef.current.currentTime = 0;
+
+      const playPromise = videoRef.current.play();
+
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // autoplay might fail silently on some devices
+        });
+      }
+    }
+  }, [open]);
   return (
     <Dialog
       open={open}
@@ -48,7 +64,20 @@ export default function RedeemConfirmationModal({
     overflow-y-auto">
         <div className="flex flex-col items-center gap-4 text-center">
           <DialogHeader>
+            <div className="flex flex-col items-center"><video
+              key={open ? "open" : "closed"}
+              ref={videoRef}
+              muted
+              playsInline
+              autoPlay
+              className="w-40 h-40"
+            >
+              <source src="/success.webm" type="video/webm" />
+              <source src="/success.mp4" type="video/mp4" />
+            </video>
+            </div>
             <DialogTitle className="text-2xl font-bold text-center dark:text-black">
+
               Congratulations 🎉
             </DialogTitle>
 
@@ -71,7 +100,7 @@ export default function RedeemConfirmationModal({
 
           <DialogClose>
             <Button
-              className={cn(color, "hover:bg-[#3b2a26] border-0 w-full")}
+              className={cn(color, "hover:bg-[#3b2a26] border-0 w-full p-4 py-6 font-semibold ")}
               onClick={() => {
                 onConfirm();
                 onOpenChange(false);

@@ -42,6 +42,14 @@ export default function RedeemOtpModal({
     const [redirecting, setRedirecting] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
+    const videoRef = useRef<HTMLVideoElement>(null);
+
+    useEffect(() => {
+        if (isValid && videoRef.current) {
+            videoRef.current.currentTime = 0;
+            videoRef.current.play();
+        }
+    }, [isValid]);
 
     useEffect(() => {
         if (isValid) {
@@ -105,7 +113,16 @@ export default function RedeemOtpModal({
 
                     <DialogHeader>
                         <DialogTitle className="text-center text-2xl font-bold dark:text-black">
-                            {isValid ? <p className="p-2 pb-4">Congratulations 🎉</p> : "Redeem Reward"}
+                            {isValid ? <div className="flex flex-col items-center gap-2 ">
+                                <video
+                                    ref={videoRef}
+                                    muted
+                                    playsInline
+                                    className="w-40 h-40"
+                                >
+                                    <source src="/success.webm" type="video/webm" />
+                                    <source src="/success.mp4" type="video/mp4" />
+                                </video><p className="p-2 pb-4">Congratulations 🎉</p></div> : "Redeem Reward"}
                         </DialogTitle>
 
                         <DialogDescription className="text-center text-neutral-700 text-xl">
@@ -135,7 +152,7 @@ export default function RedeemOtpModal({
 
                 {/* Reward Info */}
                 {!isValid && (
-                    <div className={cn("p-4 rounded-xl text-center text-white", color)}>
+                    <div className={cn("p-4 rounded-xl text-center text-white mb-6", color)}>
                         {rewardPoints !== 0 && <p className="font-bold text-md">{rewardPoints} PTS</p>}
                         <p className="text-sm">{rewardName}</p>
                     </div>
@@ -144,7 +161,7 @@ export default function RedeemOtpModal({
                 {isValid ? (
                     <div className="text-center">
                         <DialogClose >
-                            <Button className={cn(color, "hover:bg-[#3b2a26] border-0")}
+                            <Button className={cn(color, "hover:bg-[#3b2a26] border-0 p-4 py-6 font-semibold ")}
                                 ref={closeButtonRef}
                                 onClick={() => {
 
@@ -203,7 +220,7 @@ function Slot(props: SlotProps) {
     return (
         <div
             className={cn(
-                "flex size-10 items-center justify-center rounded-lg border border-input bg-background font-medium text-foreground shadow-[0_0_20px_rgba(0,0,0,0.10)] transition-shadow dark:bg-white dark:text-black",
+                "flex size-10 items-center justify-center rounded-lg border border-neutral-300 bg-background font-medium text-foreground shadow-[0_0_20px_rgba(0,0,0,0.10)] transition-shadow dark:bg-white dark:text-black",
                 { "ring-2 ring-ring": props.isActive }
             )}
         >

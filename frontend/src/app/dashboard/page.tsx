@@ -46,22 +46,22 @@ export default function DashboardPage() {
           {/* RIGHT COLUMN */}
           <div className="flex flex-col gap-6">
 
-            <Skeleton className="h-65 rounded-2xl" />
+            <Skeleton className="h-86 rounded-2xl" />
 
-            <div className="grid grid-cols-2 gap-6">
+            {/* <div className="grid grid-cols-2 gap-6">
               <Skeleton className="h-40 rounded-2xl" />
               <Skeleton className="h-40 rounded-2xl" />
-            </div>
+            </div> */}
 
           </div>
 
         </div>
 
         {/* Loyalty + Feedback Cards */}
-        <div className="grid grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-2 gap-6">
           <Skeleton className="h-[300px] rounded-2xl" />
           <Skeleton className="h-[300px] rounded-2xl" />
-        </div>
+        </div> */}
 
       </div>
     )
@@ -72,7 +72,7 @@ export default function DashboardPage() {
 
 
       <DashboardGrid stats={stats} />
-      <LoyaltyCard
+      {/* <LoyaltyCard
         pointsRedeemed={5900}
         pointsEarned={1200}
         profileComplete={60}
@@ -85,7 +85,7 @@ export default function DashboardPage() {
         averageRating={1.5}
         positiveFeedback={80}
         negativeFeedback={10}
-      />
+      /> */}
     </div>
   )
 }

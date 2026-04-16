@@ -17,8 +17,6 @@ export default function CustomerForm({ customer, onSuccess }: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleConfirm = () => {
-    console.log("Next customer...");
-    // reset form / clear state here if needed
     onSuccess();
   };
 

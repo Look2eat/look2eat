@@ -53,7 +53,7 @@ export default function BillAmountModal({
     top-[10%] sm:top-1/2
     translate-y-0 sm:-translate-y-1/2
     max-h-[90vh]
-    overflow-y-auto">
+    overflow-y-auto p-6 pt-0">
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold dark:bg-white dark:text-black">
             Enter Bill Amount
@@ -89,7 +89,7 @@ export default function BillAmountModal({
 
 
           <Button
-            className={cn(color, "w-full hover:bg-[#3b2a26] border-0")}
+            className={cn(color, "w-full hover:bg-[#3b2a26] border-0 p-4 py-6 font-semibold")}
             onClick={handleContinue}
             disabled={!amount}
           >

@@ -185,14 +185,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Look2Eat</span>
-                  <span className="truncate text-xs">Enterprise</span>
+                  <span className="truncate font-medium">Zuplin</span>
+                  <span className="truncate text-xs">Enterprise Plan</span>
                 </div>
               </a>
             </SidebarMenuButton>
             <SidebarMenuItem>
               <SidebarMenuButton asChild className="my-2 h-11 rounded-xl px-4 py-3">
-                <button className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full " onClick={() => { router.push("dashboard/cashierPortal"); }}>
+                <button className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full " onClick={() => { router.push("cashierPortal"); }}>
                   <IndianRupee className="w-4 h-4" />
                   <span>Cashier Portal</span>
                 </button>
@@ -217,7 +217,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-          <SidebarMenuItem>
+          {/* <SidebarMenuItem>
             <SidebarMenuButton
               asChild
               isActive={pathname === "/dashboard/loyalty"}
@@ -257,7 +257,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
 
 
-          </SidebarMenuItem>
+          </SidebarMenuItem> */}
 
         </SidebarMenu>
 
