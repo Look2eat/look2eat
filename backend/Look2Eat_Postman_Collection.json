@@ -364,6 +364,70 @@
               ]
             }
           }
+        },
+        {
+          "name": "11. Upload Brand Images (Cloudinary)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{jwt_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": []
+                },
+                {
+                  "key": "banner",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "description": "Upload Brand Banner and Logo direct to Cloudinary. Must be sent as multipart/form-data. Key names must be 'logo' and 'banner'.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/images",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "admin",
+                "brands",
+                "{{brandId}}",
+                "images"
+              ]
+            }
+          }
+        },
+        {
+          "name": "12. Get Public Loyalty Page Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Token-less Public API endpoint serving the WebApp Whatsapp View. Replace the slug (e.g. 'mcdonalds') and customer walletId in the URL parameters.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/loyalty/YOUR-SLUG-HERE/YOUR-WALLET-ID-HERE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "loyalty",
+                "YOUR-SLUG-HERE",
+                "YOUR-WALLET-ID-HERE"
+              ]
+            }
+          }
         }
       ]
     }

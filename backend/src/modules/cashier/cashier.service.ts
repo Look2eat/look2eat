@@ -109,6 +109,7 @@ export class CashierService {
 
     return {
       customerPhoneNumber,
+      walletId: wallet.id,
       walletBalance: wallet.currentCoins,
       coinsExpiry: wallet.expiryDate,
       isNewCustomer: isNew,
