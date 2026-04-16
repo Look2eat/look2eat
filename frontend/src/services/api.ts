@@ -108,14 +108,23 @@ export const lookupCustomer = async (
   );
 };
 
+export interface StandardPurchaseResponse {
+  success: boolean;
+  data: {
+    coinsEarned: number;
+    // add other fields if needed
+  };
+}
+
+// Update processStandardPurchase return type
 export const processStandardPurchase = async (
-  customerPhoneNumber: string, 
-  brandId: string, 
-  purchaseAmount: number
-) => {
-  return fetchApi<unknown>('/cashier/transaction/purchase', {
+  customerPhone: string,
+  brandId: string,
+  amount: number
+): Promise<StandardPurchaseResponse> => {
+  return fetchApi<StandardPurchaseResponse>('/cashier/transaction/purchase', {
     method: 'POST',
-    body: JSON.stringify({ customerPhoneNumber, brandId, purchaseAmount }),
+    body: JSON.stringify({ customerPhone, brandId, amount }),
   });
 };
 
@@ -137,14 +146,31 @@ export const verifyCustomerOtp = async (
   });
 };
 
+// In @/services/api.ts — add this interface
+export interface RedemptionResponse {
+  success: boolean;
+  message: string;
+  data: {
+    redemptionTransactionId: string;
+    purchaseTransactionId: string;
+    coinsRedeemed: number;
+    cashbackApplied: number;
+    purchaseAmount: number;
+    coinsEarned: number;
+    remainingCoins: number;
+    timestamp: string;
+  };
+}
+
+// Update processRedemption return type
 export const processRedemption = async (
-  customerPhoneNumber: string, 
-  brandId: string, 
-  milestoneId: string, 
-  purchaseAmount: number
-) => {
-  return fetchApi<unknown>('/cashier/transaction/redeem', {
+  customerPhone: string,
+  brandId: string,
+  milestoneId: string,
+  amount: number
+): Promise<RedemptionResponse> => {
+  return fetchApi<RedemptionResponse>('/cashier/transaction/redeem', {
     method: 'POST',
-    body: JSON.stringify({ customerPhoneNumber, brandId, milestoneId, purchaseAmount }),
+    body: JSON.stringify({ customerPhone, brandId, milestoneId, purchaseAmount: amount }),
   });
 };
