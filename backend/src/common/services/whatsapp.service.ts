@@ -239,9 +239,7 @@ export const whatsappService = {
     brandId: string,
     isFirstPurchase: boolean = false
   ) {
-    const templateName = isFirstPurchase
-      ? process.env.WHATSAPP_TEMPLATE_FIRST_PURCHASE!
-      : process.env.WHATSAPP_TEMPLATE_PURCHASE!;
+    const templateName = process.env.WHATSAPP_TEMPLATE_FIRST_PURCHASE!;
 
     return whatsappService.sendMessage(
       {
