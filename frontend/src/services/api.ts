@@ -7,7 +7,24 @@ const getToken = (): string | null => {
   return null;
 };
 
-
+export interface DashboardKpis {
+  data: {
+    kpis: {
+      totalSales: number;
+      totalRewardRedeemed: number;
+      redemptionRate: number;
+      totalPointsIssued: number;
+    };
+    graph: {
+      customerReturnRate: {
+        visit1Time: number;
+        visit2Times: number;
+        visit3To5Times: number;
+        visit6PlusTimes: number;
+      };
+    };
+  };
+}
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const token = getToken();
   
@@ -42,16 +59,53 @@ export const adminLogin = async (phoneNumber: string, password: string, fcmToken
   });
 };
 
-export const getDashboardKpis = async (brandId: string) => {
-  return fetchApi<unknown>(`/admin/brands/${brandId}/dashboard`, {
+export const getDashboardKpis = async (brandId: string): Promise<DashboardKpis> => {
+  return fetchApi<DashboardKpis>(`/admin/brands/${brandId}/dashboard`, {
     method: 'GET',
   });
 };
 
-export const lookupCustomer = async (customerPhoneNumber: string, brandId: string) => {
-  return fetchApi<unknown>(`/cashier/customer/${customerPhoneNumber}?brandId=${brandId}`, {
-    method: 'GET',
-  });
+export interface CustomerInfoResponse {
+  success: boolean;
+  data: {
+    isNewCustomer: boolean;
+    customerPhoneNumber: string;
+    walletBalance: number;
+    coinsExpiry: string;
+    name?: string;
+    nextMilestone?: {
+      coinsRequired: number;
+      cashbackAmount: number;
+      coinsNeeded: number;
+    };
+    allMilestones: {
+      id: string;
+      brandId: string;
+      name: string;
+      coinsRequired: number;
+      cashbackAmount: number;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+    }[];
+    promotionalRewards?: {
+      id: string;
+      description: string;
+      expiry: string;
+    }[];
+    lastVisit?: string;
+    negativeReview?: boolean;
+  };
+}
+
+export const lookupCustomer = async (
+  customerPhoneNumber: string,
+  brandId: string
+): Promise<CustomerInfoResponse> => {
+  return fetchApi<CustomerInfoResponse>(
+    `/cashier/customer/${customerPhoneNumber}?brandId=${brandId}`,
+    { method: 'GET' }
+  );
 };
 
 export const processStandardPurchase = async (

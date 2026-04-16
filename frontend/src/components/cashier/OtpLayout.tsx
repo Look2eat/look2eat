@@ -13,6 +13,7 @@ import {
 import { OTPInput, SlotProps } from "input-otp";
 import { useEffect, useRef, useState } from "react";
 import { hover } from "framer-motion";
+import { processRedemption, verifyCustomerOtp } from "@/services/api";
 
 interface Props {
     open: boolean;
@@ -20,12 +21,17 @@ interface Props {
     rewardName: string;
     rewardPoints: number;
     name: string
-    onConfirm: () => void;
+
     color?: string;
     billAmount: string;
+    customerPhone: string;
+    brandId: string;
+    milestoneId: string;
+    onConfirm: (coinsEarned: number) => void; // ← add coinsEarned
+
 }
 
-const MOCK_OTP = "5678"; // 🔥 Replace with backend OTP later
+
 
 export default function RedeemOtpModal({
     open,
@@ -35,7 +41,10 @@ export default function RedeemOtpModal({
     onConfirm,
     name,
     color = "bg-[#322424]",
-    billAmount
+    billAmount,
+    customerPhone,
+    brandId,
+    milestoneId,
 }: Props) {
     const [value, setValue] = useState("");
     const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
@@ -43,6 +52,7 @@ export default function RedeemOtpModal({
     const inputRef = useRef<HTMLInputElement>(null);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const [coinsEarned, setCoinsEarned] = useState<number>(0);
 
     useEffect(() => {
         if (isValid && videoRef.current) {
@@ -65,19 +75,17 @@ export default function RedeemOtpModal({
     }, [open]);
     async function handleSubmit(code?: string) {
         const otp = code ?? value;
+        setIsValid(undefined);
 
-        inputRef.current?.select();
-        await new Promise((r) => setTimeout(r, 100));
-
-        const correct = otp === MOCK_OTP;
-        setIsValid(correct);
-
-        if (correct) {
-            if (redirecting) {
-                onConfirm();
-            } // 🔥 Deduct points here later
+        try {
+            await verifyCustomerOtp(customerPhone, brandId, otp);
+            setIsValid(true);
+            // immediately fire redemption
+            const redemptionRes = await processRedemption(customerPhone, brandId, milestoneId, Number(billAmount));
+            setCoinsEarned(redemptionRes.data.coinsEarned); // ← store it
+        } catch {
+            setIsValid(false);
         }
-
         setValue("");
     }
 
@@ -87,7 +95,7 @@ export default function RedeemOtpModal({
             onOpenChange={(nextOpen) => {
                 if (!nextOpen) {
                     if (isValid) {
-                        onConfirm();        // ← call confirm if OTP verified
+                        onConfirm(coinsEarned); // ← call confirm with coins earned
                     }
                     setIsValid(undefined);
                     setValue("");
@@ -140,7 +148,7 @@ export default function RedeemOtpModal({
                                     <br className="p-1" />
                                     Points Earned{" "}
                                     <strong>
-                                        {Math.floor(Number(billAmount || 0) / 10)}
+                                        {coinsEarned}
                                     </strong>
                                 </p>
                             ) : (
@@ -165,7 +173,7 @@ export default function RedeemOtpModal({
                                 ref={closeButtonRef}
                                 onClick={() => {
 
-                                    onConfirm();
+                                    onConfirm(coinsEarned);
                                     setIsValid(undefined);
                                     onOpenChange(false);
 

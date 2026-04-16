@@ -2,24 +2,24 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Customer } from "@/types/customer";
+import { lookupCustomer } from "@/services/api";
 
 interface Props {
   onCustomerSelect: (customer: Customer | null) => void;
   resetKey?: number;
+  brandId: string;
 }
 
-export default function CustomerLookup({ onCustomerSelect, resetKey }: Props) {
+export default function CustomerLookup({ onCustomerSelect, resetKey, brandId }: Props) {
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Customer | null>(null);
   const [notFound, setNotFound] = useState(false);
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
   useEffect(() => {
     setPhone("");
     setResult(null);
@@ -35,24 +35,43 @@ export default function CustomerLookup({ onCustomerSelect, resetKey }: Props) {
       return;
     }
 
-
     const timer = setTimeout(async () => {
       setLoading(true);
+      try {
+        const { data } = await lookupCustomer(phone, brandId);
 
-      // 🔥 Replace with real DB search
-      const mockCustomer =
-        phone.includes("9888032")
-          ? { name: "Avneet Singh", phone: "+91 9888032525", points: 640, negativeReview: true, expiryDate: "3 Aug, 2026", rewards: [] }
-          : null;
-
-      if (mockCustomer) {
-        setResult(mockCustomer);
-        setNotFound(false);
-      } else {
+        if (data.isNewCustomer) {
+          setResult(null);
+          setNotFound(true);
+        } else {
+          setResult({
+            name: data.name || "",
+            phone: data.customerPhoneNumber,
+            points: data.walletBalance || 0,
+            expiryDate: new Date(data.coinsExpiry).toLocaleDateString('en-IN', {
+              day: 'numeric', month: 'short', year: 'numeric'
+            }),
+            negativeReview: data.negativeReview || false,
+            lastVisit: data.lastVisit || "",
+            rewards: data.allMilestones
+              .filter((m) => m.isActive)
+              .map((m) => ({
+                id: m.id,
+                pointsRequired: m.coinsRequired,        // coinsRequired → pointsRequired
+                description: `₹${m.cashbackAmount} Cashback`,  // cashbackAmount → description
+              })),
+            promotionalrewards: data.promotionalRewards?.map((p) => ({
+              ...p,
+              expiry: new Date(p.expiry),
+            })) || [],
+          });
+          setNotFound(false);
+        }
+      } catch {
         setResult(null);
         setNotFound(true);
       }
-      setOpen(true)
+      setOpen(true);
       setLoading(false);
     }, 400);
 
@@ -63,7 +82,6 @@ export default function CustomerLookup({ onCustomerSelect, resetKey }: Props) {
     <div>
       <h2 className="text-xl font-semibold mb-6 dark:text-black">Customer Details</h2>
 
-      {/* Input */}
       <div className="relative">
         <input
           type="tel"
@@ -74,69 +92,50 @@ export default function CustomerLookup({ onCustomerSelect, resetKey }: Props) {
           onChange={(e) => setPhone(e.target.value)}
           className="w-full px-6 py-4 rounded-2xl bg-[#efefef] focus:outline-none text-lg dark:text-black"
         />
-
         {phone && (
           <button
             onClick={() => {
-              setPhone("");
-              setResult(null);
-              setOpen(false)
-              setNotFound(false);
-              onCustomerSelect(null); // 🔥 dismiss customer form
+              setPhone(""); setResult(null);
+              setOpen(false); setNotFound(false);
+              onCustomerSelect(null);
             }}
             className="absolute right-6 top-4 text-gray-500"
-          >
-            ✕
-          </button>
+          >✕</button>
         )}
       </div>
 
-      {/* Loading */}
-      {loading && (
-        <p className="mt-4 text-sm text-gray-500">Searching...</p>
-      )}
+      {loading && <p className="mt-4 text-sm text-gray-500">Searching...</p>}
 
-      {/* Found Customer */}
       {result && open && (
         <div
-          onClick={() => {
-            onCustomerSelect(result)
-            setOpen(false)
-          }
-          }
+          onClick={() => { onCustomerSelect(result); setOpen(false); }}
           className="mt-6 bg-white p-6 rounded-2xl shadow-md cursor-pointer hover:shadow-lg transition"
         >
           <p className="text-gray-600 text-sm">{result.name}</p>
-
           <div className="flex items-center gap-3 mt-2">
             <span className="text-gray-400 text-lg">↳</span>
-            <span className="text-lg font-semibold dark:text-black">
-              {result.phone}
-            </span>
+            <span className="text-lg font-semibold dark:text-black">{result.phone}</span>
           </div>
         </div>
       )}
 
-      {/* Not Found → Add Customer */}
       {!loading && notFound && open && (
         <div
           onClick={() => {
-            onCustomerSelect({ name: "", phone, points: 0, negativeReview: false, lastVisit: "", expiryDate: "", rewards: [], isNew: true }) // 🔥 pass empty name and phone for new customer
-            setOpen(false)
-          } // empty name for new
-          }
+            onCustomerSelect({
+              name: "", phone, points: 0,
+              negativeReview: false, lastVisit: "",
+              expiryDate: "", rewards: [], isNew: true
+            });
+            setOpen(false);
+          }}
           className="mt-6 bg-white p-6 rounded-2xl shadow-md cursor-pointer hover:shadow-lg transition border border-dashed border-[#3b2a26]"
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-[#3b2a26] text-white flex items-center justify-center text-lg">
-              +
-            </div>
-
+            <div className="w-8 h-8 rounded-full bg-[#3b2a26] text-white flex items-center justify-center text-lg">+</div>
             <div>
               <p className="font-semibold dark:text-black">Add New Customer</p>
-              <p className="text-sm text-gray-500">
-                {phone}
-              </p>
+              <p className="text-sm text-gray-500">{phone}</p>
             </div>
           </div>
         </div>

@@ -1,9 +1,9 @@
-// import { use, useEffect } from "react";
-
 import { Customer } from "@/types/customer";
 import { useState } from "react";
 import RedeemOtpModal from "./OtpLayout";
 import BillAmountModal from "./LoyaltyPayment";
+import { requestCustomerOtp } from "@/services/api";
+
 interface Props extends Customer {
     rewards: {
         id: string;
@@ -16,6 +16,7 @@ interface Props extends Customer {
         expiry: Date;
     }[]
     onOtpSuccess?: () => void;
+    brandId: string;  // add
 }
 
 export default function CashierLoyaltyPreview({
@@ -27,9 +28,11 @@ export default function CashierLoyaltyPreview({
     lastVisit,
     promotionalrewards = [],
     onOtpSuccess,
-
+    phone,      // add
+    brandId,    // add
 }: Props) {
     const [selectedReward, setSelectedReward] = useState<{
+        id: string;          // add id
         description: string;
         pointsRequired: number;
     } | null>(null);
@@ -39,89 +42,68 @@ export default function CashierLoyaltyPreview({
     const [billAmount, setBillAmount] = useState("");
     const [promoOpen, setPromoOpen] = useState(false);
 
+    async function handleOpenOtp(amount: string) {
+        setBillAmount(amount);
+        setBillModalOpen(false);
+        try {
+            await requestCustomerOtp(phone, brandId);
+        } catch {
+            console.error("Failed to send OTP");
+        }
+        setTimeout(() => setOtpModalOpen(true), 200);
+    }
 
     return (
         <div>
             <h2 className="text-xl font-semibold mb-6 dark:text-black">Loyalty Program</h2>
 
-            {/* If no user */}
-            {!name && (
+            {!phone && (
                 <div className="space-y-4">
                     {rewards.map((reward) => (
                         <div
                             key={reward.id}
                             className="bg-[#3b2a26] text-white p-5 rounded-2xl shadow-md flex justify-between"
                         >
-                            <span className="font-semibold">
-                                {reward.pointsRequired} PTS
-                            </span>
-                            <span className="text-sm text-right max-w-[60%]">
-                                {reward.description}
-                            </span>
+                            <span className="font-semibold">{reward.pointsRequired} PTS</span>
+                            <span className="text-sm text-right max-w-[60%]">{reward.description}</span>
                         </div>
                     ))}
                 </div>
             )}
 
-            {/* If user exists */}
-            {name && (
+            {phone && (
                 <div className="space-y-6">
                     {(() => {
-                        const unlockedRewards = rewards.filter(
-                            (r) => points! >= r.pointsRequired
-                        );
+                        const unlockedRewards = rewards.filter((r) => points! >= r.pointsRequired);
+                        const lockedRewards = rewards.filter((r) => points! < r.pointsRequired);
 
-                        const lockedRewards = rewards.filter(
-                            (r) => points! < r.pointsRequired
-                        );
+                        if (!phone || points === undefined) return null;
 
-                        if (!name || (points === undefined)) return null;
+                        const sortedRewards = [...rewards].sort((a, b) => a.pointsRequired - b.pointsRequired);
+                        const nextReward = sortedRewards.find((r) => r.pointsRequired > points);
 
-
-                        // 1️⃣ Sort rewards ascending
-                        const sortedRewards = [...rewards].sort(
-                            (a, b) => a.pointsRequired - b.pointsRequired
-                        );
-
-                        // 2️⃣ Find next reward
-                        const nextReward = sortedRewards.find(
-                            (r) => r.pointsRequired > points
-                        );
-
-                        // 3️⃣ Calculate progress safely
                         let progress = 100;
                         let remaining = 0;
 
                         if (nextReward) {
-                            progress = Math.min(
-                                (points / nextReward.pointsRequired) * 100,
-                                100
-                            );
+                            progress = Math.min((points / nextReward.pointsRequired) * 100, 100);
                             remaining = nextReward.pointsRequired - points;
                         }
-                        console.log(expiryDate)
-
 
                         return (
                             <>
-                                {/* Brown Panel */}
                                 <div className="bg-[#3b2a26] text-white p-6 rounded-2xl space-y-6">
 
-                                    {/* User Info */}
                                     <div className="flex justify-between items-center">
-                                        <div>
-                                            <h2 className="text-lg font-medium">Hello {name}</h2>
-                                        </div>
-
-                                        <p className="text-xs opacity-70 text-right">
-                                            (Points Expires {expiryDate})
-                                        </p>
+                                        <h2 className="text-lg font-medium">Hello {name}</h2>
+                                        <p className="text-xs opacity-70 text-right">(Points Expires {expiryDate})</p>
                                     </div>
+
                                     <div className="mt-4 flex items-end gap-2">
                                         <span className="text-4xl font-bold">{points}</span>
                                         <span className="text-lg opacity-80 mb-1">PTS</span>
                                     </div>
-                                    { }
+
                                     <div className="mt-5">
                                         <div className="w-full h-3 bg-white/30 rounded-full overflow-hidden">
                                             <div
@@ -129,34 +111,22 @@ export default function CashierLoyaltyPreview({
                                                 style={{ width: `${progress}%` }}
                                             />
                                         </div>
-
                                         <p className="mt-2 text-sm opacity-80">
-                                            {remaining > 0
-                                                ? `${remaining} Points to next reward`
-                                                : "Reward Unlocked 🎉"}
+                                            {remaining > 0 ? `${remaining} Points to next reward` : "Reward Unlocked 🎉"}
                                         </p>
                                     </div>
+
                                     {promotionalrewards.length > 0 && (
-                                        <div >
-                                            {/* Header */}
+                                        <div>
                                             <div
                                                 onClick={() => setPromoOpen(!promoOpen)}
                                                 className="bg-white text-black p-5 rounded-2xl font-bold cursor-pointer flex justify-between items-center"
                                             >
                                                 <span>Promotional Offers</span>
-                                                <span
-                                                    className={`transition-transform duration-300 ${promoOpen ? "rotate-180" : ""
-                                                        }`}
-                                                >
-                                                    ▼
-                                                </span>
+                                                <span className={`transition-transform duration-300 ${promoOpen ? "rotate-180" : ""}`}>▼</span>
                                             </div>
 
-                                            {/* Dropdown Body */}
-                                            <div
-                                                className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 ${promoOpen ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"
-                                                    }`}
-                                            >
+                                            <div className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 ${promoOpen ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
                                                 {promotionalrewards.map((promo, index) => (
                                                     <div key={promo.id}>
                                                         <div className="p-4 flex justify-between items-center text-black">
@@ -166,13 +136,9 @@ export default function CashierLoyaltyPreview({
                                                                     Expires {new Date(promo.expiry).toLocaleDateString()}
                                                                 </p>
                                                             </div>
-
                                                             <button
                                                                 onClick={() => {
-                                                                    setSelectedReward({
-                                                                        description: promo.description,
-                                                                        pointsRequired: 0,
-                                                                    });
+                                                                    setSelectedReward({ id: promo.id, description: promo.description, pointsRequired: 0 });
                                                                     setBillModalOpen(true);
                                                                 }}
                                                                 className="bg-[#3b2a26] text-white px-4 py-1 rounded-lg text-sm"
@@ -180,8 +146,6 @@ export default function CashierLoyaltyPreview({
                                                                 Redeem
                                                             </button>
                                                         </div>
-
-                                                        {/* Separator (except last item) */}
                                                         {index !== promotionalrewards.length - 1 && (
                                                             <div className="border-t border-gray-200 mx-4" />
                                                         )}
@@ -191,33 +155,31 @@ export default function CashierLoyaltyPreview({
                                         </div>
                                     )}
 
+                                    {lastVisit && (
+                                        <div className="bg-[#FFD178] text-black p-5 rounded-2xl font-bold text-center">
+                                            Last Visit {lastVisit} ago
+                                        </div>
+                                    )}
 
-                                    {lastVisit && <div className="bg-[#FFD178] text-black p-5 rounded-2xl font-bold text-center" >Last Visit {lastVisit} ago</div>}
+                                    {negativeReview && (
+                                        <div className="bg-[#FF5A5A] text-white p-5 rounded-2xl font-bold text-center">
+                                            Customer has left a negative review
+                                        </div>
+                                    )}
 
-                                    {negativeReview && <div className="bg-[#FF5A5A] text-white p-5 rounded-2xl font-bold text-center" >Customer has left a negative review</div>}
-
-                                    {/* Unlocked Rewards Inside Panel */}
                                     {unlockedRewards.map((reward) => (
                                         <div
                                             key={reward.id}
                                             className="bg-white text-black p-4 rounded-xl flex justify-between items-center"
                                         >
                                             <div>
-                                                <p className="font-semibold">
-                                                    {reward.pointsRequired} PTS
-                                                </p>
-                                                <p className="text-sm">
-                                                    {reward.description}
-                                                </p>
+                                                <p className="font-semibold">{reward.pointsRequired} PTS</p>
+                                                <p className="text-sm">{reward.description}</p>
                                             </div>
-
                                             <button
                                                 onClick={() => {
-                                                    setSelectedReward({
-                                                        description: reward.description,
-                                                        pointsRequired: reward.pointsRequired,
-                                                    });
-                                                    setBillModalOpen(true); // 🔥 open bill modal first
+                                                    setSelectedReward({ id: reward.id, description: reward.description, pointsRequired: reward.pointsRequired });
+                                                    setBillModalOpen(true);
                                                 }}
                                                 className="bg-[#3b2a26] text-white px-4 py-1 rounded-lg text-sm"
                                             >
@@ -227,36 +189,25 @@ export default function CashierLoyaltyPreview({
                                     ))}
                                 </div>
 
-                                {/* Locked Rewards Outside */}
                                 {lockedRewards.map((reward) => (
                                     <div
                                         key={reward.id}
                                         className="bg-[#3b2a26] text-white p-5 rounded-2xl opacity-50"
                                     >
                                         <div className="flex justify-between">
-                                            <span className="font-semibold">
-                                                {reward.pointsRequired} PTS
-                                            </span>
-                                            <span className="text-sm max-w-[60%] text-right">
-                                                {reward.description}
-                                            </span>
+                                            <span className="font-semibold">{reward.pointsRequired} PTS</span>
+                                            <span className="text-sm max-w-[60%] text-right">{reward.description}</span>
                                         </div>
                                     </div>
                                 ))}
+
                                 <BillAmountModal
                                     open={billModalOpen}
                                     onOpenChange={setBillModalOpen}
                                     customerName={name}
-                                    onContinue={(amount) => {
-                                        setBillAmount(amount);
-                                        setBillModalOpen(false);
-
-                                        // Small delay for smooth transition
-                                        setTimeout(() => {
-                                            setOtpModalOpen(true);
-                                        }, 200);
-                                    }}
+                                    onContinue={handleOpenOtp}
                                 />
+
                                 <RedeemOtpModal
                                     open={otpModalOpen}
                                     onOpenChange={(open) => {
@@ -269,18 +220,18 @@ export default function CashierLoyaltyPreview({
                                     rewardPoints={selectedReward?.pointsRequired || 0}
                                     name={name}
                                     billAmount={billAmount}
+                                    customerPhone={phone}
+                                    brandId={brandId}
+                                    milestoneId={selectedReward?.id || ""}
                                     onConfirm={() => {
-                                        console.log("Redeem confirmed!");
-                                        onOtpSuccess?.()
-                                        // 🔥 deduct points here later
+                                        onOtpSuccess?.();
                                     }}
                                 />
                             </>
                         );
                     })()}
-
                 </div>
             )}
-        </div>)
+        </div>
+    );
 }
-

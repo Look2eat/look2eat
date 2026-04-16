@@ -4,25 +4,27 @@
 import { useEffect, useState } from "react"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import DashboardGrid from "@/components/dashboard/DashboardGrid"
-import {
-  fetchDashboardStats,
-  DashboardStats
-} from "@/lib/mockDashboardApi"
+// import {
+//   fetchDashboardStats,
+//   DashboardStats
+// } from "@/lib/mockDashboardApi"
+import { getDashboardKpis, DashboardKpis } from "@/services/api"
 import LoyaltyCard from "@/components/dashboard/LoyaltyCard"
 import FeedbackCard from "@/components/dashboard/FeedbackCard"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardStats | null>(null)
+  const [stats, setStats] = useState<DashboardKpis | null>(null)
+  const brandId = "c6bace44-43b8-48e2-8022-af23e835fd2a" // pull from context/localStorage/store
 
   useEffect(() => {
     async function load() {
-      const data = await fetchDashboardStats()
+      const data = await getDashboardKpis(brandId)
+      console.log(data.data)
       setStats(data)
     }
-
     load()
-  }, [])
+  }, [brandId])
 
   if (!stats) {
     return (

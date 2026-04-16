@@ -10,10 +10,11 @@ interface Props {
   onCustomerChange: (customer: Customer | null) => void;
   resetKey?: number;
   onOtpSuccess?: () => void;
+  brandId: string;
 }
 
 export default function CustomerPanel({ onCustomerChange, resetKey,
-  onOtpSuccess }: Props) {
+  onOtpSuccess, brandId }: Props) {
 
   const [selectedCustomer, setSelectedCustomer] =
     useState<Customer | null>(null);
@@ -24,16 +25,16 @@ export default function CustomerPanel({ onCustomerChange, resetKey,
   const handleSelect = (customer: Customer | null) => {
     console.log("CustomerPanel got:", customer); // 👈 add this
     setSelectedCustomer(customer);
-    onCustomerChange(customer); 
+    onCustomerChange(customer);
   };
   useEffect(() => console.log("Changed"), [selectedCustomer])
 
   return (
     <div>
-      <CustomerLookup onCustomerSelect={handleSelect} resetKey={resetKey} />
+      <CustomerLookup onCustomerSelect={handleSelect} resetKey={resetKey} brandId={brandId} />
 
       {selectedCustomer && (
-        <CustomerForm customer={selectedCustomer} onSuccess={onOtpSuccess!}/>
+        <CustomerForm customer={selectedCustomer} onSuccess={onOtpSuccess!} brandId={brandId} />
       )}
     </div>
   );

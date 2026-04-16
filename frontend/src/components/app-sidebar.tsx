@@ -192,7 +192,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuButton>
             <SidebarMenuItem>
               <SidebarMenuButton asChild className="my-2 h-11 rounded-xl px-4 py-3">
-                <button className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full " onClick={() => { router.push("cashierPortal"); }}>
+                <button className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full " onClick={() => { router.push("cashier"); }}>
                   <IndianRupee className="w-4 h-4" />
                   <span>Cashier Portal</span>
                 </button>
