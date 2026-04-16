@@ -3,6 +3,7 @@ import { adminController } from "./admin.controller";
 import { authenticateJwt } from "../../common/middleware/auth.middleware";
 import { validateRequest } from "../../common/middleware/validation.middleware";
 import { adminValidation } from "./admin.validation";
+import { uploadToCloudinary } from "../../common/services/cloudinary.service";
 
 export const adminRouter: Router = express.Router();
 
@@ -17,6 +18,12 @@ adminRouter.post(
 adminRouter.get(
   "/brands/:brandId/coin-ratio",
   adminController.getBrandCoinRatio
+);
+
+adminRouter.post(
+  "/brands/:brandId/images",
+  uploadToCloudinary.fields([{ name: 'logo', maxCount: 1 }, { name: 'banner', maxCount: 1 }]),
+  adminController.uploadBrandImages
 );
 
 adminRouter.get(

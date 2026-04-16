@@ -285,4 +285,27 @@ export const adminController = {
       throw error;
     }
   },
+
+  async uploadBrandImages(req: Request, res: Response) {
+    try {
+      const { brandId } = req.params;
+
+      if (!brandId || Array.isArray(brandId)) {
+        throw new AppError("Brand ID is required", 400);
+      }
+
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      const logoUrl = files?.logo?.[0]?.path;
+      const bannerImageUrl = files?.banner?.[0]?.path;
+
+      const updatedBrand = await adminService.uploadBrandImages(brandId, logoUrl, bannerImageUrl);
+
+      res.status(200).json({
+        message: "Brand images uploaded successfully",
+        data: updatedBrand,
+      });
+    } catch (error) {
+      throw error;
+    }
+  },
 };

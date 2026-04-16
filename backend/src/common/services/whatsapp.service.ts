@@ -58,6 +58,12 @@ export const whatsappService = {
     });
     const brandSlug = brand?.slug || "app";
 
+    const wallet = await prisma.coinWallet.findFirst({
+      where: { phoneNumber, brandId },
+      select: { id: true }
+    });
+    const walletId = wallet?.id || phoneNumber.replace(/^\+/, '');
+
     let lastError: any;
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
@@ -66,7 +72,8 @@ export const whatsappService = {
           phoneNumber,
           templateName,
           variables,
-          brandSlug
+          brandSlug,
+          walletId
         );
 
         const response = await axios.post(WHATSAPP_API_URL, messageBody, {
@@ -91,7 +98,8 @@ export const whatsappService = {
             sentAt: new Date(),
           },
         });
-
+        console.log(messageBody);
+        console.log(response);
         console.log(
           `✅ WhatsApp message sent to ${phoneNumber} (templateId: ${messageId})`
         );
@@ -157,7 +165,8 @@ export const whatsappService = {
     phoneNumber: string,
     templateName: string,
     variables: Record<string, string>,
-    brandSlug: string
+    brandSlug: string,
+    walletId: string
   ): any {
     const templateConfig = TEMPLATE_MAPPING[templateName];
     const paramNames = templateConfig.paramNames;
@@ -181,8 +190,7 @@ export const whatsappService = {
       },
     ];
 
-    const rawPhoneNumber = phoneNumber.replace(/^\+/, '');
-    const buttonPayload = isOTP && variables["otp"] ? variables["otp"] : `${brandSlug}/${rawPhoneNumber}`;
+    const buttonPayload = isOTP && variables["otp"] ? variables["otp"] : `${brandSlug}/${walletId}`;
     components.push({
       type: "button",
       sub_type: "url",

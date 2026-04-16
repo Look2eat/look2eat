@@ -26,6 +26,13 @@ export const adminService = {
     return settings;
   },
 
+  async uploadBrandImages(brandId: string, logoUrl?: string, bannerImageUrl?: string) {
+    if (!logoUrl && !bannerImageUrl) {
+      throw new AppError("No images provided for upload", 400);
+    }
+    return adminRepository.updateBrandImages(brandId, logoUrl, bannerImageUrl);
+  },
+
   async createCashier(
     outletId: string,
     phoneNumber: string,

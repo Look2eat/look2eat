@@ -73,6 +73,16 @@ export const adminRepository = {
     });
   },
 
+  async updateBrandImages(brandId: string, logoUrl?: string, bannerImageUrl?: string) {
+    return prisma.brand.update({
+      where: { id: brandId },
+      data: {
+        ...(logoUrl && { logoUrl }),
+        ...(bannerImageUrl && { bannerImageUrl }),
+      },
+    });
+  },
+
   async createRewardMilestone(
     brandId: string,
     name: string,

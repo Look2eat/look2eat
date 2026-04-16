@@ -85,7 +85,7 @@ export class CashierRepository {
           phoneNumber: customerPhoneNumber,
           brandId,
           currentCoins: 0,
-          expiryDate: new Date('2026-04-20T23:59:59Z'), 
+          expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), 
         },
       });
     }
@@ -146,6 +146,10 @@ export class CashierRepository {
         currentCoins: {
           increment: coinsEarned,
         },
+        totalCoinsEarned: {
+          increment: coinsEarned,
+        },
+        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
 
@@ -189,6 +193,7 @@ export class CashierRepository {
         currentCoins: {
           decrement: coinsRedeemed,
         },
+        expiryDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
     });
 
