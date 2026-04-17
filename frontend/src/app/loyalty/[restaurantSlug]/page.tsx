@@ -8,16 +8,17 @@ import { getPublicBrandPage } from "@/services/api";
 import { notFound } from "next/navigation";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     restaurantSlug: string;
-  };
+  }>;
 }
 
 export default async function LoyaltyPage({ params }: PageProps) {
+  const { restaurantSlug } = await params;
   let pageData;
 
   try {
-    pageData = await getPublicBrandPage(params.restaurantSlug);
+    pageData = await getPublicBrandPage(restaurantSlug);
   } catch {
     notFound();
   }

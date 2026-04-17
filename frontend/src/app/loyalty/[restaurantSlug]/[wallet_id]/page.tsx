@@ -9,17 +9,18 @@ import { getPublicLoyaltyPage } from "@/services/api";
 import { notFound } from "next/navigation";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     restaurantSlug: string;
     wallet_id: string;
-  };
+  }>;
 }
 
 export default async function PublicLoyaltyPage({ params }: PageProps) {
+  const { restaurantSlug, wallet_id } = await params;
   let pageData;
 
   try {
-    pageData = await getPublicLoyaltyPage(params.restaurantSlug, params.wallet_id);
+    pageData = await getPublicLoyaltyPage(restaurantSlug, wallet_id);
   } catch {
     notFound();
   }
