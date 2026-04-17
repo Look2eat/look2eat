@@ -175,11 +175,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
   const pathname = usePathname();
   return (
-    <Sidebar variant="inset"  {...props}>
-      <SidebarHeader className="px-0">
+    <Sidebar variant="inset"  {...props} >
+      <SidebarHeader className="px-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild className="px-0">
+            <SidebarMenuButton size="lg" asChild>
               <a href="#">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Command className="size-4" />
@@ -190,19 +190,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
               </a>
             </SidebarMenuButton>
-            <SidebarMenuItem>
-              <SidebarMenuButton asChild className="my-2 h-11 rounded-xl px-4 py-3">
-                <button className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full " onClick={() => { router.push("cashier"); }}>
-                  <IndianRupee className="w-4 h-4" />
-                  <span>Cashier Portal</span>
-                </button>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
+          </SidebarMenuItem>
+
+          {/* ← moved OUT of the previous SidebarMenuItem */}
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild className="my-2 h-11 rounded-xl px-4 py-3">
+              <button
+                className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full"
+                onClick={() => router.push("cashier")}
+              >
+                <IndianRupee className="w-4 h-4" />
+                <span>Cashier Portal</span>
+              </button>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="overflow-y-auto overflow-x-hidden">
+      <SidebarContent className="overflow-y-auto overflow-x-hidden px-2">
         {/* Core Navigation */}
 
         <SidebarMenu>

@@ -179,7 +179,74 @@ export interface RedemptionResponse {
     timestamp: string;
   };
 }
+export interface PublicLoyaltyResponse {
+  data: {
+    brand: {
+      id: string;
+      name: string;
+      logoUrl: string;
+      bannerImageUrl: string;
+    };
+    settings: {
+      coinRatioValue: number;
+    };
+    wallet: {
+      id: string;
+      currentCoins: number;
+      expiryDate: string;
+      totalCoinsEarned: number;
+    };
+    milestones: {
+      id: string;
+      brandId: string;
+      name: string;
+      coinsRequired: number;
+      cashbackAmount: number;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+    }[];
+  };
+}
 
+export const getPublicLoyaltyPage = async (
+  restaurantSlug: string,
+  walletId: string
+): Promise<PublicLoyaltyResponse> => {
+  return fetchApi<PublicLoyaltyResponse>(
+    `/public/loyalty/${restaurantSlug}/${walletId}`,
+    { method: "GET" }
+  );
+};
+export interface PublicBrandPageResponse {
+  data: {
+    brand: {
+      id: string;
+      name: string;
+      logoUrl: string;
+      bannerImageUrl: string;
+    };
+    settings: {
+      coinRatioValue: number;
+    };
+    milestones: {
+      id: string;
+      name: string;
+      coinsRequired: number;
+      cashbackAmount: number;
+      isActive: boolean;
+    }[];
+  };
+}
+
+export const getPublicBrandPage = async (
+  restaurantSlug: string
+): Promise<PublicBrandPageResponse> => {
+  return fetchApi<PublicBrandPageResponse>(
+    `/public/loyalty/${restaurantSlug}`,
+    { method: "GET" }
+  );
+};
 // Update processRedemption return type
 export const processRedemption = async (
   customerPhoneNumber: string,
