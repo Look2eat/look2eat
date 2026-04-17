@@ -64,7 +64,7 @@ export default function CustomerRepeatRateCard({ data }: Props) {
                             {/* Percent */}
                             <span className="text-[10px] md:text-sm font-semibold text-right">
                                 {percent}%
-                                <span className="hidden md:inline"> | {row.value}</span>
+                                <span className="hidden md:inline"> | {row.value.toFixed(2)}</span>
                             </span>
                         </div>
                     )
