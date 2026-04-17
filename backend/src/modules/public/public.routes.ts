@@ -7,3 +7,9 @@ publicRouter.get(
   "/loyalty/:slug/:walletId",
   publicController.getLoyaltyPageData
 );
+
+
+publicRouter.get(
+  "/loyalty/:slug",
+  publicController.getBrandPublicData
+);
