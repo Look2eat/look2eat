@@ -24,7 +24,8 @@ import {
   SquareTerminal,
   UsersRound,
 } from "lucide-react"
-
+import { useRouter } from 'next/navigation';
+import { LogOut } from 'lucide-react';
 import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavSecondary } from "@/components/nav-secondary"
@@ -45,7 +46,6 @@ import { AnimateIcon } from "./animate-ui/icons/icon"
 import { ChartColumnIncreasing } from "./animate-ui/icons/chart-column-increasing"
 import { LayoutDashboard } from "./animate-ui/icons/layout-dashboard"
 import { ThemeToggle } from "./theme-toggle"
-import { useRouter } from 'next/navigation';
 
 const data = {
   user: {
@@ -267,7 +267,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
 
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="px-2 gap-2">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              className="h-11 rounded-xl px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+              onClick={() => {
+                localStorage.removeItem('token');
+                localStorage.removeItem('brandId');
+                router.push('/login');
+              }}
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
         <ThemeToggle />
       </SidebarFooter>
     </Sidebar>
