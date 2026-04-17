@@ -52,10 +52,28 @@ async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise
   return data;
 }
 
+export interface LoginResponse {
+  token: string;
+  user: {
+    id: string;
+    brandId: string;
+    name: string;
+    email: string;
+    phoneNumber: string;
+    role: string;
+    isActive: boolean;
+    brand: {
+      id: string;
+      name: string;
+      slug: string;
+    };
+  };
+}
+
 export const adminLogin = async (phoneNumber: string, password: string, fcmToken?: string) => {
-  return fetchApi<unknown>('/auth/login', {
+  return fetchApi<LoginResponse>('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ phoneNumber, password, fcmToken }),
+    body: JSON.stringify({ phone: phoneNumber, password, fcmToken }),
   });
 };
 
@@ -118,13 +136,13 @@ export interface StandardPurchaseResponse {
 
 // Update processStandardPurchase return type
 export const processStandardPurchase = async (
-  customerPhone: string,
+  customerPhoneNumber: string,
   brandId: string,
   amount: number
 ): Promise<StandardPurchaseResponse> => {
   return fetchApi<StandardPurchaseResponse>('/cashier/transaction/purchase', {
     method: 'POST',
-    body: JSON.stringify({ customerPhone, brandId, amount }),
+    body: JSON.stringify({ customerPhoneNumber, brandId, purchaseAmount:amount }),
   });
 };
 
@@ -164,13 +182,13 @@ export interface RedemptionResponse {
 
 // Update processRedemption return type
 export const processRedemption = async (
-  customerPhone: string,
+  customerPhoneNumber: string,
   brandId: string,
   milestoneId: string,
   amount: number
 ): Promise<RedemptionResponse> => {
   return fetchApi<RedemptionResponse>('/cashier/transaction/redeem', {
     method: 'POST',
-    body: JSON.stringify({ customerPhone, brandId, milestoneId, purchaseAmount: amount }),
+    body: JSON.stringify({ customerPhoneNumber, brandId, milestoneId, purchaseAmount: amount }),
   });
 };

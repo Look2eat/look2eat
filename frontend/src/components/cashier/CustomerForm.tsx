@@ -26,10 +26,12 @@ export default function CustomerForm({ customer, onSuccess, brandId }: Props) {
     setLoading(true);
     setError("");
     try {
+      console.log("Submitting purchase for:", { phone: customer.phone, brandId, amount });
       const res = await processStandardPurchase(customer.phone, brandId, Number(amount));
       setCoinsEarned(res.data.coinsEarned);
       setIsModalOpen(true);
-    } catch {
+    } catch (err) {
+      console.error("Purchase failed:", err);
       setError("Transaction failed. Please try again.");
     } finally {
       setLoading(false);
