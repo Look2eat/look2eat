@@ -8,8 +8,17 @@ publicRouter.get(
   publicController.getLoyaltyPageData
 );
 
-
 publicRouter.get(
   "/loyalty/:slug",
   publicController.getBrandPublicData
+);
+
+publicRouter.get(
+  "/webhook/whatsapp",
+  publicController.verifyWebhook
+);
+
+publicRouter.post(
+  "/webhook/whatsapp",
+  publicController.handleWebhook
 );

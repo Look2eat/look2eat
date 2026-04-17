@@ -300,4 +300,74 @@ export const whatsappService = {
       2
     );
   },
+
+  async sendTextMessage(phoneNumber: string, text: string): Promise<boolean> {
+    try {
+      await axios.post(
+        WHATSAPP_API_URL,
+        {
+          messaging_product: "whatsapp",
+          recipient_type: "individual",
+          to: phoneNumber.replace(/^\+/, ""),
+          type: "text",
+          text: { body: text },
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(`✅ Text message sent to ${phoneNumber}`);
+      return true;
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      const errorData = axiosError.response?.data as any;
+      console.error(
+        `❌ Failed to send text message to ${phoneNumber}:`,
+        errorData?.error?.message || String(error)
+      );
+      return false;
+    }
+  },
+
+  buildKnowMoreReply(
+    brandName: string,
+    currentCoins: number,
+    coinRatioValue: number,
+    milestones: { coinsRequired: number; cashbackAmount: number }[],
+    publicUrl: string
+  ): string {
+    const cashbackPercent = (coinRatioValue * 100).toFixed(0);
+
+    let milestoneLines = "";
+    if (milestones.length > 0) {
+      milestoneLines = milestones
+        .map(
+          (m) => `  • ${m.coinsRequired} coins = ₹${m.cashbackAmount} cashback`
+        )
+        .join("\n");
+    }
+
+    const nextRedeemable = milestones.find(
+      (m) => m.coinsRequired <= currentCoins
+    );
+    const redeemLine = nextRedeemable
+      ? `\n•  You've ₹${nextRedeemable.cashbackAmount} cashback — Redeem it to pay your next bill.\n•  To redeem, just share your mobile number with our team.`
+      : currentCoins > 0
+        ? `\n•  You have ${currentCoins} coins. Keep earning to unlock cashback!`
+        : "";
+
+    return (
+      `Welcome aboard! 🥳\n\n` +
+      `Thanks for choosing *${brandName}*. We're excited to have you in our loyalty community.\n\n` +
+      `🌟 *How it works:*\n\n` +
+      `•  Earn *${cashbackPercent}%* cashback on every bill.\n` +
+      (milestoneLines ? `\n🎯 *Reward Milestones:*\n${milestoneLines}\n` : "") +
+      redeemLine +
+      `\n\n🎁 Get rewarded on every purchase.\n\n` +
+      `👉 View My Loyalty Rewards: ${publicUrl}`
+    );
+  },
 };
