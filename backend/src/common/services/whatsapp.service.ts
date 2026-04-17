@@ -342,10 +342,9 @@ export const whatsappService = {
     const milestoneLines = milestones
       .map((m) => {
         if (currentCoins >= m.coinsRequired) {
-          return `✅ ${m.coinsRequired} coins  →  ₹${m.cashbackAmount} cashback    *(Available to redeem)*`;
+          return `✅ ${m.coinsRequired} coins  →  ₹${m.cashbackAmount} cashback`;
         } else {
-          const remaining = m.coinsRequired - currentCoins;
-          return `⬜ ${m.coinsRequired} coins  →  ₹${m.cashbackAmount} cashback  *(${remaining} coins remaining)*`;
+          return `⬜ ${m.coinsRequired} coins  →  ₹${m.cashbackAmount} cashback`;
         }
       })
       .join("\n");
@@ -353,17 +352,14 @@ export const whatsappService = {
     return (
       `Welcome to *${brandName} Loyalty Program* 🎉\n\n` +
       `Thank you for choosing ${brandName}. Your loyalty means a lot to us.\n\n` +
-      `─────────────────────\n` +
       `💰 *Wallet Balance:* ${currentCoins} coins\n` +
-      `─────────────────────\n\n` +
       `📊 *Reward Milestones*\n\n` +
       `${milestoneLines}\n\n` +
-      `─────────────────────\n\n` +
       `📌 *How to Redeem*\n` +
       `Simply share your registered mobile number with our team and we'll process your cashback promptly.\n\n` +
+      `Earn coins on every purchase and unlock greater rewards.\n\n` +
       `🔗 *View Rewards Portal:*\n` +
       `${publicUrl}\n\n` +
-      `_Earn coins on every purchase and unlock greater rewards._\n\n` +
       `— Team ${brandName}`
     );
   },
