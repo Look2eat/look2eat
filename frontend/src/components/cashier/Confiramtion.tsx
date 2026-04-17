@@ -51,14 +51,14 @@ export default function RedeemConfirmationModal({
         onOpenChange(nextOpen);
       }}
     >
-      <DialogContent className="!w-[90vw]
-    !max-w-none
-    sm:!max-w-md
-    rounded-2xl
-    p-6
-    dark:bg-white dark:text-black
-    max-h-[90vh]
-    overflow-y-auto">
+      <DialogContent className={cn(
+        "!w-[90vw] !max-w-none sm:!max-w-md",
+        "!rounded-2xl",          // force override shadcn's default rounded
+        "p-6",
+        "dark:bg-white dark:text-black",
+        "max-h-[90vh] overflow-y-auto",
+        "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      )}>
         <div className="flex flex-col items-center gap-4 text-center">
           <DialogHeader>
             <div className="flex flex-col items-center">
@@ -79,7 +79,7 @@ export default function RedeemConfirmationModal({
             </DialogTitle>
 
             <DialogDescription className="text-neutral-700 text-lg mt-2">
-              <strong>{customerName}</strong> has successfully earned{" "}
+              Successfully earned{" "}
               <strong>{coinsEarned} PTS!</strong>   {/* ← direct from API */}
             </DialogDescription>
           </DialogHeader>

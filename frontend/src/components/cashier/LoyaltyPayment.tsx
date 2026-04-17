@@ -43,17 +43,14 @@ export default function BillAmountModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="!w-[90vw]
-    !max-w-none
-    sm:!max-w-md
-    rounded-2xl
-    dark:bg-white
-    dark:text-black
-    fixed
-    top-[10%] sm:top-1/2
-    translate-y-0 sm:-translate-y-1/2
-    max-h-[90vh]
-    overflow-y-auto p-6 pt-0">
+      <DialogContent className={cn(
+        "!w-[90vw] !max-w-none sm:!max-w-md",
+        "!rounded-2xl",          // force override shadcn's default rounded
+        "p-6",
+        "dark:bg-white dark:text-black",
+        "max-h-[90vh] overflow-y-auto",
+        "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      )}>
         <DialogHeader>
           <DialogTitle className="text-center text-2xl font-bold dark:bg-white dark:text-black">
             Enter Bill Amount

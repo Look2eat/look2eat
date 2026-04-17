@@ -8,37 +8,37 @@ interface Props {
 
 export default function DashboardGrid({ stats }: Props) {
     return (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {/* LEFT COLUMN */}
+            {/* LEFT COLUMN — stats cards */}
             <div className="flex flex-col gap-6">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4 md:gap-6">
                     <StatCard
                         title="Total Sales"
                         value={`₹${stats.data.kpis.totalSales.toLocaleString('en-IN')}`}
-                        className="h-40"
+                        className="h-36 md:h-40"
                     />
                     <StatCard
                         title="Rewards Redeemed"
                         value={stats.data.kpis.totalRewardRedeemed}
-                        className="h-40"
+                        className="h-36 md:h-40"
                     />
                 </div>
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-4 md:gap-6">
                     <StatCard
                         title="Redemption Rate"
                         value={`${stats.data.kpis.redemptionRate.toFixed(2)} %`}
-                        className="h-40"
+                        className="h-36 md:h-40"
                     />
                     <StatCard
                         title="Points Issued"
                         value={stats.data.kpis.totalPointsIssued.toLocaleString('en-IN')}
-                        className="h-40"
+                        className="h-36 md:h-40"
                     />
                 </div>
             </div>
 
-            {/* RIGHT COLUMN */}
+            {/* RIGHT COLUMN — chart */}
             <div className="flex flex-col gap-6">
                 <CustomerRepeatRateCard
                     data={{

@@ -29,52 +29,32 @@ export default function DashboardPage() {
 
   if (!stats) {
     return (
-      <div className="p-10 min-h-screen space-y-6">
-
-        {/* Top Grid Skeleton */}
-        <div className="grid grid-cols-2 gap-6">
-
-          {/* LEFT COLUMN */}
+      <div className="p-4 md:p-10 min-h-screen space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex flex-col gap-6">
-
             <div className="grid grid-cols-2 gap-6">
               <Skeleton className="h-40 rounded-2xl" />
               <Skeleton className="h-40 rounded-2xl" />
             </div>
-
-            <Skeleton className="h-65 rounded-2xl" />
-
+            <div className="grid grid-cols-2 gap-6">
+              <Skeleton className="h-40 rounded-2xl" />
+              <Skeleton className="h-40 rounded-2xl" />
+            </div>
           </div>
-
-          {/* RIGHT COLUMN */}
           <div className="flex flex-col gap-6">
-
             <Skeleton className="h-86 rounded-2xl" />
-
-            {/* <div className="grid grid-cols-2 gap-6">
-              <Skeleton className="h-40 rounded-2xl" />
-              <Skeleton className="h-40 rounded-2xl" />
-            </div> */}
-
           </div>
-
         </div>
-
-        {/* Loyalty + Feedback Cards */}
-        {/* <div className="grid grid-cols-2 gap-6">
-          <Skeleton className="h-[300px] rounded-2xl" />
-          <Skeleton className="h-[300px] rounded-2xl" />
-        </div> */}
-
       </div>
     )
+
   }
 
   return (
-    <div className="p-10  min-h-screen">
 
-
+    <div className="p-4 md:p-10 min-h-screen">
       <DashboardGrid stats={stats} />
+
       {/* <LoyaltyCard
         pointsRedeemed={5900}
         pointsEarned={1200}

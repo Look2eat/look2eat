@@ -103,18 +103,14 @@ export default function RedeemOtpModal({
                 onOpenChange(nextOpen);
             }}
         >
-            <DialogContent className="!w-[92vw]
-    !max-w-none
-    sm:!max-w-md
-    rounded-2xl
-    p-6
-    dark:bg-white dark:text-black
-
-    top-[30%] translate-y-0
-    sm:top-1/2 sm:-translate-y-1/2
-
-    max-h-[85dvh]
-    overflow-y-auto">
+            <DialogContent className={cn(
+                "!w-[90vw] !max-w-none sm:!max-w-md",
+                "!rounded-2xl",          // force override shadcn's default rounded
+                "p-6",
+                "dark:bg-white dark:text-black",
+                "max-h-[90vh] overflow-y-auto",
+                "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+            )}>
                 <div className="flex flex-col items-center gap-3">
 
 
