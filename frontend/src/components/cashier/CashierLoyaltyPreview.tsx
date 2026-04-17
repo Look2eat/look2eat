@@ -44,13 +44,13 @@ export default function CashierLoyaltyPreview({
 
     async function handleOpenOtp(amount: string) {
         setBillAmount(amount);
-        setBillModalOpen(false);
         try {
             await requestCustomerOtp(phone, brandId);
         } catch {
             console.error("Failed to send OTP");
         }
-        setTimeout(() => setOtpModalOpen(true), 200);
+        setBillModalOpen(false);
+        setOtpModalOpen(true);  // open only after OTP request completes
     }
 
     return (

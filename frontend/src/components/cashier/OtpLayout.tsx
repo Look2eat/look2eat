@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { OTPInput, SlotProps } from "input-otp";
 import { useEffect, useRef, useState } from "react";
-import { hover } from "framer-motion";
 import { processRedemption, verifyCustomerOtp } from "@/services/api";
 
 interface Props {
@@ -20,18 +19,14 @@ interface Props {
     onOpenChange: (open: boolean) => void;
     rewardName: string;
     rewardPoints: number;
-    name: string
-
+    name: string;
     color?: string;
     billAmount: string;
     customerPhone: string;
     brandId: string;
     milestoneId: string;
-    onConfirm: (coinsEarned: number) => void; // ← add coinsEarned
-
+    onConfirm: (coinsEarned: number) => void;
 }
-
-
 
 export default function RedeemOtpModal({
     open,
@@ -48,11 +43,11 @@ export default function RedeemOtpModal({
 }: Props) {
     const [value, setValue] = useState("");
     const [isValid, setIsValid] = useState<boolean | undefined>(undefined);
-    const [redirecting, setRedirecting] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [coinsEarned, setCoinsEarned] = useState<number>(0);
     const inputRef = useRef<HTMLInputElement>(null);
     const closeButtonRef = useRef<HTMLButtonElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
-    const [coinsEarned, setCoinsEarned] = useState<number>(0);
 
     useEffect(() => {
         if (isValid && videoRef.current) {
@@ -62,31 +57,29 @@ export default function RedeemOtpModal({
     }, [isValid]);
 
     useEffect(() => {
-        if (isValid) {
-            closeButtonRef.current?.focus();
-        }
+        if (isValid) closeButtonRef.current?.focus();
     }, [isValid]);
+
     useEffect(() => {
-        if (open) {
-            setTimeout(() => {
-                inputRef.current?.focus();
-            }, 100);
-        }
+        if (open) setTimeout(() => inputRef.current?.focus(), 100);
     }, [open]);
+
     async function handleSubmit(code?: string) {
         const otp = code ?? value;
         setIsValid(undefined);
+        setIsLoading(true);
+        setValue("");
 
         try {
             await verifyCustomerOtp(customerPhone, brandId, otp);
-            setIsValid(true);
-            // immediately fire redemption
             const redemptionRes = await processRedemption(customerPhone, brandId, milestoneId, Number(billAmount));
-            setCoinsEarned(redemptionRes.data.coinsEarned); // ← store it
+            setCoinsEarned(redemptionRes.data.coinsEarned);
+            setIsValid(true);
         } catch {
             setIsValid(false);
+        } finally {
+            setIsLoading(false);
         }
-        setValue("");
     }
 
     return (
@@ -94,9 +87,7 @@ export default function RedeemOtpModal({
             open={open}
             onOpenChange={(nextOpen) => {
                 if (!nextOpen) {
-                    if (isValid) {
-                        onConfirm(coinsEarned); // ← call confirm with coins earned
-                    }
+                    if (isValid) onConfirm(coinsEarned);
                     setIsValid(undefined);
                     setValue("");
                 }
@@ -105,28 +96,28 @@ export default function RedeemOtpModal({
         >
             <DialogContent className={cn(
                 "!w-[90vw] !max-w-none sm:!max-w-md",
-                "!rounded-2xl",          // force override shadcn's default rounded
+                "!rounded-2xl",
                 "p-6",
                 "dark:bg-white dark:text-black",
                 "max-h-[90vh] overflow-y-auto",
                 "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
             )}>
                 <div className="flex flex-col items-center gap-3">
-
-
-
                     <DialogHeader>
                         <DialogTitle className="text-center text-2xl font-bold dark:text-black">
-                            {isValid ? <div className="flex flex-col items-center gap-2 ">
-                                <video
-                                    ref={videoRef}
-                                    muted
-                                    playsInline
-                                    className="w-40 h-40"
-                                >
-                                    <source src="/success.webm" type="video/webm" />
-                                    <source src="/success.mp4" type="video/mp4" />
-                                </video><p className="p-2 pb-4">Congratulations 🎉</p></div> : "Redeem Reward"}
+                            {isValid ? (
+                                <div className="flex flex-col items-center gap-2 bg-white dark:bg-white">
+                                    <video ref={videoRef} muted playsInline className="w-40 h-40">
+                                        <source src="/success.webm" type="video/webm" />
+                                        <source src="/success.mp4" type="video/mp4" />
+                                    </video>
+                                    <p className="p-2 pb-4">Congratulations 🎉</p>
+                                </div>
+                            ) : isLoading ? (
+                                "Verifying..."
+                            ) : (
+                                "Redeem Reward"
+                            )}
                         </DialogTitle>
 
                         <DialogDescription className="text-center text-neutral-700 text-xl">
@@ -134,19 +125,14 @@ export default function RedeemOtpModal({
                                 <p>
                                     <strong>{name}</strong> has successfully redeemed{" "}
                                     <strong>{rewardName}</strong>
-
                                     {rewardPoints !== 0 && (
-                                        <>
-                                            {" "}for <strong>{rewardPoints} PTS</strong>
-                                        </>
+                                        <> for <strong>{rewardPoints} PTS</strong></>
                                     )}
-                                    !
-                                    <br className="p-1" />
-                                    Points Earned{" "}
-                                    <strong>
-                                        {coinsEarned}
-                                    </strong>
+                                    !<br />
+                                    Points Earned <strong>{coinsEarned}</strong>
                                 </p>
+                            ) : isLoading ? (
+                                "Please wait while we verify your OTP"
                             ) : (
                                 "Enter OTP to redeem reward"
                             )}
@@ -154,34 +140,49 @@ export default function RedeemOtpModal({
                     </DialogHeader>
                 </div>
 
-                {/* Reward Info */}
-                {!isValid && (
+                {/* Reward Info — hidden while loading or after success */}
+                {!isValid && !isLoading && (
                     <div className={cn("p-4 rounded-xl text-center text-white mb-6", color)}>
                         {rewardPoints !== 0 && <p className="font-bold text-md">{rewardPoints} PTS</p>}
                         <p className="text-sm">{rewardName}</p>
                     </div>
                 )}
 
+                {/* Bottom section */}
                 {isValid ? (
                     <div className="text-center">
-                        <DialogClose >
-                            <Button className={cn(color, "hover:bg-[#3b2a26] border-0 p-4 py-6 font-semibold ")}
+                        <DialogClose>
+                            <Button
                                 ref={closeButtonRef}
+                                className={cn(color, "hover:bg-[#3b2a26] border-0 p-4 py-6 font-semibold")}
                                 onClick={() => {
-
                                     onConfirm(coinsEarned);
                                     setIsValid(undefined);
                                     onOpenChange(false);
-
                                 }}
                             >
                                 Next Customer
                             </Button>
                         </DialogClose>
                     </div>
+                ) : isLoading ? (
+                    // ── Loader ──────────────────────────────────────────
+                    <div className="flex flex-col items-center gap-3 py-8">
+                        <div className="relative w-14 h-14">
+                            {/* Outer ring */}
+                            <div className="absolute inset-0 rounded-full border-4 border-neutral-100" />
+                            {/* Spinning arc */}
+                            <div className={cn(
+                                "absolute inset-0 rounded-full border-4 border-transparent animate-spin",
+                                "border-t-neutral-700"
+                            )} />
+                        </div>
+                        <p className="text-sm text-neutral-400 tracking-wide">Verifying OTP...</p>
+                    </div>
                 ) : (
+                    // ── OTP Input ────────────────────────────────────────
                     <div className="space-y-4">
-                        <div className="flex justify-center ">
+                        <div className="flex justify-center">
                             <OTPInput
                                 ref={inputRef}
                                 value={value}
@@ -190,9 +191,9 @@ export default function RedeemOtpModal({
                                 inputMode="numeric"
                                 type="number"
                                 autoFocus
-                                containerClassName="flex items-center gap-3 "
+                                containerClassName="flex items-center gap-3"
                                 render={({ slots }) => (
-                                    <div className="flex gap-2 ">
+                                    <div className="flex gap-2">
                                         {slots.map((slot, idx) => (
                                             <Slot key={idx} {...slot} />
                                         ))}
@@ -209,9 +210,7 @@ export default function RedeemOtpModal({
                         )}
 
                         <p className="text-center text-sm">
-                            <button className="underline hover:no-underline">
-                                Resend OTP
-                            </button>
+                            <button className="underline hover:no-underline">Resend OTP</button>
                         </p>
                     </div>
                 )}

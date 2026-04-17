@@ -61,7 +61,7 @@ export default function RedeemConfirmationModal({
       )}>
         <div className="flex flex-col items-center gap-4 text-center">
           <DialogHeader>
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center bg-white dark:bg-white">
               <video
                 key={open ? "open" : "closed"}
                 ref={videoRef}
@@ -69,6 +69,7 @@ export default function RedeemConfirmationModal({
                 playsInline
                 autoPlay
                 className="w-40 h-40"
+
               >
                 <source src="/success.webm" type="video/webm" />
                 <source src="/success.mp4" type="video/mp4" />
