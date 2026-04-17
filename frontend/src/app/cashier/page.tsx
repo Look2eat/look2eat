@@ -5,6 +5,7 @@ import CashierLayout from "@/components/cashier/CashierLayout";
 import CashierLoyaltyPreview from "@/components/cashier/CashierLoyaltyPreview";
 import CustomerPanel from "@/components/cashier/CustomerPanel";
 import { Customer } from "@/types/customer";
+import { getBrandIdFromToken } from "@/lib/auth";
 
 export default function CashierPage() {
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
@@ -14,6 +15,7 @@ export default function CashierPage() {
     setSelectedCustomer(null);
     setLookupResetKey((prev) => prev + 1);
   }
+  const brandId = getBrandIdFromToken();
 
   return (
     <CashierLayout
@@ -22,7 +24,7 @@ export default function CashierPage() {
           onCustomerChange={setSelectedCustomer}
           resetKey={lookupResetKey}
           onOtpSuccess={handleOtpSuccess}
-          brandId="c6bace44-43b8-48e2-8022-af23e835fd2a"
+          brandId={brandId}
         />
       }
       right={
@@ -36,7 +38,7 @@ export default function CashierPage() {
           negativeReview={selectedCustomer?.negativeReview ?? false}
           lastVisit={selectedCustomer?.lastVisit ?? ""}
           onOtpSuccess={handleOtpSuccess}
-          brandId="c6bace44-43b8-48e2-8022-af23e835fd2a"                // ← was empty string
+          brandId={brandId}
         />
       }
     />

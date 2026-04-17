@@ -12,10 +12,11 @@ import { getDashboardKpis, DashboardKpis } from "@/services/api"
 import LoyaltyCard from "@/components/dashboard/LoyaltyCard"
 import FeedbackCard from "@/components/dashboard/FeedbackCard"
 import { Skeleton } from "@/components/ui/skeleton"
+import { getBrandIdFromToken } from "@/lib/auth"
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardKpis | null>(null)
-  const brandId = "c6bace44-43b8-48e2-8022-af23e835fd2a" // pull from context/localStorage/store
+  const brandId = getBrandIdFromToken() // pull from context/localStorage/store
 
   useEffect(() => {
     async function load() {
