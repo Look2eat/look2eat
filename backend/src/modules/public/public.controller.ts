@@ -113,15 +113,19 @@ export const publicController = {
   },
 
   async verifyWebhook(req: Request, res: Response) {
-    const mode = req.query["hub.mode"];
-    const token = req.query["hub.verify_token"];
-    const challenge = req.query["hub.challenge"];
+    const mode = req.query["hub.mode"] as string;
+    const token = req.query["hub.verify_token"] as string;
+    const challenge = req.query["hub.challenge"] as string;
+
+    console.log(`🔍 Webhook verify attempt — mode: ${mode}, token: ${token}, challenge: ${challenge}`);
+    console.log(`🔍 Expected token: ${process.env.WHATSAPP_VERIFY_TOKEN}`);
 
     if (mode === "subscribe" && token === process.env.WHATSAPP_VERIFY_TOKEN) {
       console.log("✅ Webhook verified by Meta");
-      res.status(200).send(challenge);
+      res.writeHead(200, { "Content-Type": "text/plain" });
+      res.end(challenge);
     } else {
-      console.warn("❌ Webhook verification failed");
+      console.warn("❌ Webhook verification failed — token mismatch or wrong mode");
       res.sendStatus(403);
     }
   },

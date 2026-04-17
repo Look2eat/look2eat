@@ -339,35 +339,32 @@ export const whatsappService = {
     milestones: { coinsRequired: number; cashbackAmount: number }[],
     publicUrl: string
   ): string {
-    const cashbackPercent = (coinRatioValue * 100).toFixed(0);
-
-    let milestoneLines = "";
-    if (milestones.length > 0) {
-      milestoneLines = milestones
-        .map(
-          (m) => `  • ${m.coinsRequired} coins = ₹${m.cashbackAmount} cashback`
-        )
-        .join("\n");
-    }
-
-    const nextRedeemable = milestones.find(
-      (m) => m.coinsRequired <= currentCoins
-    );
-    const redeemLine = nextRedeemable
-      ? `\n•  You've ₹${nextRedeemable.cashbackAmount} cashback — Redeem it to pay your next bill.\n•  To redeem, just share your mobile number with our team.`
-      : currentCoins > 0
-        ? `\n•  You have ${currentCoins} coins. Keep earning to unlock cashback!`
-        : "";
+    const milestoneLines = milestones
+      .map((m) => {
+        if (currentCoins >= m.coinsRequired) {
+          return `✅ ${m.coinsRequired} coins  →  ₹${m.cashbackAmount} cashback    *(Available to redeem)*`;
+        } else {
+          const remaining = m.coinsRequired - currentCoins;
+          return `⬜ ${m.coinsRequired} coins  →  ₹${m.cashbackAmount} cashback  *(${remaining} coins remaining)*`;
+        }
+      })
+      .join("\n");
 
     return (
-      `Welcome aboard! 🥳\n\n` +
-      `Thanks for choosing *${brandName}*. We're excited to have you in our loyalty community.\n\n` +
-      `🌟 *How it works:*\n\n` +
-      `•  Earn *${cashbackPercent}%* cashback on every bill.\n` +
-      (milestoneLines ? `\n🎯 *Reward Milestones:*\n${milestoneLines}\n` : "") +
-      redeemLine +
-      `\n\n🎁 Get rewarded on every purchase.\n\n` +
-      `👉 View My Loyalty Rewards: ${publicUrl}`
+      `Welcome to *${brandName} Loyalty Program* 🎉\n\n` +
+      `Thank you for choosing ${brandName}. Your loyalty means a lot to us.\n\n` +
+      `─────────────────────\n` +
+      `💰 *Wallet Balance:* ${currentCoins} coins\n` +
+      `─────────────────────\n\n` +
+      `📊 *Reward Milestones*\n\n` +
+      `${milestoneLines}\n\n` +
+      `─────────────────────\n\n` +
+      `📌 *How to Redeem*\n` +
+      `Simply share your registered mobile number with our team and we'll process your cashback promptly.\n\n` +
+      `🔗 *View Rewards Portal:*\n` +
+      `${publicUrl}\n\n` +
+      `_Earn coins on every purchase and unlock greater rewards._\n\n` +
+      `— Team ${brandName}`
     );
   },
 };
