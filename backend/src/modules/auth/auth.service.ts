@@ -47,6 +47,7 @@ export const authService = {
       brandId: user.brandId,
       phoneNumber: user.phoneNumber,
       name: user.name,
+      slug: user.brand?.slug
     });
 
     return { token, user };
@@ -59,6 +60,7 @@ export const authService = {
     brandId?: string | null;
     phoneNumber?: string;
     name?: string;
+    slug?: string
   }) {
     const secret = process.env.JWT_SECRET;
     if (!secret) throw new AppError("JWT_SECRET is not set", 500);
