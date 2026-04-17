@@ -352,15 +352,13 @@ export const whatsappService = {
     return (
       `Welcome to *${brandName} Loyalty Program* 🎉\n\n` +
       `Thank you for choosing ${brandName}. Your loyalty means a lot to us.\n\n` +
-      `💰 *Wallet Balance:* ${currentCoins} coins\n` +
+      `💰 *Wallet Balance:* ${currentCoins} coins\n\n` +
       `📊 *Reward Milestones*\n\n` +
       `${milestoneLines}\n\n` +
       `📌 *How to Redeem*\n` +
       `Simply share your registered mobile number with our team and we'll process your cashback promptly.\n\n` +
-      `Earn coins on every purchase and unlock greater rewards.\n\n` +
       `🔗 *View Rewards Portal:*\n` +
-      `${publicUrl}\n\n` +
-      `— Team ${brandName}`
+      `${publicUrl}\n\n`
     );
   },
 };
