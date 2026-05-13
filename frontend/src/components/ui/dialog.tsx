@@ -67,14 +67,16 @@ export function DialogPopup({
   showCloseButton = true,
   bottomStickOnMobile = true,
   closeProps,
+  portalProps,
   ...props
 }: DialogPrimitive.Popup.Props & {
   showCloseButton?: boolean;
   bottomStickOnMobile?: boolean;
   closeProps?: DialogPrimitive.Close.Props;
+  portalProps?: DialogPrimitive.Portal.Props;
 }): React.ReactElement {
   return (
-    <DialogPortal>
+    <DialogPortal {...portalProps}>
       <DialogBackdrop />
       <DialogViewport
         className={cn(
@@ -97,7 +99,7 @@ export function DialogPopup({
             <DialogPrimitive.Close
               aria-label="Close"
               className="absolute end-2 top-2"
-              render={<Button size="icon" variant="ghost" className="text-gray-600 hover:text-white" />}
+              render={<Button size="icon" variant="ghost" />}
               {...closeProps}
             >
               <XIcon />
@@ -116,7 +118,7 @@ export function DialogHeader({
 }: useRender.ComponentProps<"div">): React.ReactElement {
   const defaultProps = {
     className: cn(
-      "flex flex-col gap-2 p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pb-3 max-sm:pb-4",
+      "flex font-poppins flex-col gap-2 p-6 in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pb-3 max-sm:pb-4",
       className,
     ),
     "data-slot": "dialog-header",
@@ -139,7 +141,7 @@ export function DialogFooter({
 }): React.ReactElement {
   const defaultProps = {
     className: cn(
-      "flex flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end sm:rounded-b-[calc(var(--radius-2xl)-1px)]",
+      "flex font-poppins flex-col-reverse gap-2 px-6 sm:flex-row sm:justify-end sm:rounded-b-[calc(var(--radius-2xl)-1px)]",
       variant === "default" && "border-t bg-muted/72 py-4",
       variant === "bare" &&
       "in-[[data-slot=dialog-popup]:has([data-slot=dialog-panel])]:pt-3 pt-4 pb-6",
