@@ -1,276 +1,133 @@
 "use client"
 
 import * as React from "react"
-import {
-  AxeIcon,
-  BadgeIndianRupee,
-  BadgeIndianRupeeIcon,
-  BanIcon,
-  BookOpen,
-  Bot,
-  Brain,
-  Calendar1,
-  Command,
-  Frame,
-  Home,
-  IndianRupee,
-  LifeBuoy,
-  LucideSmile,
-  Map,
-  MessageCircleHeart,
-  PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
-  UsersRound,
-} from "lucide-react"
+import { Cog, Heart, Megaphone, Wallet, } from "lucide-react"
 import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
-import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
-import { NavSecondary } from "@/components/nav-secondary"
-import { NavUser } from "@/components/nav-user"
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar"
-import { ChartLine } from "./animate-ui/icons/chart-line"
-import { AnimateIcon } from "./animate-ui/icons/icon"
-import { ChartColumnIncreasing } from "./animate-ui/icons/chart-column-increasing"
-import { LayoutDashboard } from "./animate-ui/icons/layout-dashboard"
-import { ThemeToggle } from "./theme-toggle"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@/components/ui/sidebar"
+import Image from "next/image";
+import WelcomeCard from "./dashboard/WelcomeCard";
+import Cashier02Icon from '@iconify-react/hugeicons/cashier-02';
+import SparkleIcon from '@iconify-react/fluent-emoji-high-contrast/sparkle';
+import CoinsIcon from '@iconify-react/majesticons/coins';
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
-    },
-    {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
   const pathname = usePathname();
+  const sidebarItems = [
+    {
+      label: "Dashboard",
+      href: "/dashboard",
+      icon: SparkleIcon,
+      disabled: false,
+    },
+    {
+      label: "Loyalty",
+      href: "/dashboard/loyalty",
+      icon: CoinsIcon,
+      disabled: false,
+    },
+    {
+      label: "Feedback",
+      href: "/dashboard/feedback",
+      icon: Heart,
+      disabled: true,
+    },
+    {
+      label: "Marketing",
+      href: "/dashboard/marketing",
+      icon: Megaphone,
+      disabled: false,
+    },
+    {
+      label: "Wallet",
+      href: "/dashboard/wallet",
+      icon: Wallet,
+      disabled: true,
+    },
+    {
+      label: "Cashier Panel",
+      href: "/dashboard/cashier-panel",
+      activePath: "/dashboard/cashier-panel",
+      icon: Cashier02Icon,
+      disabled: false,
+    },
+    {
+      label: "Account Settings",
+      href: "/dashboard/settings",
+      icon: Cog,
+      disabled: false,
+    },
+  ];
   return (
-    <Sidebar variant="inset"  {...props} >
-      <SidebarHeader className="px-2">
+    <Sidebar variant="inset"  {...props} className="py-7">
+      <SidebarHeader className="p-0">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <a href="#">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
-                </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Zuplin</span>
-                  <span className="truncate text-xs">Enterprise Plan</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-
-          {/* ← moved OUT of the previous SidebarMenuItem */}
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild className="my-2 h-11 rounded-xl px-4 py-3">
-              <button
-                className="flex items-center gap-2 cursor-pointer bg-primary font-semibold text-white px-3 py-2 rounded-md hover:bg-purple-300 transition w-full"
-                onClick={() => router.push("cashier")}
-              >
-                <IndianRupee className="w-4 h-4" />
-                <span>Cashier Portal</span>
-              </button>
-            </SidebarMenuButton>
+            <a href="#">
+              <div className="flex items-start justify-start  px-2">
+                <Image
+                  src="/logo.svg"
+                  alt="Zuplin"
+                  width={120}
+                  height={32}
+                  className="block dark:hidden"
+                />
+                <Image
+                  src="/logo_dark.svg"
+                  alt="Zuplin"
+                  width={120}
+                  height={32}
+                  className="hidden dark:block"
+                />
+              </div>
+            </a>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+      <WelcomeCard />
 
-      <SidebarContent className="overflow-y-auto overflow-x-hidden px-2">
-        {/* Core Navigation */}
+      {/* Core Navigation */}
 
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild isActive={pathname === "/dashboard"} className="h-11 rounded-xl px-4 py-3">
-              <Link href="/dashboard">
+      <SidebarContent>
+        <div className="px-4 py-4 bg-background rounded-4xl mt-6 ml-2 w-66 text-[#48494C] dark:text-white">
+          <SidebarMenu className="space-y-1">
+            {sidebarItems.map((item) => {
+              const Icon = item.icon;
 
-                <LayoutDashboard animateOnHover />
-                <span className="text-[14px]">Dashboard</span>
-
-
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          {/* <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === "/dashboard/loyalty"}
-              className="h-11 rounded-xl px-4 py-3"
-            >
-              <Link href="/dashboard/loyalty">
-                <MessageCircleHeart />
-                <span>Loyalty Program</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === "/dashboard/reviews"}
-              className="h-11 rounded-xl px-4 py-3"
-            >
-              <Link href="/dashboard/reviews">
-                <LucideSmile />
-                <span>Reviews</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              isActive={pathname === "/dashboard/customer"}
-              className="h-11 rounded-xl px-4 py-3"
-            >
-              <Link href="/dashboard/customer">
-                <UsersRound />
-                <span>Customer Insight</span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-
-
-
-          </SidebarMenuItem> */}
-
-        </SidebarMenu>
-
+              return (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    isActive={pathname === (item.activePath ?? item.href)}
+                    className="h-10 rounded-[28px] px-3 text-base font-poppins"
+                    disabled={item.disabled}
+                    asChild={!item.disabled}
+                  >
+                    {item.disabled ? (
+                      <div className="flex items-center gap-2 cursor-not-allowed opacity-50">
+                        <Icon style={{ width: "22px", height: "22px" }} />
+                        <span>{item.label}</span>
+                      </div>
+                    ) : (
+                      <Link href={item.href} className="flex items-center gap-2">
+                        <Icon style={{ width: "22px", height: "22px" }} />
+                        <span>{item.label}</span>
+                      </Link>
+                    )}
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              );
+            })}
+          </SidebarMenu>
+        </div>
       </SidebarContent>
       <SidebarFooter className="px-2 gap-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
+            {/* <SidebarMenuButton
               className="h-11 rounded-xl px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
               onClick={() => {
                 localStorage.removeItem('token');
@@ -280,10 +137,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>
-            </SidebarMenuButton>
+            </SidebarMenuButton> */}
           </SidebarMenuItem>
         </SidebarMenu>
-        <ThemeToggle />
       </SidebarFooter>
     </Sidebar>
   )
