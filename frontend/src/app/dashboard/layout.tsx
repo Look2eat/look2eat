@@ -26,12 +26,9 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
-      <SidebarProvider>
+      <SidebarProvider >
         <AppSidebar />
-        <SidebarInset>
-          <header className="flex h-16 shrink-0 items-center gap-2">
-            <DashboardHeader />
-          </header>
+        <SidebarInset className="bg-background">
           {children}
         </SidebarInset>
       </SidebarProvider>
