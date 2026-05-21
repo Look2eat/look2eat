@@ -2,18 +2,16 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import DashboardHeader from "@/components/dashboard/DashboardHeader"
-import DashboardGrid from "@/components/dashboard/DashboardGrid"
+
 // import {
 //   fetchDashboardStats,
 //   DashboardStats
 // } from "@/lib/mockDashboardApi"
 import { getDashboardKpis, DashboardKpis } from "@/services/api"
-import LoyaltyCard from "@/components/dashboard/LoyaltyCard"
-import FeedbackCard from "@/components/dashboard/FeedbackCard"
+
 import { Skeleton } from "@/components/ui/skeleton"
 import { getBrandIdFromToken } from "@/lib/auth"
-import StatisticsBlock from "@/components/shadcn-space/blocks/dashboard-shell-01/statistics"
+import Widget from "@/components/shadcn-space/blocks/widget-01/widget"
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardKpis | null>(null)
@@ -57,7 +55,7 @@ export default function DashboardPage() {
       {/* <DashboardGrid stats={stats} /> */}
       <div className="grid grid-cols-12 gap-6 p-6 max-w-7xl mx-auto">
         <div className="col-span-12">
-          <StatisticsBlock />
+          <Widget />
         </div>
       </div>
 
