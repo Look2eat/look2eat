@@ -27,9 +27,9 @@ export default function CustomerRepeatRateCard({ data }: Props) {
         data.visit6plus
 
     return (
-        <div className="p-4 md:p-6 rounded-2xl bg-muted/60 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1] flex flex-col gap-6 md:gap-10">
+        <div className="p-4 md:p-6 rounded-2xl bg-white dark:bg-[#121214] flex flex-col gap-6 md:gap-10">
 
-            <h3 className="text-sm md:text-base font-bold tracking-wide uppercase">
+            <h3 className="text-base md:text-xl font-semibold">
                 Customer Repeat Rate
             </h3>
 
@@ -43,7 +43,7 @@ export default function CustomerRepeatRateCard({ data }: Props) {
                     return (
                         <div
                             key={row.label}
-                            className="grid grid-cols-[90px_1fr_60px] md:grid-cols-[160px_1fr_80px] items-center gap-2 md:gap-4"
+                            className="grid grid-cols-[90px_1fr_60px] md:grid-cols-[150px_1fr_90px] items-center gap-2 md:gap-4"
                         >
                             {/* Label */}
                             <span className="text-[10px] md:text-sm font-medium leading-tight">
@@ -55,7 +55,7 @@ export default function CustomerRepeatRateCard({ data }: Props) {
                                 <div
                                     className={cn(
                                         "h-full rounded-full transition-all duration-700 ease-out",
-                                        percent > 0 ? "bg-blue-600" : "bg-foreground/10"
+                                        percent > 0 ? "dark:bg-white bg-neutral-800" : "bg-foreground/10"
                                     )}
                                     style={{ width: `${percent}%` }}
                                 />

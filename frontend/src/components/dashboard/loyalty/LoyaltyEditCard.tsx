@@ -29,25 +29,25 @@ export default function LoyaltyEditCard({
         <div>
 
             {/* LEFT CONTENT */}
-            <div className="flex flex-col gap-6 max-w-xl z-10">
+            {/* <div className="flex flex-col gap-2 max-w-xl z-10">
 
-                <h1 className="text-5xl font-bold tracking-tight">
+                <h1 className="text-3xl font-bold tracking-tight">
                     {title}
                 </h1>
 
                 {subtitle && (
-                    <p className="text-2xl font-semibold text-muted-foreground">
+                    <p className="text-xl font-semibold text-muted-foreground">
                         {subtitle}
                     </p>
                 )}
 
                 {description && (
-                    <p className="text-xl text-muted-foreground">
+                    <p className="text-base text-muted-foreground">
                         {description}
                     </p>
                 )}
-            </div>
-            <div className="flex flex-col gap-6 mt-6 z-10 pt-20">
+            </div> */}
+            <div className="flex flex-col gap-6 mt-6 z-10 pt-4">
                 {/* Buttons */}
                 <div className="flex gap-6 mt-4">
                     <button
@@ -69,7 +69,7 @@ export default function LoyaltyEditCard({
             {/* RIGHT IMAGE */}
             <div className="absolute right-0 -bottom-50 top-0 flex items-center pr-6 pointer-events-none">
 
-                <div className="relative w-55 h-[460px] -rotate-18 rounded-[40px] overflow-hidden bg-muted/50 shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
+                <div className="relative w-30 h-[240px] -rotate-15 rounded-[30px] overflow-hidden bg-muted/50 shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
                     <Image
                         src={imageUrl}
                         alt="Loyalty Preview"
