@@ -26,6 +26,17 @@ export const mockData = {
   security: {
     twoFA: true,
   },
+  wallet: {
+    creditBalance: 3400,         // in ₹ — covers 1700 customers @ ₹2 each
+    customerRate: 2,             // ₹ per customer
+    recharges: [
+      { id: "rch001", date: "Jun 1, 2026",  amount: 1000, customers: 500,  status: "Success" },
+      { id: "rch002", date: "May 10, 2026", amount: 2000, customers: 1000, status: "Success" },
+      { id: "rch003", date: "Apr 18, 2026", amount: 500,  customers: 250,  status: "Success" },
+      { id: "rch004", date: "Mar 5, 2026",  amount: 1000, customers: 500,  status: "Success" },
+      { id: "rch005", date: "Feb 12, 2026", amount: 500,  customers: 250,  status: "Failed"  },
+    ],
+  },
   billing: {
     plan: "Pro",
     amount: "₹2,499 / month",
@@ -41,3 +52,5 @@ export const mockData = {
 // Types
 export type Cashier = { id: string; name: string; username: string; password: string };
 export type BillingRow = { id: string; date: string; amount: string; status: string };
+
+export type RechargeRow = { id: string; date: string; amount: number; customers: number; status: string };
