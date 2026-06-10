@@ -14,7 +14,7 @@ export default function CashierMainScreen() {
 
                 {/* 70% */}
                 <main className="w-full lg:w-[65%]">
-                    <div className="rounded-3xl bg-white dark:bg-[#040317] p-6 h-full ">
+                    <div className="rounded-3xl bg-white dark:bg-[#121214] p-6 h-full ">
 
                         <h1 className="text-2xl font-bold">
                             Manage Cahier Accounts

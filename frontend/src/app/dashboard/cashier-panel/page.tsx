@@ -5,7 +5,7 @@ function page() {
     return (
         <div className=" px-6 py-6 font-poppins">
             <div>
-                <h1 className="mb-6 text-3xl font-bold tracking-tight text-[#1D2033] dark:text-[#FDFEFF]">Account Settings</h1>
+                <h1 className="mb-6 text-3xl font-bold tracking-tight text-[#1D2033] dark:text-[#FDFEFF]">Cashier Panel</h1>
                 <CashierMainScreen /></div>
         </div>
     )

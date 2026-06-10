@@ -11,7 +11,12 @@ import { getDashboardKpis, DashboardKpis } from "@/services/api"
 
 import { Skeleton } from "@/components/ui/skeleton"
 import { getBrandIdFromToken } from "@/lib/auth"
-import Widget from "@/components/shadcn-space/blocks/widget-01/widget"
+import StatisticsBlock from "@/components/shadcn-space/blocks/dashboard-shell-01/statistics"
+import SalesOverviewChart from "@/components/shadcn-space/blocks/dashboard-shell-01/sales-overview-chart"
+
+import PreviewTabs from "@/components/shadcn-space/blocks/dashboard-shell-01/tabs"
+import { MiniChart } from "@/components/ui/mini-chart"
+
 
 export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardKpis | null>(null)
@@ -55,7 +60,20 @@ export default function DashboardPage() {
       {/* <DashboardGrid stats={stats} /> */}
       <div className="grid grid-cols-12 gap-6 p-6 max-w-7xl mx-auto">
         <div className="col-span-12">
-          <Widget />
+          <StatisticsBlock />
+        </div>
+        <div className="xl:col-span-8 col-span-12">
+          <SalesOverviewChart />
+        </div>
+        <div className="xl:col-span-4 col-span-12">
+          <MiniChart />
+        </div>
+        <div className="col-span-12">
+          <div className="flex items-start justify-start mb-4">
+            <PreviewTabs />
+          </div>
+
+
         </div>
       </div>
 

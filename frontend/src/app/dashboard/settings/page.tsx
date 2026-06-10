@@ -22,7 +22,7 @@ export default function AccountSettingsPage() {
             <div className="mx-auto ">
                 <h1 className="mb-6 text-3xl font-bold tracking-tight text-[#1D2033] dark:text-[#FDFEFF]">Account Settings</h1>
 
-                <div className="overflow-hidden rounded-2xl bg-white dark:bg-[#040317] shadow-sm ring-1 ring-gray-100 dark:ring-gray-900">
+                <div className="overflow-hidden rounded-2xl bg-white dark:bg-[#121214] shadow-sm ring-1 ring-gray-100 dark:ring-gray-900">
                     <Tabs className="w-full flex-row lg:min-h-140 gap-4" defaultValue="profile" orientation="vertical">
                         <SettingsSidebar />
 

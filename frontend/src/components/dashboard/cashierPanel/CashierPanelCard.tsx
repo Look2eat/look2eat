@@ -23,7 +23,7 @@ export default function CashierPanelCard({
     };
 
     return (
-        <div className="w-full rounded-3xl bg-white dark:bg-[#040317] p-5 ">
+        <div className="w-full rounded-3xl bg-white dark:bg-[#121214] p-5 ">
             {/* Heading */}
             <h2 className="text-center text-lg md:text-xl font-semibold leading-snug">
                 To open cashier panel on another device scan QR code or copy the
@@ -66,7 +66,7 @@ export default function CashierPanelCard({
                 <p className="text-neutral-500 dark:text-neutral-300 text-lg mb-5">Scan QR</p>
 
                 <div className="rounded-xl bg-white p-3">
-                    <QRCode data={cashierLink} background="#040317" foreground="#040317" />
+                    <QRCode data={cashierLink} background="#121214" foreground="#121214" />
                 </div>
             </div>
 

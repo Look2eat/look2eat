@@ -46,39 +46,41 @@
   --radius-4xl: calc(var(--radius) + 16px);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-color-destructive-foreground: var(----color-destructive-foreground);
-  --color-color-color-destructive-foreground: var(----color-color-destructive-foreground);
+  --color-color-color-destructive-foreground: var(
+    ----color-color-destructive-foreground
+  );
   --animate-skeleton: skeleton 2s -1s infinite linear;
   @keyframes skeleton {
-  to {
-    background-position: -200% 0;
+    to {
+      background-position: -200% 0;
     }
   }
   @keyframes fadeSlideIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0px);
+    to {
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateY(0px);
     }
   }
   @keyframes slideRightIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateX(0px);
+    to {
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateX(0px);
     }
   }
   @keyframes testimonialIn {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-    transform: translateY(0px) scale(1);
+    to {
+      opacity: 1;
+      filter: blur(0px);
+      transform: translateY(0px) scale(1);
     }
   }
 }
 
 :root {
   --radius: 0.65rem;
-  --background: #F2F6FA;
+  --background: #f2f6fa;
   --foreground: oklch(0.141 0.005 285.823);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.141 0.005 285.823);
@@ -101,7 +103,7 @@
   --chart-3: oklch(0.546 0.245 262.881);
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: #FFFFFF;
+  --sidebar: #ffffff;
   --sidebar-foreground: oklch(0.141 0.005 285.823);
   --sidebar-primary: oklch(0.546 0.245 262.881);
   --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
@@ -110,11 +112,11 @@
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.708 0 0);
   --destructive-foreground: oklch(1 0 0);
-  --main:#FFFFFF;
+  --main: #ffffff;
 }
 
 .dark {
-  --background: #151621;
+  --background: #1E1F27;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.21 0.006 285.885);
   --card-foreground: oklch(0.985 0 0);
@@ -137,7 +139,7 @@
   --chart-3: oklch(0.546 0.245 262.881);
   --chart-4: oklch(0.488 0.243 264.376);
   --chart-5: oklch(0.424 0.199 265.638);
-  --sidebar: #040317;
+  --sidebar: #121214;
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.623 0.214 259.815);
   --sidebar-primary-foreground: oklch(0.97 0.014 254.604);
@@ -146,7 +148,7 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.439 0 0);
   --destructive-foreground: oklch(1 0 0);
-  --main:#FFFFFF;
+  --main: #ffffff;
 }
 
 @layer base {
@@ -162,7 +164,8 @@
   --font-mono: var(--font-geist-mono);
   --font-poppins: var(--font-poppins);
 }
-html, body {
+html,
+body {
   height: 100%;
   overflow-x: hidden;
 }
