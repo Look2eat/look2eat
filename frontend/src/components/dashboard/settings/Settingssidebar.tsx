@@ -11,8 +11,10 @@ const TAB_ITEMS = [
     { value: "profile", label: "Profile" },
     { value: "business", label: "Business" },
     { value: "team", label: "Team" },
+    { value: "wallet", label: "Wallet" },
     { value: "security", label: "Security" },
     { value: "billing", label: "Billing" },
+    { value: "wallet", label: "Wallet" },
 ];
 
 export function SettingsSidebar() {
