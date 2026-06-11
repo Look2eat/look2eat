@@ -4,8 +4,8 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
-  engineType = "library"
+  provider      = "prisma-client-js"
+  engineType    = "library"
   binaryTargets = ["native"]
 }
 
@@ -14,183 +14,196 @@ datasource db {
 }
 
 model Brand {
-  id                String   @id @default(uuid())
-  name              String
-  slug              String   @unique
-  email             String
-  phoneNumber       String
-  logoUrl           String?
-  primaryColor      String?
-  bannerImageUrl    String?
-  description       String?
-  termsText         String?
-  isActive          Boolean  @default(true)
+  id             String  @id @default(uuid())
+  name           String
+  slug           String  @unique
+  email          String
+  phoneNumber    String
+  logoUrl        String?
+  primaryColor   String?
+  bannerImageUrl String?
+  description    String?
+  termsText      String?
+  isActive       Boolean @default(true)
 
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  users             AdminUser[]
-  outlets           Outlet[]
-  settings          BrandSettings?
-  rewardMilestones  RewardMilestone[]
-  coinWallets       CoinWallet[]
-  whatsappMessages  WhatsAppMessage[]
+  users               AdminUser[]
+  outlets             Outlet[]
+  settings            BrandSettings?
+  rewardMilestones    RewardMilestone[]
+  coinWallets         CoinWallet[]
+  whatsappMessages    WhatsAppMessage[]
+  customerOtpSessions CustomerOTPSession[]
 }
 
 model AdminUser {
-  id              String   @id @default(uuid())
-  brandId         String?
-  name            String
-  email           String   @unique
-  phoneNumber     String
-  passwordHash    String
-  role            Role
-  isActive        Boolean  @default(true)
+  id           String  @id @default(uuid())
+  brandId      String?
+  name         String
+  email        String  @unique
+  phoneNumber  String
+  passwordHash String
+  role         Role
+  isActive     Boolean @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  brand           Brand?    @relation(fields: [brandId], references: [id])
+  brand Brand? @relation(fields: [brandId], references: [id])
 
   @@unique([brandId, email])
 }
 
 model Outlet {
-  id           String   @id @default(uuid())
-  brandId      String
-  name         String
-  address      String?
-  phoneNumber  String?
+  id          String  @id @default(uuid())
+  brandId     String
+  name        String
+  address     String?
+  phoneNumber String?
 
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  isActive Boolean @default(true)
 
-  brand        Brand    @relation(fields: [brandId], references: [id])
-  cashiers     Cashier[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brand Brand @relation(fields: [brandId], references: [id])
+
+  cashiers Cashier[]
+
+  subscriptions      OutletSubscription[]
+  creditWallet       PlatformCreditWallet?
+  creditTransactions CreditTransaction[]
 }
 
 // Cashier login credentials
 model Cashier {
-  id              String   @id @default(uuid())
-  outletId        String
-  phoneNumber     String
-  name            String
-  passwordHash    String  // Hashed password for login
-  isActive        Boolean  @default(true)
+  id           String  @id @default(uuid())
+  outletId     String
+  phoneNumber  String
+  name         String
+  passwordHash String // Hashed password for login
+  isActive     Boolean @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  outlet          Outlet   @relation(fields: [outletId], references: [id], onDelete: Cascade)
-  sessions        CashierSession[]
+  outlet   Outlet           @relation(fields: [outletId], references: [id], onDelete: Cascade)
+  sessions CashierSession[]
 
   @@unique([outletId, phoneNumber])
 }
 
 // Cashier session & OTP management
 model CashierSession {
-  id              String   @id @default(uuid())
-  cashierId       String
-  otp             String
-  otpExpiresAt    DateTime // 15 minutes from creation
-  verifiedAt      DateTime?
-  lastActivityAt  DateTime @default(now())
-  isActive        Boolean  @default(true)
+  id             String    @id @default(uuid())
+  cashierId      String
+  otp            String
+  otpExpiresAt   DateTime // 15 minutes from creation
+  verifiedAt     DateTime?
+  lastActivityAt DateTime  @default(now())
+  isActive       Boolean   @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  cashier         Cashier  @relation(fields: [cashierId], references: [id], onDelete: Cascade)
+  cashier Cashier @relation(fields: [cashierId], references: [id], onDelete: Cascade)
 
   @@index([cashierId, isActive])
 }
 
 // Customer OTP session for phone verification
 model CustomerOTPSession {
-  id              String   @id @default(uuid())
-  brandId         String
-  phoneNumber     String
-  otp             String
-  expiresAt       DateTime // 15 minutes from creation
-  verified        Boolean  @default(false)
-  verifiedAt      DateTime?
+  id          String    @id @default(uuid())
+  brandId     String
+  phoneNumber String
+  otp         String
+  expiresAt   DateTime // 15 minutes from creation
+  verified    Boolean   @default(false)
+  verifiedAt  DateTime?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  brand     Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@index([brandId, phoneNumber, verified])
 }
 
 // Brand settings (coin ratio, expiry dates)
 model BrandSettings {
-  id              String   @id @default(uuid())
-  brandId         String   @unique
-  coinRatioValue  Float    @default(1.0) // 1 rupee = X coins
-  pilotStartDate  DateTime?
-  pilotEndDate    DateTime? // 19 April afternoon for pilot
-  isActive        Boolean  @default(true)
+  id             String    @id @default(uuid())
+  brandId        String    @unique
+  coinRatioValue Float     @default(1.0) // 1 rupee = X coins
+  pilotStartDate DateTime?
+  pilotEndDate   DateTime? // 19 April afternoon for pilot
+  isActive       Boolean   @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 }
 
 // Reward milestones (e.g., 200 coins = 50 rs cashback)
 model RewardMilestone {
-  id              String   @id @default(uuid())
-  brandId         String
-  name            String
-  coinsRequired   Int
-  cashbackAmount  Int    // in rupees
-  isActive        Boolean @default(true)
+  id             String  @id @default(uuid())
+  brandId        String
+  name           String
+  coinsRequired  Int
+  cashbackAmount Int // in rupees
+  isActive       Boolean @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brand        Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
+  @@unique([brandId, coinsRequired])
   @@index([brandId])
 }
 
 // Customer coin wallet per brand
 model CoinWallet {
-  id              String   @id @default(uuid())
-  brandId         String
-  phoneNumber     String
-  currentCoins    Int      @default(0)
-  totalCoinsEarned Int    @default(0)
-  expiryDate      DateTime? // When coins expire (19 April in pilot)
-  isActive        Boolean  @default(true)
+  id               String    @id @default(uuid())
+  brandId          String
+  phoneNumber      String
+  currentCoins     Int       @default(0)
+  totalCoinsEarned Int       @default(0)
+  expiryDate       DateTime? // When coins expire (19 April in pilot)
+  isActive         Boolean   @default(true)
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  transactions    Transaction[]
+  brand        Brand         @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
 
   @@unique([brandId, phoneNumber])
+  @@index([expiryDate])
   @@index([brandId, isActive])
 }
 
 // All transactions (purchases and redemptions)
 model Transaction {
-  id              String   @id @default(uuid())
-  walletId        String
-  type            TransactionType // PURCHASE or REDEMPTION
-  purchaseAmount  Int? // in rupees (for purchase)
-  coinsEarned     Int? // coins earned from purchase
-  coinsRedeemed   Int? // coins used for redemption
-  cashbackApplied Int? // cashback in rupees
-  milestoneId     String? // which milestone was redeemed
+  id                 String          @id @default(uuid())
+  walletId           String
+  type               TransactionType // PURCHASE or REDEMPTION
+  purchaseAmount     Int? // in rupees (for purchase)
+  coinsEarned        Int? // coins earned from purchase
+  coinsRedeemed      Int? // coins used for redemption
+  cashbackApplied    Int? // cashback in rupees
+  milestoneId        String? // which milestone was redeemed
   cashierPhoneNumber String? // which cashier made the transaction
-  whatsappSent    Boolean  @default(false)
-  whatsappError   String?
+  whatsappSent       Boolean         @default(false)
+  whatsappError      String?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  wallet          CoinWallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  wallet    CoinWallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  milestone RewardMilestone? @relation(fields: [milestoneId], references: [id])
 
   @@index([walletId, createdAt])
   @@index([type])
@@ -198,23 +211,96 @@ model Transaction {
 
 // WhatsApp message logs
 model WhatsAppMessage {
-  id              String   @id @default(uuid())
-  brandId         String
-  phoneNumber     String
-  templateName    String
-  variables       String   @db.Text // JSON stringified variables
-  status          MessageStatus @default(PENDING)
-  messageId       String?
-  errorMessage    String?
-  sentAt          DateTime?
+  id           String        @id @default(uuid())
+  brandId      String
+  phoneNumber  String
+  templateName String
+  variables    String        @db.Text // JSON stringified variables
+  status       MessageStatus @default(PENDING)
+  messageId    String?
+  errorMessage String?
+  sentAt       DateTime?
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  brand           Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@index([brandId, status])
   @@index([phoneNumber, status])
+}
+
+model SubscriptionPlan {
+  id   String @id @default(uuid())
+  name String
+
+  durationMonths Int
+
+  price Int
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  subscriptions OutletSubscription[]
+}
+
+model OutletSubscription {
+  id String @id @default(uuid())
+
+  outletId String
+  planId   String
+
+  startDate DateTime
+  endDate   DateTime
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outlet Outlet           @relation(fields: [outletId], references: [id])
+  plan   SubscriptionPlan @relation(fields: [planId], references: [id])
+
+  @@index([outletId, isActive])
+  @@index([endDate])
+}
+
+model PlatformCreditWallet {
+  id String @id @default(uuid())
+
+  outletId String @unique
+
+  balance Int @default(0)
+
+  totalPurchased Int @default(0)
+  totalConsumed  Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outlet Outlet @relation(fields: [outletId], references: [id])
+}
+
+model CreditTransaction {
+  id String @id @default(uuid())
+
+  outletId String
+
+  type CreditTransactionType
+
+  credits Int
+
+  amountPaid Int?
+
+  description String?
+
+  createdAt DateTime @default(now())
+
+  outlet Outlet @relation(fields: [outletId], references: [id])
+
+  @@index([outletId, createdAt])
 }
 
 enum Role {
@@ -233,4 +319,9 @@ enum MessageStatus {
   SENT
   FAILED
   FAILED_INVALID_NUMBER
+}
+
+enum CreditTransactionType {
+  PURCHASE
+  CONSUMPTION
 }

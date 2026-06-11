@@ -2,10 +2,19 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.authRepository = void 0;
 const client_1 = require("../../prisma/client");
-const enums_1 = require("../../generated/prisma/enums");
+const client_2 = require("@prisma/client");
 exports.authRepository = {
     findByEmail: (email) => client_1.prisma.adminUser.findUnique({
         where: { email },
+        include: {
+            brand: true
+        }
+    }),
+    findByPhoneNumber: (phoneNumber) => client_1.prisma.adminUser.findFirst({
+        where: { phoneNumber },
+        include: {
+            brand: true
+        }
     }),
     findBrandBySlug: (slug) => client_1.prisma.brand.findUnique({
         where: { slug },
@@ -27,7 +36,7 @@ exports.authRepository = {
                     email: data.email,
                     phoneNumber: data.phone,
                     passwordHash: data.passwordHash,
-                    role: enums_1.Role.OWNER,
+                    role: client_2.Role.OWNER,
                 },
             });
             return { brand, owner };

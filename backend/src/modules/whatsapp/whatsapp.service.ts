@@ -1,41 +1,23 @@
 import axios, { AxiosError } from "axios";
 import { prisma } from "../../prisma/client";
-import { AppError } from "../errors/AppError";
+import { AppError } from "../../common/errors/AppError";
+import { WhatsAppMessage } from "./types";
+import { env } from "../../config/env";
+import { TEMPLATE_MAPPING } from "./whatsapp.templates";
 
-interface WhatsAppTemplateVariable {
-  type: "text";
-  parameter_name?: string;
-  text: string;
-}
 
-interface WhatsAppMessage {
-  phoneNumber: string;
-  templateName: string;
-  variables: Record<string, string>;
-  brandId: string;
-}
-
-const WHATSAPP_API_URL = `https://graph.facebook.com/${process.env.WHATSAPP_API_VERSION}/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
-
-const TEMPLATE_MAPPING: Record<string, { paramNames: string[] }> = {
-  [process.env.WHATSAPP_TEMPLATE_OTP!]: {
-    paramNames: ["otp"],
-  },
-  [process.env.WHATSAPP_TEMPLATE_FIRST_PURCHASE!]: {
-    paramNames: ["restaurant_name", "points"],
-  },
-  [process.env.WHATSAPP_TEMPLATE_PURCHASE!]: {
-    paramNames: ["restaurant_name", "points"],
-  },
-  [process.env.WHATSAPP_TEMPLATE_PURCHASE_REDEEM!]: {
-    paramNames: ["restaurant_name", "redeem", "earned", "total"],
-  },
-  [process.env.WHATSAPP_TEMPLATE_EXPIRY_WARNING!]: {
-    paramNames: ["restaurant_name", "points", "date"],
-  },
-};
+const WHATSAPP_API_URL =
+  `https://graph.facebook.com/${env.whatsappApiVersion}/${env.whatsappPhoneNumberId}/messages`;
 
 export const whatsappService = {
+  formatPhoneNumber(phoneNumber: string): string {
+    const digits = phoneNumber.replace(/\D/g, "");
+    if (digits.length === 10) {
+      return "91" + digits;
+    }
+    return digits;
+  },
+
   async sendMessage(message: WhatsAppMessage, retries = 3): Promise<boolean> {
     const { phoneNumber, templateName, variables, brandId } = message;
 
@@ -64,7 +46,7 @@ export const whatsappService = {
     });
     const walletId = wallet?.id || phoneNumber.replace(/^\+/, '');
 
-    let lastError: any;
+    let lastError: unknown;
     for (let attempt = 1; attempt <= retries; attempt++) {
       try {
 
@@ -76,9 +58,12 @@ export const whatsappService = {
           walletId
         );
 
+        console.log(`[WhatsApp Outbound] Sending template message to number format: ${messageBody.to}`);
+        console.log(`[WhatsApp Outbound] Full Payload:`, JSON.stringify(messageBody, null, 2));
+
         const response = await axios.post(WHATSAPP_API_URL, messageBody, {
           headers: {
-            Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${env.whatsappAccessToken}`,
             "Content-Type": "application/json",
           },
         });
@@ -88,9 +73,7 @@ export const whatsappService = {
         await prisma.whatsAppMessage.create({
           data: {
             brandId,
-            phoneNumber: phoneNumber.startsWith("+")
-              ? phoneNumber
-              : `+${phoneNumber}`,
+            phoneNumber: `+${whatsappService.formatPhoneNumber(phoneNumber)}`,
             templateName,
             variables: JSON.stringify(variables),
             status: "SENT",
@@ -98,12 +81,10 @@ export const whatsappService = {
             sentAt: new Date(),
           },
         });
-        console.log(messageBody);
-        console.log(response);
-        console.log(
-          `✅ WhatsApp message sent to ${phoneNumber} (templateId: ${messageId})`
-        );
+
+        console.log(`WhatsApp message sent to ${phoneNumber}`);
         return true;
+
       } catch (error) {
         lastError = error;
         const axiosError = error as AxiosError;
@@ -122,9 +103,7 @@ export const whatsappService = {
           await prisma.whatsAppMessage.create({
             data: {
               brandId,
-              phoneNumber: phoneNumber.startsWith("+")
-                ? phoneNumber
-                : `+${phoneNumber}`,
+              phoneNumber: `+${whatsappService.formatPhoneNumber(phoneNumber)}`,
               templateName,
               variables: JSON.stringify(variables),
               status: "FAILED_INVALID_NUMBER",
@@ -138,9 +117,7 @@ export const whatsappService = {
           await prisma.whatsAppMessage.create({
             data: {
               brandId,
-              phoneNumber: phoneNumber.startsWith("+")
-                ? phoneNumber
-                : `+${phoneNumber}`,
+              phoneNumber: `+${whatsappService.formatPhoneNumber(phoneNumber)}`,
               templateName,
               variables: JSON.stringify(variables),
               status: "FAILED",
@@ -170,7 +147,7 @@ export const whatsappService = {
   ): any {
     const templateConfig = TEMPLATE_MAPPING[templateName];
     const paramNames = templateConfig.paramNames;
-    const isOTP = templateName === process.env.WHATSAPP_TEMPLATE_OTP;
+    const isOTP = templateName === env.whatsappTemplateOtp;
 
     const parameters = paramNames.map((paramName) => {
       const obj: any = {
@@ -206,7 +183,7 @@ export const whatsappService = {
     return {
       messaging_product: "whatsapp",
       recipient_type: "individual",
-      to: phoneNumber.replace(/^\+/, ''), 
+      to: whatsappService.formatPhoneNumber(phoneNumber), 
       type: "template",
       template: {
         name: templateName,
@@ -222,7 +199,7 @@ export const whatsappService = {
     return whatsappService.sendMessage(
       {
         phoneNumber,
-        templateName: process.env.WHATSAPP_TEMPLATE_OTP!,
+        templateName: env.whatsappTemplateOtp,
         variables: {
           otp,
         },
@@ -237,9 +214,9 @@ export const whatsappService = {
     restaurantName: string,
     points: number,
     brandId: string,
-    isFirstPurchase: boolean = false
+    isNew: boolean
   ) {
-    const templateName = process.env.WHATSAPP_TEMPLATE_FIRST_PURCHASE!;
+    const templateName = env.whatsappTemplateFirstPurchase;
 
     return whatsappService.sendMessage(
       {
@@ -266,7 +243,7 @@ export const whatsappService = {
     return whatsappService.sendMessage(
       {
         phoneNumber,
-        templateName: process.env.WHATSAPP_TEMPLATE_PURCHASE_REDEEM!,
+        templateName:  env.whatsappTemplatePurchaseRedeem,
         variables: {
           restaurant_name: restaurantName,
           redeem: redeemedCoins.toString(),
@@ -289,7 +266,7 @@ export const whatsappService = {
     return whatsappService.sendMessage(
       {
         phoneNumber,
-        templateName: process.env.WHATSAPP_TEMPLATE_EXPIRY_WARNING!,
+        templateName: env.whatsappTemplateExpiryWarning,
         variables: {
           restaurant_name: restaurantName,
           points: points.toString(),
@@ -303,18 +280,20 @@ export const whatsappService = {
 
   async sendTextMessage(phoneNumber: string, text: string): Promise<boolean> {
     try {
+      const formattedNum = whatsappService.formatPhoneNumber(phoneNumber);
+      console.log(`[WhatsApp Outbound] Sending text message to number format: ${formattedNum}`);
       await axios.post(
         WHATSAPP_API_URL,
         {
           messaging_product: "whatsapp",
           recipient_type: "individual",
-          to: phoneNumber.replace(/^\+/, ""),
+          to: formattedNum,
           type: "text",
           text: { body: text },
         },
         {
           headers: {
-            Authorization: `Bearer ${process.env.WHATSAPP_ACCESS_TOKEN}`,
+            Authorization: `Bearer ${env.whatsappAccessToken}`,
             "Content-Type": "application/json",
           },
         }

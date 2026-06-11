@@ -21,11 +21,11 @@ export const authController = {
 
       const { passwordHash, ...ownerWithoutPassword } = owner;
 
-      res.status(201).json({ 
-        data: { 
-          brand, 
-          owner: ownerWithoutPassword 
-        } 
+      res.status(201).json({
+        data: {
+          brand,
+          owner: ownerWithoutPassword
+        }
       });
     } catch (error) {
       console.error('Error in registerOwner:', error);

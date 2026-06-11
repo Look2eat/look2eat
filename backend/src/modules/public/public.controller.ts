@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../../prisma/client";
 import { AppError } from "../../common/errors/AppError";
-import { whatsappService } from "../../common/services/whatsapp.service";
+import { whatsappService } from "../whatsapp/whatsapp.service";
 
 export const publicController = {
   async getLoyaltyPageData(req: Request, res: Response) {
@@ -138,6 +138,25 @@ export const publicController = {
       const entry = body?.entry?.[0];
       const changes = entry?.changes?.[0];
       const value = changes?.value;
+
+      // Handle status updates (delivery/read receipts or failures)
+      if (value?.statuses && value.statuses.length > 0) {
+        for (const status of value.statuses) {
+          console.log(`🔍 Webhook status update for message ID ${status.id}: ${status.status}`);
+          if (status.status === "failed") {
+            const errorMsg = status.errors?.[0]?.message || status.errors?.[0]?.title || "Message undeliverable";
+            console.error(`❌ WhatsApp message delivery failed for ID ${status.id}: ${errorMsg}`, status.errors);
+            
+            await prisma.whatsAppMessage.updateMany({
+              where: { messageId: status.id },
+              data: {
+                status: "FAILED",
+                errorMessage: errorMsg,
+              },
+            });
+          }
+        }
+      }
 
       if (!value?.messages || value.messages.length === 0) return;
 

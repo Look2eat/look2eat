@@ -1,5 +1,5 @@
 import { prisma } from '../../prisma/client';
-import { whatsappService } from '../../common/services/whatsapp.service';
+import { whatsappService } from "../whatsapp/whatsapp.service";
 
 export function startReminderJob() {
   const ONE_HOUR = 60 * 60 * 1000;

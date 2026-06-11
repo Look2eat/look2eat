@@ -31,8 +31,8 @@ exports.authController = {
         }
     },
     async login(req, res) {
-        const { email, password } = req.body;
-        const { token, user } = await auth_service_1.authService.login(email, password);
+        const { phone, password } = req.body;
+        const { token, user } = await auth_service_1.authService.login(phone, password);
         const { passwordHash, ...userWithoutPassword } = user;
         res.json({ token, user: userWithoutPassword });
     },

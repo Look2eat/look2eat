@@ -9,6 +9,7 @@ exports.requireOutletScope = requireOutletScope;
 exports.authenticateCashierJwt = authenticateCashierJwt;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const AppError_1 = require("../errors/AppError");
+const client_1 = require("@prisma/client");
 function authenticateJwt(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader?.startsWith("Bearer ")) {
@@ -56,7 +57,18 @@ function authenticateCashierJwt(req, res, next) {
         throw new AppError_1.AppError("JWT_SECRET is not set", 500);
     try {
         const payload = jsonwebtoken_1.default.verify(token, secret);
-        req.cashierAuth = payload;
+        if (payload.role && payload.role === client_1.Role.OWNER) {
+            req.cashierAuth = {
+                cashierId: payload.sub,
+                phoneNumber: payload.phoneNumber || "ADMIN",
+                outletId: "ADMIN_OUTLET",
+                brandId: payload.brandId,
+                name: payload.name || "Admin",
+            };
+        }
+        else {
+            req.cashierAuth = payload;
+        }
         next();
     }
     catch (err) {

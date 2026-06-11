@@ -8,14 +8,14 @@ export const adminRepository = {
     });
   },
 
-  async createBrandSettings(brandId: string, coinRatioValue: number) {
+  async createBrandSettings(data: {
+    brandId: string;
+    coinRatioValue: number;
+    pilotStartDate?: Date;
+    pilotEndDate?: Date;
+  }) {
     return prisma.brandSettings.create({
-      data: {
-        brandId,
-        coinRatioValue,
-        pilotStartDate: new Date("2026-04-17"),
-        pilotEndDate: new Date("2026-04-19T17:00:00"), 
-      },
+      data,
     });
   },
 

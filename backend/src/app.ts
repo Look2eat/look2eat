@@ -2,11 +2,14 @@ import express, { Express } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import morgan from "morgan";
+
 import { authRouter } from "./modules/auth/auth.routes";
-import { outletRouter } from "./modules/outlet/outlet.routes";
 import { adminRouter } from "./modules/admin/admin.routes";
+import { outletRouter } from "./modules/outlet/outlet.routes";
 import { cashierRouter } from "./modules/cashier/cashier.routes";
 import { publicRouter } from "./modules/public/public.routes";
+import { subscriptionRouter } from "./modules/subscription/subscription.routes";
+
 import { errorHandler } from "./common/middleware/errorHandler.middleware";
 
 export function createApp(): Express {
@@ -16,23 +19,28 @@ export function createApp(): Express {
   app.use(cors());
 
   app.use(express.json());
+  app.use((req, _res, next) => {
+  console.log("CONTENT TYPE:", req.headers["content-type"]);
+  console.log("BODY:", req.body);
+  next();
+}); 
   app.use(express.urlencoded({ extended: true }));
 
   app.use(morgan("tiny"));
 
   app.use("/api/v1/auth", authRouter);
-  app.use("/api/v1/outlets", outletRouter);
+
   app.use("/api/v1/admin", adminRouter);
+  app.use("/api/v1/outlets", outletRouter);
   app.use("/api/v1/cashier", cashierRouter);
+
+  app.use("/api/v1/subscriptions", subscriptionRouter);
+
   app.use("/api/v1/public", publicRouter);
 
-  app.get("/debug", (_req, res) => res.json({
-    databaseUrl: process.env.DATABASE_URL ? "SET" : "NOT SET",
-    databaseUrlValue: process.env.DATABASE_URL?.substring(0, 50) + "...",
-    jwtSecret: process.env.JWT_SECRET ? "SET" : "NOT SET"
-  }));
-
-  app.get("/health", (_req, res) => res.status(200).json({ status: "ok" }));
+  app.get("/health", (_req, res) =>
+    res.status(200).json({ status: "ok" })
+  );
 
   app.use(errorHandler);
 

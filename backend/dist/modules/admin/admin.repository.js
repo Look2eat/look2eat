@@ -3,20 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.adminRepository = void 0;
 const client_1 = require("../../prisma/client");
 exports.adminRepository = {
-    // Brand Settings
     async getBrandSettings(brandId) {
         return client_1.prisma.brandSettings.findUnique({
             where: { brandId },
         });
     },
-    async createBrandSettings(brandId, coinRatioValue) {
+    async createBrandSettings(data) {
         return client_1.prisma.brandSettings.create({
-            data: {
-                brandId,
-                coinRatioValue,
-                pilotStartDate: new Date("2026-04-17"),
-                pilotEndDate: new Date("2026-04-19T17:00:00"), // 19 April 5 PM
-            },
+            data,
         });
     },
     async updateBrandSettings(brandId, coinRatioValue) {
@@ -25,14 +19,13 @@ exports.adminRepository = {
             data: { coinRatioValue },
         });
     },
-    // Cashier Management
-    async createCashier(outletId, phoneNumber, name, tempPassword) {
+    async createCashier(outletId, phoneNumber, name, passwordHash) {
         return client_1.prisma.cashier.create({
             data: {
                 outletId,
                 phoneNumber,
                 name,
-                tempPassword,
+                passwordHash,
             },
         });
     },
@@ -61,7 +54,15 @@ exports.adminRepository = {
             data: { isActive },
         });
     },
-    // Reward Milestones
+    async updateBrandImages(brandId, logoUrl, bannerImageUrl) {
+        return client_1.prisma.brand.update({
+            where: { id: brandId },
+            data: {
+                ...(logoUrl && { logoUrl }),
+                ...(bannerImageUrl && { bannerImageUrl }),
+            },
+        });
+    },
     async createRewardMilestone(brandId, name, coinsRequired, cashbackAmount) {
         return client_1.prisma.rewardMilestone.create({
             data: {
@@ -87,7 +88,6 @@ exports.adminRepository = {
             },
         });
     },
-    // Transaction History
     async getTransactionsByBrandId(brandId, limit = 50, offset = 0) {
         return client_1.prisma.transaction.findMany({
             where: {
@@ -157,7 +157,6 @@ exports.adminRepository = {
             orderBy: { createdAt: "desc" },
         });
     },
-    // Get all brands with transaction count
     async getBrandsWithStats() {
         const brands = await client_1.prisma.brand.findMany({
             where: { isActive: true },
@@ -166,7 +165,6 @@ exports.adminRepository = {
                 settings: true,
             },
         });
-        // Get transaction count for each brand
         const brandsWithStats = await Promise.all(brands.map(async (brand) => {
             const transactionCount = await client_1.prisma.transaction.count({
                 where: {

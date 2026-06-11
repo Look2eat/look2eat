@@ -33,7 +33,6 @@ exports.adminController = {
             throw error;
         }
     },
-    // Cashier Management
     async createCashier(req, res) {
         try {
             const { outletId, phoneNumber, name } = admin_validation_1.adminValidation.createCashier.parse(req.body);
@@ -94,7 +93,6 @@ exports.adminController = {
             throw error;
         }
     },
-    // Reward Milestones
     async createRewardMilestone(req, res) {
         try {
             const { brandId, name, coinsRequired, cashbackAmount } = admin_validation_1.adminValidation.createRewardMilestone.parse(req.body);
@@ -146,7 +144,6 @@ exports.adminController = {
             if (!brandId || Array.isArray(brandId)) {
                 throw new AppError_1.AppError("Brand ID is required and must be a string", 400);
             }
-            // Convert query params safely
             const limitNum = limit ? parseInt(limit) : 50;
             const offsetNum = offset ? parseInt(offset) : 0;
             const customerPhoneStr = Array.isArray(customerPhone) ? customerPhone[0] : customerPhone;
@@ -198,12 +195,46 @@ exports.adminController = {
             throw error;
         }
     },
+    async getDashboard(req, res) {
+        try {
+            const { brandId } = req.params;
+            if (!brandId || Array.isArray(brandId)) {
+                throw new AppError_1.AppError("Brand ID is required", 400);
+            }
+            const dashboard = await admin_service_1.adminService.getDashboardData(brandId);
+            res.status(200).json({
+                data: dashboard,
+            });
+        }
+        catch (error) {
+            throw error;
+        }
+    },
     async getBrandsList(req, res) {
         try {
             const brands = await admin_service_1.adminService.getBrandsList();
             res.status(200).json({
                 data: brands,
                 count: brands.length,
+            });
+        }
+        catch (error) {
+            throw error;
+        }
+    },
+    async uploadBrandImages(req, res) {
+        try {
+            const { brandId } = req.params;
+            if (!brandId || Array.isArray(brandId)) {
+                throw new AppError_1.AppError("Brand ID is required", 400);
+            }
+            const files = req.files;
+            const logoUrl = files?.logo?.[0]?.path;
+            const bannerImageUrl = files?.banner?.[0]?.path;
+            const updatedBrand = await admin_service_1.adminService.uploadBrandImages(brandId, logoUrl, bannerImageUrl);
+            res.status(200).json({
+                message: "Brand images uploaded successfully",
+                data: updatedBrand,
             });
         }
         catch (error) {

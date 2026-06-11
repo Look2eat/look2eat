@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Look2Eat Unified API",
-    "description": "Updated collection with only the 10 required endpoints for Admin-as-Cashier flow.",
+    "description": "Comprehensive Postman collection for Look2Eat loyalty platform covering all modules: Auth, Admin (Brands, Cashiers, Milestones, Dashboard), Outlets, Subscriptions/Credits, Cashier Actions, and Public Webhooks.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -16,11 +16,10 @@
   },
   "item": [
     {
-      "name": "Look2Eat Unified Flow",
-      "description": "The single folder containing all 10 required endpoints.",
+      "name": "1. Authentication",
       "item": [
         {
-          "name": "1. Register Owner",
+          "name": "Register Owner",
           "request": {
             "method": "POST",
             "header": [
@@ -31,9 +30,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"brandName\": \"Pizza Palace\", \"slug\": \"pizza-palace\", \"name\": \"Rajendra Kumar\", \"email\": \"owner@look2eat.com\", \"password\": \"SecurePass123!\", \"phone\": \"9876543210\"}"
+              "raw": "{\n  \"brandName\": \"Pizza Palace\",\n  \"slug\": \"pizza-palace\",\n  \"name\": \"Rajendra Kumar\",\n  \"email\": \"owner@look2eat.com\",\n  \"password\": \"SecurePass123!\",\n  \"phone\": \"9876543210\"\n}"
             },
-            "description": "Register a new owner account. Required fields: brandName, slug (lowercase-letters-numbers-hyphens), name, email, password (min 8 chars), phone (10-15 digits). Save the ownerId from response.",
+            "description": "Register a new owner account and brand. Automatically sets 'brandId' and 'slug' variables upon success.",
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/register-owner",
               "host": [
@@ -46,10 +45,29 @@
                 "register-owner"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.brand) {",
+                  "    if (jsonData.data.brand.id) {",
+                  "        pm.collectionVariables.set(\"brandId\", jsonData.data.brand.id);",
+                  "    }",
+                  "    if (jsonData.data.brand.slug) {",
+                  "        pm.collectionVariables.set(\"slug\", jsonData.data.brand.slug);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "2. Login (Admin/Cashier)",
+          "name": "Login (Admin)",
           "request": {
             "method": "POST",
             "header": [
@@ -60,9 +78,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"phone\": \"9876543210\", \"password\": \"SecurePass123!\"}"
+              "raw": "{\n  \"phone\": \"9876543210\",\n  \"password\": \"SecurePass123!\"\n}"
             },
-            "description": "Login to get JWT token. Save as jwt_token in environment variables.",
+            "description": "Login as brand owner. Sets 'jwt_token' and 'brandId' variables upon success.",
             "url": {
               "raw": "{{baseUrl}}/api/v1/auth/login",
               "host": [
@@ -84,15 +102,10 @@
                 "exec": [
                   "var jsonData = pm.response.json();",
                   "if (jsonData.token) {",
-                  "    pm.environment.set(\"jwt_token\", jsonData.token);",
                   "    pm.collectionVariables.set(\"jwt_token\", jsonData.token);",
                   "}",
                   "if (jsonData.user && jsonData.user.brandId) {",
-                  "    pm.environment.set(\"brandId\", jsonData.user.brandId);",
                   "    pm.collectionVariables.set(\"brandId\", jsonData.user.brandId);",
-                  "}",
-                  "if (jsonData.data && jsonData.data.user && jsonData.data.user.brandId) {",
-                  "    pm.collectionVariables.set(\"brandId\", jsonData.data.user.brandId);",
                   "}"
                 ]
               }
@@ -100,68 +113,77 @@
           ]
         },
         {
-          "name": "3. Set Coin Ratio",
+          "name": "Login (Cashier)",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"brandId\": \"{{brandId}}\", \"coinRatioValue\": 0.5}"
+              "raw": "{\n  \"phoneNumber\": \"9988776655\",\n  \"password\": \"SecurePass123!\",\n  \"outletId\": \"{{outletId}}\"\n}"
             },
-            "description": "Set how many coins customers earn per rupee spent. Example: 0.5 means 1 rupee = 0.5 coins. Uses brandId (NOT outletId)",
+            "description": "Login using Cashier specific credentials. Sets 'cashierJwt' variable upon success.",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/brands/coin-ratio",
+              "raw": "{{baseUrl}}/api/v1/cashier/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "v1",
-                "admin",
-                "brands",
-                "coin-ratio"
+                "cashier",
+                "login"
               ]
             }
-          }
-        },
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.token) {",
+                  "    pm.collectionVariables.set(\"cashierJwt\", jsonData.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2. Outlets",
+      "item": [
         {
-          "name": "4. Create Reward Milestone",
+          "name": "Create Outlet",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"brandId\": \"{{brandId}}\", \"name\": \"20 Cashback\", \"coinsRequired\": 200, \"cashbackAmount\": 20}"
+              "raw": "{\n  \"name\": \"Pizza Palace HSR Layout\",\n  \"address\": \"123, 27th Main Road, HSR Sector 2, Bengaluru\",\n  \"phoneNumber\": \"9876543211\"\n}"
             },
-            "description": "Create a reward tier. Example: 200 coins = 20 rupees cashback. Save milestoneId. Uses brandId (NOT outletId)",
+            "description": "Create an outlet under the authenticated brand. Required role: OWNER. Sets 'outletId' variable.",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/milestones",
+              "raw": "{{baseUrl}}/api/v1/outlets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "v1",
-                "admin",
-                "milestones"
+                "outlets"
               ]
             }
           },
@@ -173,7 +195,7 @@
                 "exec": [
                   "var jsonData = pm.response.json();",
                   "if (jsonData.data && jsonData.data.id) {",
-                  "    pm.collectionVariables.set(\"milestoneId\", jsonData.data.id);",
+                  "    pm.collectionVariables.set(\"outletId\", jsonData.data.id);",
                   "}"
                 ]
               }
@@ -181,45 +203,665 @@
           ]
         },
         {
-          "name": "5. Dashboard KPIs",
+          "name": "Get Outlets List",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
-              }
-            ],
-            "description": "Get dashboard KPIs and graph metrics",
+            "header": [],
+            "description": "List all outlets belonging to the authenticated brand. Required role: OWNER or OUTLET_MANAGER.",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/dashboard",
+              "raw": "{{baseUrl}}/api/v1/outlets",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "v1",
-                "admin",
-                "brands",
-                "{{brandId}}",
-                "dashboard"
+                "outlets"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Admin Actions",
+      "item": [
+        {
+          "name": "Brands & Design",
+          "item": [
+            {
+              "name": "Get Brands List",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "description": "Get lists of all registered brands.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "brands"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Set Coin Ratio",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"brandId\": \"{{brandId}}\",\n  \"coinRatioValue\": 0.5\n}"
+                },
+                "description": "Set coin conversion ratio for the brand (e.g. 0.5 coins per rupee spent).",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/coin-ratio",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "brands",
+                    "coin-ratio"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Coin Ratio",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "description": "Fetch current coin ratio for the brand.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/coin-ratio",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "brands",
+                    "{{brandId}}",
+                    "coin-ratio"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Upload Brand Images",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "logo",
+                      "description": "Brand logo image file",
+                      "type": "file",
+                      "src": []
+                    },
+                    {
+                      "key": "banner",
+                      "description": "Brand banner image file",
+                      "type": "file",
+                      "src": []
+                    }
+                  ]
+                },
+                "description": "Upload and update brand logo and banner images using multipart form-data.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/images",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "brands",
+                    "{{brandId}}",
+                    "images"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cashiers Management",
+          "item": [
+            {
+              "name": "Create Cashier",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"outletId\": \"{{outletId}}\",\n  \"phoneNumber\": \"9988776655\",\n  \"name\": \"John Doe\"\n}"
+                },
+                "description": "Create cashier login profile under a specific outlet. Sets 'cashierId' variable.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/cashiers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "cashiers"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.data && jsonData.data.id) {",
+                      "    pm.collectionVariables.set(\"cashierId\", jsonData.data.id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Cashiers by Outlet",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "description": "Get cashier profiles connected to a given outlet ID.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/outlets/{{outletId}}/cashiers",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "outlets",
+                    "{{outletId}}",
+                    "cashiers"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Deactivate Cashier",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "description": "Deactivate cashier profile preventing them from logging in.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/cashiers/{{cashierId}}/deactivate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "cashiers",
+                    "{{cashierId}}",
+                    "deactivate"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Reactivate Cashier",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "description": "Reactivate cashier profile allowing them to log in.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/cashiers/{{cashierId}}/reactivate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "cashiers",
+                    "{{cashierId}}",
+                    "reactivate"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Milestones",
+          "item": [
+            {
+              "name": "Create Reward Milestone",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"brandId\": \"{{brandId}}\",\n  \"name\": \"50 Cashback\",\n  \"coinsRequired\": 500,\n  \"cashbackAmount\": 50\n}"
+                },
+                "description": "Create a reward tier (e.g. 500 coins = 50 rs cashback). Sets 'milestoneId' variable.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/milestones",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "milestones"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "var jsonData = pm.response.json();",
+                      "if (jsonData.data && jsonData.data.id) {",
+                      "    pm.collectionVariables.set(\"milestoneId\", jsonData.data.id);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Reward Milestones",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "description": "Fetch all reward milestones configured for a brand.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/milestones",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "brands",
+                    "{{brandId}}",
+                    "milestones"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Reward Milestone",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"coinsRequired\": 600,\n  \"cashbackAmount\": 60\n}"
+                },
+                "description": "Update details of a specific reward milestone.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/milestones/{{milestoneId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "milestones",
+                    "{{milestoneId}}"
+                  ]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reports & Analytics",
+          "item": [
+            {
+              "name": "Get Dashboard KPIs",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "description": "Retrieve general dashboard statistics and KPIs for the brand.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/dashboard",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "brands",
+                    "{{brandId}}",
+                    "dashboard"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Transaction Stats",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "description": "Fetch summarized statistical data regarding purchases, redemptions, and active customers.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/brands/{{brandId}}/transactions/stats",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "brands",
+                    "{{brandId}}",
+                    "transactions",
+                    "stats"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Transaction History",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "description": "Retrieve comprehensive transaction history logs with filters.",
+                "url": {
+                  "raw": "{{baseUrl}}/api/v1/admin/transactions?brandId={{brandId}}&limit=50&offset=0",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "brandId",
+                      "value": "{{brandId}}"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "50"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "4. Subscriptions & Credits",
+      "item": [
+        {
+          "name": "Create Subscription Plan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Growth Plan\",\n  \"durationMonths\": 6,\n  \"price\": 5000\n}"
+            },
+            "description": "Create a new subscription plan for outlets. Sets 'planId' variable.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscriptions/plans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscriptions",
+                "plans"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.id) {",
+                  "    pm.collectionVariables.set(\"planId\", jsonData.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Plans List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Fetch all available subscription plans on the platform.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscriptions/plans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscriptions",
+                "plans"
               ]
             }
           }
         },
         {
-          "name": "6. Customer Lookup",
+          "name": "Purchase Subscription",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
-            "description": "PROTECTED ENDPOINT - Requires cashier JWT token. Get customer wallet balance and available rewards.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outletId\": \"{{outletId}}\",\n  \"planId\": \"{{planId}}\"\n}"
+            },
+            "description": "Subscribe an outlet to a platform subscription plan.",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/cashier/customer/9123456789?brandId={{brandId}}",
+              "raw": "{{baseUrl}}/api/v1/subscriptions/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscriptions",
+                "purchase"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Active Subscription",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Get the current active subscription detail for an outlet.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscriptions/outlets/{{outletId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscriptions",
+                "outlets",
+                "{{outletId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Purchase Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outletId\": \"{{outletId}}\",\n  \"credits\": 100,\n  \"amountPaid\": 200\n}"
+            },
+            "description": "Add credits to an outlet's platform wallet.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscriptions/credits/purchase",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscriptions",
+                "credits",
+                "purchase"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Consume Credits",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outletId\": \"{{outletId}}\",\n  \"credits\": 5,\n  \"description\": \"WhatsApp message verification fee\"\n}"
+            },
+            "description": "Deduct credits from an outlet's balance for a consumption event.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscriptions/credits/consume",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscriptions",
+                "credits",
+                "consume"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Credit Balance",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Fetch wallet balance and totals for an outlet.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/subscriptions/credits/{{outletId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "subscriptions",
+                "credits",
+                "{{outletId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Cashier Actions",
+      "item": [
+        {
+          "name": "Customer Lookup",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cashierJwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "description": "Fetch a customer's coin wallet details, milestones, and newness. Sets 'walletId' variable.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/customer/{{phone}}?brandId={{brandId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -228,7 +870,7 @@
                 "v1",
                 "cashier",
                 "customer",
-                "9123456789"
+                "{{phone}}"
               ],
               "query": [
                 {
@@ -237,27 +879,105 @@
                 }
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.walletId) {",
+                  "    pm.collectionVariables.set(\"walletId\", jsonData.data.walletId);",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "7. Process Purchase",
+          "name": "Request Customer OTP",
           "request": {
             "method": "POST",
             "header": [
               {
                 "key": "Content-Type",
                 "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"brandId\": \"{{brandId}}\", \"purchaseAmount\": 100}"
+              "raw": "{\n  \"customerPhoneNumber\": \"{{phone}}\",\n  \"brandId\": \"{{brandId}}\"\n}"
             },
-            "description": "PROTECTED ENDPOINT - Process a customer purchase. Coins calculated = purchaseAmount * coinRatio. Customer receives WhatsApp notification.",
+            "description": "Cashier triggers an OTP to customer phone number via WhatsApp for verification.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/request-customer-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cashier",
+                "request-customer-otp"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify Customer OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerPhoneNumber\": \"{{phone}}\",\n  \"otp\": \"1234\",\n  \"brandId\": \"{{brandId}}\"\n}"
+            },
+            "description": "Verify customer's OTP to validate their session before allowing a redemption transaction.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/cashier/verify-customer-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "cashier",
+                "verify-customer-otp"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Process Purchase",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cashierJwt}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customerPhoneNumber\": \"{{phone}}\",\n  \"brandId\": \"{{brandId}}\",\n  \"purchaseAmount\": 1000\n}"
+            },
+            "description": "Record a customer purchase and award them loyalty points based on coinRatio setting.",
             "url": {
               "raw": "{{baseUrl}}/api/v1/cashier/transaction/purchase",
               "host": [
@@ -274,37 +994,18 @@
           }
         },
         {
-          "name": "8. Request OTP (For Redemption)",
+          "name": "Process Redemption",
           "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"brandId\": \"{{brandId}}\"}"
-            },
-            "description": "PUBLIC ENDPOINT - Cashier requests OTP for customer. Customer phone must start with country code digit. OTP will be sent to customer via WhatsApp.",
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/cashier/request-customer-otp",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "cashier",
-                "request-customer-otp"
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{cashierJwt}}",
+                  "type": "string"
+                }
               ]
-            }
-          }
-        },
-        {
-          "name": "9. Verify OTP (For Redemption)",
-          "request": {
+            },
             "method": "POST",
             "header": [
               {
@@ -314,42 +1015,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"otp\": \"123456\", \"brandId\": \"{{brandId}}\"}"
+              "raw": "{\n  \"customerPhoneNumber\": \"{{phone}}\",\n  \"brandId\": \"{{brandId}}\",\n  \"milestoneId\": \"{{milestoneId}}\",\n  \"purchaseAmount\": 500\n}"
             },
-            "description": "PUBLIC ENDPOINT - Verify customer OTP. Replace OTP with the one received by customer on WhatsApp.",
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/cashier/verify-customer-otp",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "cashier",
-                "verify-customer-otp"
-              ]
-            }
-          }
-        },
-        {
-          "name": "10. Process Redemption",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{jwt_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"customerPhoneNumber\": \"9123456789\", \"brandId\": \"{{brandId}}\", \"milestoneId\": \"{{milestoneId}}\", \"purchaseAmount\": 80}"
-            },
-            "description": "PROTECTED ENDPOINT - Customer redeems coins for cashback. Coins deducted and cashback applied. Customer receives WhatsApp notification.",
+            "description": "Process customer reward redemption for cashback at a specific milestone (requires OTP validation first). Also registers a concurrent purchase.",
             "url": {
               "raw": "{{baseUrl}}/api/v1/cashier/transaction/redeem",
               "host": [
@@ -366,9 +1034,137 @@
           }
         }
       ]
+    },
+    {
+      "name": "6. Public & Webhooks",
+      "item": [
+        {
+          "name": "Get Brand Public Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Fetch public details (like milestones and info) for a brand by slug.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/loyalty/{{slug}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "loyalty",
+                "{{slug}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Loyalty Page Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Fetch customer loyalty details for the public web portal using slug and walletId.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/loyalty/{{slug}}/{{walletId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "loyalty",
+                "{{slug}}",
+                "{{walletId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify WhatsApp Webhook",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Meta API GET request verification handshake.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/webhook/whatsapp?hub.mode=subscribe&hub.challenge=1158201444&hub.verify_token=look2eat_token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "webhook",
+                "whatsapp"
+              ],
+              "query": [
+                {
+                  "key": "hub.mode",
+                  "value": "subscribe"
+                },
+                {
+                  "key": "hub.challenge",
+                  "value": "1158201444"
+                },
+                {
+                  "key": "hub.verify_token",
+                  "value": "look2eat_token"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Handle WhatsApp Webhook (Know More Button)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"object\": \"whatsapp_business_account\",\n  \"entry\": [\n    {\n      \"id\": \"WHATSAPP_BUSINESS_ACCOUNT_ID\",\n      \"changes\": [\n        {\n          \"value\": {\n            \"messaging_product\": \"whatsapp\",\n            \"metadata\": {\n              \"display_phone_number\": \"PHONE_NUMBER\",\n              \"phone_number_id\": \"PHONE_NUMBER_ID\"\n            },\n            \"contacts\": [\n              {\n                \"profile\": {\n                  \"name\": \"CUSTOMER_NAME\"\n                },\n                \"wa_id\": \"SENDER_PHONE\"\n              }\n            ],\n            \"messages\": [\n              {\n                \"context\": {\n                  \"id\": \"wamid.HBgMOTEyMzQ1Njc4OQYVMRIwOEEwODNFMzE5RDVDQ0UxNTBBAA==\"\n                },\n                \"from\": \"919876543210\",\n                \"id\": \"wamid.ABGGFlCG5FJQApDxN3r5uL_0tE5N4f9w\",\n                \"timestamp\": \"TIMESTAMP\",\n                \"type\": \"button\",\n                \"button\": {\n                  \"text\": \"Know More\",\n                  \"payload\": \"KNOW_MORE_PAYLOAD\"\n                }\n              }\n            ]\n          },\n          \"field\": \"messages\"\n        }\n      ]\n    }\n  ]\n}"
+            },
+            "description": "Simulates an incoming WhatsApp Message Event webhook sent by Facebook/Meta for user hitting 'Know More'.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/public/webhook/whatsapp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "public",
+                "webhook",
+                "whatsapp"
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "cashierJwt",
+      "value": "",
+      "type": "string"
+    },
     {
       "key": "brandId",
       "value": "",
@@ -380,23 +1176,33 @@
       "type": "string"
     },
     {
-      "key": "cashierJwt",
-      "value": "",
-      "type": "string"
-    },
-    {
       "key": "cashierId",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "tempPassword",
       "value": "",
       "type": "string"
     },
     {
       "key": "milestoneId",
       "value": "",
+      "type": "string"
+    },
+    {
+      "key": "planId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "walletId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "slug",
+      "value": "pizza-palace",
+      "type": "string"
+    },
+    {
+      "key": "phone",
+      "value": "9123456789",
       "type": "string"
     }
   ]

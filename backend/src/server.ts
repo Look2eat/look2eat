@@ -1,25 +1,19 @@
 import "dotenv/config";
 
-console.log('DATABASE_URL at startup:', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
-console.log('DATABASE_URL value:', process.env.DATABASE_URL);
-
 import { createApp } from "./app";
 import { initDb } from "./config/db";
-
-const PORT = Number(process.env.PORT ?? 4000);
+import { env } from "./config/env";
+import { startJobs } from "./bootstrap/jobs";
 
 async function main() {
   await initDb();
 
   const app = createApp();
 
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+  await startJobs();
 
-    import("./modules/cashier/reminder.job").then(({ startReminderJob }) => {
-      startReminderJob();
-      console.log('22-hour reminder background job started.');
-    });
+  app.listen(env.port, () => {
+    console.log(`Server running on http://localhost:${env.port}`);
   });
 }
 

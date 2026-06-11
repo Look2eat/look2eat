@@ -1,8 +1,9 @@
 import { adminRepository } from "./admin.repository";
 import { AppError } from "../../common/errors/AppError";
-import crypto from "crypto";
 import bcrypt from "bcrypt";
+import { TransactionFilters } from "./admin.types";
 
+const SALT_ROUNDS = 10;
 export const adminService = {
 
   async setBrandCoinRatio(brandId: string, coinRatioValue: number) {
@@ -15,7 +16,7 @@ export const adminService = {
       return adminRepository.updateBrandSettings(brandId, coinRatioValue);
     }
 
-    return adminRepository.createBrandSettings(brandId, coinRatioValue);
+    return adminRepository.createBrandSettings({brandId, coinRatioValue});
   },
 
   async getBrandCoinRatio(brandId: string) {
@@ -56,7 +57,7 @@ export const adminService = {
 
     const tempPassword = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const passwordHash = await bcrypt.hash(tempPassword, 10);
+    const passwordHash = await bcrypt.hash(tempPassword, SALT_ROUNDS);
 
     const cashier = await adminRepository.createCashier(
       outletId,
@@ -140,12 +141,7 @@ export const adminService = {
     brandId: string,
     limit: number = 50,
     offset: number = 0,
-    filters?: {
-      customerPhone?: string;
-      type?: "PURCHASE" | "REDEMPTION";
-      startDate?: Date;
-      endDate?: Date;
-    }
+    filters?: TransactionFilters
   ) {
     let transactions: any[];
 
