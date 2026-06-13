@@ -9,7 +9,7 @@ import { mockData, type BillingRow } from "../../../lib/mock-settings";
 
 function BillingHistoryTable({ rows }: { rows: BillingRow[] }) {
     return (
-        <div className="overflow-hidden rounded-xl border border-gray-100  dark:border-neutral-700 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-gray-100  dark:border-neutral-700">
             <table className="w-full text-base">
                 <thead>
                     <tr className="border-b border-gray-100 bg-gray-50/60  dark:border-neutral-700 dark:bg-neutral-900">
@@ -21,7 +21,7 @@ function BillingHistoryTable({ rows }: { rows: BillingRow[] }) {
                 </thead>
                 <tbody>
                     {rows.map((row) => (
-                        <tr key={row.id} className="border-b border-gray-100 dark:border-neutral-700 last:border-0 hover:bg-gray-50/40 transition-colors dark:hover:bg-neutral-900 ">
+                        <tr key={row.id} className="border-b border-gray-100 dark:border-neutral-700 last:border-0 hover:bg-gray-50/40  dark:hover:bg-neutral-900 ">
                             <td className="px-4 py-3 font-mono text-sm text-gray-500 dark:text-neutral-300">{row.id}</td>
                             <td className="px-4 py-3 text-gray-700 dark:text-neutral-300">{row.date}</td>
                             <td className="px-4 py-3 font-medium text-gray-700 dark:text-neutral-300">{row.amount}</td>
@@ -66,7 +66,7 @@ export function BillingTab() {
             <div className="flex items-center justify-between py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Cancel Subscription</p>
-                    <p className="mt-0.5 text-xs text-gray-400">You&apos;ll retain access until {b.renewalDate}.</p>
+                    <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">You&apos;ll retain access until {b.renewalDate}.</p>
                 </div>
                 <Dialog>
                     <DialogTrigger
