@@ -28,7 +28,7 @@ export default function DashboardLayout({
     <AuthGuard>
       <SidebarProvider >
         <AppSidebar />
-        <SidebarInset className="bg-background">
+        <SidebarInset className="bg-background flex-1 min-w-0">
           {children}
         </SidebarInset>
       </SidebarProvider>

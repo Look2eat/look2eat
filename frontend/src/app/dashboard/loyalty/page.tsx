@@ -10,6 +10,8 @@ import { TopRewardsCard } from "@/components/dashboard/loyalty/topRewards"
 import ReedemTable from "@/components/dashboard/ReedemTable"
 import { LoyaltyCampaign } from "@/components/dashboard/loyalty/LoyaltyCampaign"
 import { Skeleton } from "@/components/ui/skeleton"
+import LoyaltyStats from "@/components/dashboard/loyalty/LoyaltyStats"
+import CustomerRepeatRateCard from "@/components/dashboard/loyalty/CustomerRepeat"
 
 
 export default function LoyaltyDashboardPage() {
@@ -59,55 +61,68 @@ export default function LoyaltyDashboardPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 p-6">
-      <LoyaltyCard
-        pointsRedeemed={5900}
-        pointsEarned={1200}
-        profileComplete={60}
-        revenueGain={50000}
-        redemptionRate={22.39}
-        clickable={false}
-        className="mt-0 mb-4"
-      />
 
-      <div className="grid grid-cols-1 xl:grid-cols-[30%_70%] gap-6 max-w-full pr-6">
-
-        <TopCustomersCard
-
-          className="max-w-md"
-          theme={"blue"}
-          variant={"expanded"}
-          title="Top 5 Customers by Rewards Redeemed"
-          percentage={65}
-          buttonText="Continue Setup"
-          animationDuration={2500}
-          staggerDelay={0.25}
-          rounded="xl"
-          showPercentage={false}
-          enableAnimations={true}
-          customer={loyaltyData.topCustomers}
-        />
+    <div className=" px-6 py-6 font-poppins flex flex-col gap-6">
+      <div>
+        <h1 className="mb-6 text-3xl font-bold tracking-tight text-[#1D2033] dark:text-[#FDFEFF]">Loyalty</h1>
+        <LoyaltyStats />
+      </div>
+      <div className="grid grid-cols-1 xl:grid-cols-[60%_40%] gap-6 max-w-full pr-6 ">
+        <CustomerRepeatRateCard data={{ visit1: 10, visit2: 20, visit3to5: 30, visit6plus: 40 }} />
         <LoyaltyCampaign />
       </div>
-      <div>
-        {/* <TopRewardsCard
-
-          className="w-full h-full"
-          theme={"blue"}
-          variant={"expanded"}
-          title="Most Redeemed Rewards"
-          percentage={65}
-          buttonText="Continue Setup"
-          animationDuration={2000}
-          staggerDelay={0.15}
-          rounded="xl"
-          showPercentage={false}
-          enableAnimations={true}
-          rewards={loyaltyData.rewardLeaderboard}
-        /> */}
-      </div>
       <ReedemTable history={loyaltyData.history} />
-
     </div>
+
+    // <div className="flex flex-col gap-6 p-6">
+    //   <LoyaltyCard
+    //     pointsRedeemed={5900}
+    //     pointsEarned={1200}
+    //     profileComplete={60}
+    //     revenueGain={50000}
+    //     redemptionRate={22.39}
+    //     clickable={false}
+    //     className="mt-0 mb-4"
+    //   />
+
+    //   <div className="grid grid-cols-1 xl:grid-cols-[30%_70%] gap-6 max-w-full pr-6">
+
+    //     <TopCustomersCard
+
+    //       className="max-w-md"
+    //       theme={"blue"}
+    //       variant={"expanded"}
+    //       title="Top 5 Customers by Rewards Redeemed"
+    //       percentage={65}
+    //       buttonText="Continue Setup"
+    //       animationDuration={2500}
+    //       staggerDelay={0.25}
+    //       rounded="xl"
+    //       showPercentage={false}
+    //       enableAnimations={true}
+    //       customer={loyaltyData.topCustomers}
+    //     />
+    //     <LoyaltyCampaign />
+    //   </div>
+    //   <div>
+    //     {/* <TopRewardsCard
+
+    //       className="w-full h-full"
+    //       theme={"blue"}
+    //       variant={"expanded"}
+    //       title="Most Redeemed Rewards"
+    //       percentage={65}
+    //       buttonText="Continue Setup"
+    //       animationDuration={2000}
+    //       staggerDelay={0.15}
+    //       rounded="xl"
+    //       showPercentage={false}
+    //       enableAnimations={true}
+    //       rewards={loyaltyData.rewardLeaderboard}
+    //     /> */}
+    //   </div>
+    //   <ReedemTable history={loyaltyData.history} />
+
+    // </div>
   )
 }

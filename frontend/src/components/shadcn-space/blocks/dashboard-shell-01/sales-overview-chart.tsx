@@ -57,7 +57,7 @@ export default function SalesOverviewChart() {
   };
 
   return (
-    <Card className="w-full py-6 gap-6 bg-white dark:bg-[#121214] border border-foreground/[0.06] rounded-2xl ">
+    <Card className="w-full py-6 gap-6 bg-white dark:bg-[#121214]  rounded-2xl ">
       <CardHeader className="flex sm:flex-row flex-col justify-between sm:items-start items-start gap-3 px-6">
         <div className="flex flex-col gap-1">
           <CardTitle className="text-xl font-semibold">Sales Overview</CardTitle>

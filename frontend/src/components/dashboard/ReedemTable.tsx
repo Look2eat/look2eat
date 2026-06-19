@@ -14,9 +14,9 @@ interface ReedemTableProps {
 export default function ReedemTable({ history }: ReedemTableProps) {
     return (
         <div>
-            <Card className="bg-muted/40 border border-foreground/[0.06] backdrop-blur-sm transition-all duration-500 hover:bg-foreground/[0.04] hover:border-foreground/[0.1]">
+            <Card className="bg-white dark:bg-[#121214]">
                 <CardHeader>
-                    <CardTitle>Rewards History </CardTitle>
+                    <CardTitle className="text-xl font-semibold">Rewards History </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="overflow-x-auto">
@@ -26,7 +26,7 @@ export default function ReedemTable({ history }: ReedemTableProps) {
                                     <th className="py-3 pr-4 font-semibold">Date/Time</th>
                                     <th className="py-3 pr-4 font-semibold">Customer</th>
                                     <th className="py-3 pr-4 font-semibold">Action</th>
-                                    <th className="py-3 font-semibold text-right">Points Delta</th>
+                                    <th className="py-3 font-semibold text-right">Points</th>
                                 </tr>
                             </thead>
                             <tbody>

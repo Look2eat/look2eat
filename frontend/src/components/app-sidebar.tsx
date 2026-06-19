@@ -34,19 +34,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       label: "Feedback",
       href: "/dashboard/feedback",
       icon: Heart,
-      disabled: true,
+      disabled: false,
     },
     {
       label: "Marketing",
       href: "/dashboard/marketing",
       icon: Megaphone,
       disabled: false,
-    },
-    {
-      label: "Wallet",
-      href: "/dashboard/wallet",
-      icon: Wallet,
-      disabled: true,
     },
     {
       label: "Cashier Panel",

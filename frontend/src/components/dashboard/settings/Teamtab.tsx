@@ -18,7 +18,7 @@ function CashierEmptyState() {
     return (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 py-16 text-center">
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
-                <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="h-6 w-6 text-gray-500 dark:text-neutral-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path
                         strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
@@ -26,7 +26,7 @@ function CashierEmptyState() {
                 </svg>
             </div>
             <p className="text-sm font-semibold text-gray-600">No cashiers yet</p>
-            <p className="mt-1 text-xs text-gray-400">Add your first cashier to get started.</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-neutral-200">Add your first cashier to get started.</p>
             <div className="mt-4">
                 <AddCashierDialog />
             </div>
@@ -46,7 +46,7 @@ function CashierRow({
     onDelete: () => void;
 }) {
     return (
-        <tr className="border-b border-gray-100 dark:border-neutral-700 last:border-0 hover:bg-gray-50/40 dark:hover:bg-neutral-900 transition-colors">
+        <tr className="border-b border-gray-100 dark:border-neutral-700 last:border-0 hover:bg-gray-50/40 dark:hover:bg-neutral-900 ">
             <td className="px-4 py-3 font-medium text-gray-700 dark:text-neutral-200">{cashier.name}</td>
             <td className="px-4 py-3 text-gray-500 dark:text-neutral-400">@{cashier.username}</td>
             <td className="px-4 py-3">
@@ -55,7 +55,7 @@ function CashierRow({
                 ) : (
                     <button
                         onClick={onReveal}
-                        className="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500 hover:bg-gray-200  dark:text-neutral-200 dark:hover:bg-neutral-500 dark:bg-neutral-700 transition-colors"
+                        className="rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-500 hover:bg-gray-200  dark:text-neutral-200 dark:hover:bg-neutral-500 dark:bg-neutral-700 "
                     >
                         Reveal
                     </button>
@@ -64,7 +64,7 @@ function CashierRow({
             <td className="px-4 py-3 text-right">
                 <button
                     onClick={onDelete}
-                    className="rounded-lg px-2.5 py-1 text-xs font-medium text-red-500 dark:hover:bg-red-500/80 dark:hover:text-red-50 hover:bg-red-50 transition-colors"
+                    className="rounded-lg px-2.5 py-1 text-xs font-medium text-red-500 dark:hover:bg-red-500/80 dark:hover:text-red-50 hover:bg-red-50 "
                 >
                     Delete
                 </button>
@@ -118,7 +118,7 @@ export function TeamTab({ footer = false }: { footer?: boolean }) {
                 <div className="mb-4 flex items-center justify-between">
                     <div>
                         <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Cashier Accounts</p>
-                        <p className="text-xs text-gray-400">Manage POS operator logins.</p>
+                        <p className="text-xs text-gray-500 dark:text-neutral-200">Manage POS operator logins.</p>
                     </div>
                     <AddCashierDialog />
                 </div>
@@ -128,7 +128,7 @@ export function TeamTab({ footer = false }: { footer?: boolean }) {
             {cashiers.length === 0 ? (
                 <CashierEmptyState />
             ) : (
-                <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-neutral-700 shadow-sm">
+                <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-neutral-700 ">
                     <table className="w-full text-sm">
                         <thead>
                             <tr className="border-b border-gray-100 dark:border-neutral-900 bg-gray-50/60 dark:bg-neutral-800">

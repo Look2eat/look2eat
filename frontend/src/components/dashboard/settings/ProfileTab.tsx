@@ -54,7 +54,7 @@ export function ProfileTab() {
             <div className="flex items-center justify-between border-b border-gray-100  dark:border-neutral-900 py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Email Address</p>
-                    <p className="mt-0.5 text-xs text-gray-400">Used for login and notifications.</p>
+                    <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">Used for login and notifications.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-right">
@@ -89,7 +89,7 @@ export function ProfileTab() {
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-neutral-900 py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Mobile Number</p>
-                    <p className="mt-0.5 text-xs text-gray-400">For OTP and account alerts.</p>
+                    <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">For OTP and account alerts.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-right">

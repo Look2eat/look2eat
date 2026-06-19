@@ -28,7 +28,7 @@ export function SectionRow({
         <div className="flex items-center justify-between border-b border-gray-100  dark:border-neutral-900 py-5 last:border-0">
             <div>
                 <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">{title}</p>
-                <p className="mt-0.5 text-xs text-gray-400">{description}</p>
+                <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">{description}</p>
             </div>
             <div className="ml-4 flex shrink-0 items-center gap-3">
                 {value && <span className="text-sm text-gray-700">{value}</span>}

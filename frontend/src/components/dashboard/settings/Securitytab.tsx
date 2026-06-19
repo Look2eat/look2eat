@@ -20,7 +20,7 @@ export function SecurityTab() {
             <div className="flex items-center justify-between border-b border-gray-100 py-5 dark:border-neutral-900">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Password</p>
-                    <p className="mt-0.5 text-xs text-gray-400">Set a unique password to protect your account.</p>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">Set a unique password to protect your account.</p>
                 </div>
                 <Dialog>
                     <DialogTrigger render={<Button variant="outline" className="text-xs" />}>
@@ -59,7 +59,7 @@ export function SecurityTab() {
             <div className="flex items-center justify-between border-b border-gray-100 py-5 dark:border-neutral-900">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">2-Step Verification</p>
-                    <p className="mt-0.5 text-xs text-gray-400">Add an extra layer of security with OTP on login.</p>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">Add an extra layer of security with OTP on login.</p>
                 </div>
                 <button
                     role="switch"
@@ -79,7 +79,7 @@ export function SecurityTab() {
             <div className="flex items-center justify-between py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Delete Account</p>
-                    <p className="mt-0.5 text-xs text-gray-400">Permanently delete your account and all associated data.</p>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">Permanently delete your account and all associated data.</p>
                 </div>
                 <Dialog>
                     <DialogTrigger

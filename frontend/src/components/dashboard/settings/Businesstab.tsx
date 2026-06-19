@@ -52,7 +52,7 @@ export function BusinessTab() {
             <div className="flex items-center justify-between border-b border-gray-100  dark:border-neutral-900 py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Business Logo</p>
-                    <p className="mt-0.5 text-xs text-gray-400">PNG or JPG, max 2MB. Shown on receipts and portal.</p>
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">PNG or JPG, max 2MB. Shown on receipts and portal.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-lg font-bold text-white shadow">
@@ -115,7 +115,7 @@ export function BusinessTab() {
             <div className="flex items-center justify-between py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Business Address</p>
-                    <p className="mt-0.5 text-xs text-gray-400">
+                    <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">
                         {b.addressLine1}, {b.addressLine2}, {b.city}, {b.state} – {b.pincode}
                     </p>
                 </div>
