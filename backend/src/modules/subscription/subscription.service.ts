@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 import { AppError } from "../../common/errors/AppError";
 import { subscriptionRepository } from "./subscription.repository";
 
@@ -8,7 +10,10 @@ export const subscriptionService = {
     price: number
   ) {
     if (!name.trim()) {
-      throw new AppError("Plan name is required", 400);
+      throw new AppError(
+        "Plan name is required",
+        400
+      );
     }
 
     if (durationMonths <= 0) {
@@ -36,19 +41,60 @@ export const subscriptionService = {
     return subscriptionRepository.getPlans();
   },
 
-  async getActiveSubscription(outletId: string) {
-    return subscriptionRepository.getActiveSubscription(
+  async getActiveSubscription(
+    outletId: string
+  ) {
+    const subscription =
+      await subscriptionRepository.getActiveSubscription(
+        outletId
+      );
+
+    if (!subscription) {
+      return null;
+    }
+
+    const daysRemaining = Math.ceil(
+      (subscription.endDate.getTime() -
+        Date.now()) /
+        (1000 * 60 * 60 * 24)
+    );
+
+    return {
+      ...subscription,
+      daysRemaining,
+    };
+  },
+
+  async hasActiveSubscription(
+    outletId: string
+  ) {
+    return subscriptionRepository.hasActiveSubscription(
       outletId
     );
   },
 
   async purchaseSubscription(
     outletId: string,
-    planId: string
+    planId: string,
+    tx?: Prisma.TransactionClient
   ) {
+    const outlet =
+      await subscriptionRepository.outletExists(
+        outletId,
+        tx
+      );
+
+    if (!outlet) {
+      throw new AppError(
+        "Outlet not found",
+        404
+      );
+    }
+
     const plan =
       await subscriptionRepository.getPlanById(
-        planId
+        planId,
+        tx
       );
 
     if (!plan) {
@@ -58,138 +104,39 @@ export const subscriptionService = {
       );
     }
 
-    await subscriptionRepository.deactivateSubscriptions(
-      outletId
-    );
+    const currentSubscription =
+      await subscriptionRepository.getActiveSubscription(
+        outletId,
+        tx
+      );
 
-    const startDate = new Date();
+    const startDate =
+      currentSubscription?.endDate &&
+      currentSubscription.endDate >
+        new Date()
+        ? new Date(
+            currentSubscription.endDate
+          )
+        : new Date();
 
     const endDate = new Date(startDate);
 
     endDate.setMonth(
-      endDate.getMonth() + plan.durationMonths
+      endDate.getMonth() +
+        plan.durationMonths
+    );
+
+    await subscriptionRepository.deactivateSubscriptions(
+      outletId,
+      tx
     );
 
     return subscriptionRepository.createSubscription(
       outletId,
       planId,
       startDate,
-      endDate
+      endDate,
+      tx
     );
-  },
-
-  async purchaseCredits(
-    outletId: string,
-    credits: number,
-    amountPaid: number
-  ) {
-    if (credits <= 0) {
-      throw new AppError(
-        "Credits must be greater than 0",
-        400
-      );
-    }
-
-    if (amountPaid <= 0) {
-      throw new AppError(
-        "Amount paid must be greater than 0",
-        400
-      );
-    }
-
-    let wallet =
-      await subscriptionRepository.getCreditWallet(
-        outletId
-      );
-
-    if (!wallet) {
-      wallet =
-        await subscriptionRepository.createCreditWallet(
-          outletId
-        );
-    }
-
-    await subscriptionRepository.incrementCredits(
-      outletId,
-      credits
-    );
-
-    await subscriptionRepository.createCreditTransaction(
-      outletId,
-      "PURCHASE",
-      credits,
-      amountPaid,
-      `Purchased ${credits} credits`
-    );
-
-    return subscriptionRepository.getCreditWallet(
-      outletId
-    );
-  },
-
-  async consumeCredits(
-    outletId: string,
-    credits: number,
-    description?: string
-  ) {
-    if (credits <= 0) {
-      throw new AppError(
-        "Credits must be greater than 0",
-        400
-      );
-    }
-
-    const wallet =
-      await subscriptionRepository.getCreditWallet(
-        outletId
-      );
-
-    if (!wallet) {
-      throw new AppError(
-        "Credit wallet not found",
-        404
-      );
-    }
-
-    if (wallet.balance < credits) {
-      throw new AppError(
-        "Insufficient credits",
-        400
-      );
-    }
-
-    await subscriptionRepository.decrementCredits(
-      outletId,
-      credits
-    );
-
-    await subscriptionRepository.createCreditTransaction(
-      outletId,
-      "CONSUMPTION",
-      credits,
-      undefined,
-      description ?? "Credits consumed"
-    );
-
-    return subscriptionRepository.getCreditWallet(
-      outletId
-    );
-  },
-
-  async getCreditBalance(outletId: string) {
-    const wallet =
-      await subscriptionRepository.getCreditWallet(
-        outletId
-      );
-
-    if (!wallet) {
-      return {
-        balance: 0,
-        totalPurchased: 0,
-        totalConsumed: 0,
-      };
-    }
-
-    return wallet;
   },
 };

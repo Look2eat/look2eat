@@ -9,6 +9,9 @@ import { outletRouter } from "./modules/outlet/outlet.routes";
 import { cashierRouter } from "./modules/cashier/cashier.routes";
 import { publicRouter } from "./modules/public/public.routes";
 import { subscriptionRouter } from "./modules/subscription/subscription.routes";
+import { creditRouter } from "./modules/credits/credit.routes";
+import {feedbackRouter} from "./modules/feedback/feedback.routes";
+import { paymentRouter } from "./modules/payment/payment.routes";
 
 import { errorHandler } from "./common/middleware/errorHandler.middleware";
 
@@ -33,10 +36,11 @@ export function createApp(): Express {
   app.use("/api/v1/admin", adminRouter);
   app.use("/api/v1/outlets", outletRouter);
   app.use("/api/v1/cashier", cashierRouter);
-
+  app.use("/api/v1/feedback", feedbackRouter);
   app.use("/api/v1/subscriptions", subscriptionRouter);
-
+  app.use("/api/v1/credits",creditRouter);
   app.use("/api/v1/public", publicRouter);
+  app.use("/api/v1/payments", paymentRouter);
 
   app.get("/health", (_req, res) =>
     res.status(200).json({ status: "ok" })

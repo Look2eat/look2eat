@@ -9,6 +9,7 @@ import { whatsappService } from "../whatsapp/whatsapp.service";
 import { cashierRepository } from "./cashier.repository";
 import { loyaltyRepository } from "../loyalty/loyalty.repository";
 import { RewardMilestoneDto } from "../loyalty/loyalty.types";
+import { string } from "zod";
 
 const OTP_EXPIRY_MINUTES = 15;
 const CASHIER_TOKEN_EXPIRY = "8h";
@@ -202,6 +203,7 @@ export const cashierService = {
   async processPurchase(
     customerPhoneNumber: string,
     brandId: string,
+    outletId: string,
     purchaseAmount: number,
     cashierPhoneNumber: string
   ) {
@@ -230,7 +232,10 @@ export const cashierService = {
       );
 
     if (!brandName) {
-      throw new AppError("Brand not found", 500);
+      throw new AppError(
+        "Brand not found",
+        500
+      );
     }
 
     const coinsEarned = Math.floor(
@@ -247,6 +252,7 @@ export const cashierService = {
       await loyaltyRepository.recordPurchaseTransaction(
         customerPhoneNumber,
         brandId,
+        outletId,
         purchaseAmount,
         coinsEarned,
         cashierPhoneNumber
@@ -269,6 +275,7 @@ export const cashierService = {
 
     return {
       transactionId: transaction.id,
+      outletId,
       coinsEarned,
       walletBalance: wallet.currentCoins,
       purchaseAmount,
@@ -279,6 +286,7 @@ export const cashierService = {
   async processRedemption(
     customerPhoneNumber: string,
     brandId: string,
+    outletId: string,
     milestoneId: string,
     purchaseAmount: number,
     cashierPhoneNumber: string
@@ -352,6 +360,7 @@ export const cashierService = {
     const { redemptionTransaction, purchaseTransaction, wallet: finalWallet } = await loyaltyRepository.redeemAndPurchase(
       customerPhoneNumber,
       brandId,
+      outletId,
       milestoneId,
       milestone.coinsRequired,
       milestone.cashbackAmount,

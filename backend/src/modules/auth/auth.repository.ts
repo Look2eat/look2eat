@@ -5,7 +5,7 @@ export const authRepository = {
   findByEmail: (email: string) =>
     prisma.adminUser.findUnique({
       where: { email },
-      include:{
+      include: {
         brand: true
       }
     }),
@@ -13,7 +13,7 @@ export const authRepository = {
   findByPhoneNumber: (phoneNumber: string) =>
     prisma.adminUser.findFirst({
       where: { phoneNumber },
-      include:{
+      include: {
         brand: true
       }
     }),

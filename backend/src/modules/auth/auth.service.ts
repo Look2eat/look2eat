@@ -23,7 +23,6 @@ export const authService = {
     }
 
     const passwordHash = await bcrypt.hash(input.password, SALT_ROUNDS);
-
     return authRepository.createBrandAndOwner({
       brandName: input.brandName,
       slug: input.slug,
@@ -36,7 +35,6 @@ export const authService = {
 
   async login(phone: string, password: string) {
     const user = await authRepository.findByPhoneNumber(phone);
-
     if (!user) {
       throw new AppError("Invalid credentials", 401);
     }
@@ -45,11 +43,9 @@ export const authService = {
       password,
       user.passwordHash
     );
-
     if (!isPasswordValid) {
       throw new AppError("Invalid credentials", 401);
     }
-
     const token = authService.createJwt({
       sub: user.id,
       email: user.email,

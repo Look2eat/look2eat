@@ -6,23 +6,8 @@ import { registerOwnerSchema, loginSchema } from "./auth.validation";
 
 export const authRouter = Router();
 
-authRouter.post(
-  "/register-owner",
-  validateRequest(registerOwnerSchema),
-  authController.registerOwner
-);
+authRouter.post("/register-owner", validateRequest(registerOwnerSchema), authController.registerOwner);
 
-authRouter.post(
-  "/login",
-  validateRequest(loginSchema),
-  authController.login
-);
+authRouter.post("/login", validateRequest(loginSchema), authController.login);
 
-authRouter.get(
-  "/me",
-  authenticateJwt,
-  authorizeRoles(["OWNER"]),
-  (req, res) => {
-    res.json({ data: (req as AuthRequest).auth });
-  }
-);
+authRouter.get("/me", authenticateJwt, authorizeRoles(["OWNER"]), (req, res) => { res.json({ data: (req as AuthRequest).auth }); });

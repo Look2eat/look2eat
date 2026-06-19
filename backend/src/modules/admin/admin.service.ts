@@ -16,7 +16,7 @@ export const adminService = {
       return adminRepository.updateBrandSettings(brandId, coinRatioValue);
     }
 
-    return adminRepository.createBrandSettings({brandId, coinRatioValue});
+    return adminRepository.createBrandSettings({ brandId, coinRatioValue });
   },
 
   async getBrandCoinRatio(brandId: string) {
@@ -70,7 +70,7 @@ export const adminService = {
       id: cashier.id,
       phoneNumber: cashier.phoneNumber,
       name: cashier.name,
-      tempPassword, 
+      tempPassword,
     };
   },
 

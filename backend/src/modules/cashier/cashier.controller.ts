@@ -172,6 +172,7 @@ export class CashierController {
       const result = await cashierService.processPurchase(
         validatedData.customerPhoneNumber,
         validatedData.brandId,
+        cashierAuth.outletId,
         validatedData.purchaseAmount,
         cashierAuth.phoneNumber
       );
@@ -213,6 +214,7 @@ export class CashierController {
       const result = await cashierService.processRedemption(
         validatedData.customerPhoneNumber,
         validatedData.brandId,
+        cashierAuth.outletId,
         validatedData.milestoneId,
         validatedData.purchaseAmount,
         cashierAuth.phoneNumber

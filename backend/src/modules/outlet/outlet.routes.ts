@@ -7,17 +7,6 @@ import { Role } from "@prisma/client";
 
 export const outletRouter = Router();
 
-outletRouter.post(
-  "/",
-  authenticateJwt,
-  authorizeRoles([Role.OWNER]),
-  validateRequest(createOutletSchema),
-  outletController.createOutlet
-);
+outletRouter.post("/", authenticateJwt, authorizeRoles([Role.OWNER]), validateRequest(createOutletSchema), outletController.createOutlet);
 
-outletRouter.get(
-  "/",
-  authenticateJwt,
-  authorizeRoles([Role.OWNER, Role.OUTLET_MANAGER]),
-  outletController.getOutlets
-);
+outletRouter.get("/", authenticateJwt, authorizeRoles([Role.OWNER, Role.OUTLET_MANAGER]), outletController.getOutlets);

@@ -3,6 +3,8 @@ import { cashierController } from './cashier.controller';
 import { authenticateCashierJwt } from '../../common/middleware/auth.middleware';
 import { validateRequest } from '../../common/middleware/validation.middleware';
 import { cashierLoginSchema, requestCustomerOTPSchema, verifyCustomerOTPSchema } from './cashier.validation';
+import { requireActiveSubscription } from "../subscription/subscription.middleware"
+
 
 export const cashierRouter = Router();
 
@@ -31,13 +33,17 @@ cashierRouter.get(
 );
 
 cashierRouter.post(
-  '/transaction/purchase',
+  "/transaction/purchase",
   authenticateCashierJwt,
-  (req, res) => cashierController.processPurchase(req, res)
+  requireActiveSubscription,
+  (req, res) =>
+    cashierController.processPurchase(req, res)
 );
 
 cashierRouter.post(
-  '/transaction/redeem',
+  "/transaction/redeem",
   authenticateCashierJwt,
-  (req, res) => cashierController.processRedemption(req, res)
+  requireActiveSubscription,
+  (req, res) =>
+    cashierController.processRedemption(req, res)
 );

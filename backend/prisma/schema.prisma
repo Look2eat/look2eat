@@ -36,6 +36,7 @@ model Brand {
   coinWallets         CoinWallet[]
   whatsappMessages    WhatsAppMessage[]
   customerOtpSessions CustomerOTPSession[]
+  feedbacks           CustomerFeedback[]
 }
 
 model AdminUser {
@@ -57,11 +58,13 @@ model AdminUser {
 }
 
 model Outlet {
-  id          String  @id @default(uuid())
-  brandId     String
-  name        String
-  address     String?
-  phoneNumber String?
+  id                    String  @id @default(uuid())
+  brandId               String
+  name                  String
+  address               String?
+  phoneNumber           String?
+  googleReviewUrl       String?
+  managerWhatsappNumber String?
 
   isActive Boolean @default(true)
 
@@ -71,10 +74,13 @@ model Outlet {
   brand Brand @relation(fields: [brandId], references: [id])
 
   cashiers Cashier[]
+  transactions Transaction[]
+  payments Payment[]
 
   subscriptions      OutletSubscription[]
   creditWallet       PlatformCreditWallet?
   creditTransactions CreditTransaction[]
+  feedbacks          CustomerFeedback[]
 }
 
 // Cashier login credentials
@@ -189,6 +195,7 @@ model CoinWallet {
 model Transaction {
   id                 String          @id @default(uuid())
   walletId           String
+  outletId String?
   type               TransactionType // PURCHASE or REDEMPTION
   purchaseAmount     Int? // in rupees (for purchase)
   coinsEarned        Int? // coins earned from purchase
@@ -202,8 +209,11 @@ model Transaction {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  wallet    CoinWallet       @relation(fields: [walletId], references: [id], onDelete: Cascade)
-  milestone RewardMilestone? @relation(fields: [milestoneId], references: [id])
+  whatsappCycle WhatsAppCycle?
+  feedback      CustomerFeedback?
+  outlet Outlet? @relation(fields: [outletId], references: [id])
+  wallet        CoinWallet        @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  milestone     RewardMilestone?  @relation(fields: [milestoneId], references: [id])
 
   @@index([walletId, createdAt])
   @@index([type])
@@ -228,6 +238,34 @@ model WhatsAppMessage {
 
   @@index([brandId, status])
   @@index([phoneNumber, status])
+}
+
+model WhatsAppCycle {
+  id String @id @default(uuid())
+
+  transactionId String @unique
+
+  creditsCharged Int @default(2)
+
+  purchaseMessageSent Boolean @default(false)
+
+  reminder1Sent   Boolean   @default(false)
+  reminder1SentAt DateTime?
+
+  reminder2Sent   Boolean   @default(false)
+  reminder2SentAt DateTime?
+
+  expirySent   Boolean   @default(false)
+  expirySentAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+
+  @@index([reminder1Sent, createdAt])
+  @@index([reminder2Sent, createdAt])
+  @@index([expirySent, createdAt])
 }
 
 model SubscriptionPlan {
@@ -301,6 +339,79 @@ model CreditTransaction {
   outlet Outlet @relation(fields: [outletId], references: [id])
 
   @@index([outletId, createdAt])
+}
+
+model CustomerFeedback {
+  id String @id @default(uuid())
+
+  transactionId String @unique
+
+  brandId  String
+  outletId String
+
+  phoneNumber String
+
+  rating Int
+
+  feedback String?
+
+  ownerNotified   Boolean   @default(false)
+  ownerNotifiedAt DateTime?
+
+  isResolved Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  transaction Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  brand       Brand       @relation(fields: [brandId], references: [id])
+  outlet      Outlet      @relation(fields: [outletId], references: [id])
+
+  @@index([transactionId])
+  @@index([outletId, rating])
+  @@index([brandId])
+}
+
+
+model Payment {
+  id String @id @default(uuid())
+
+  outletId String
+
+  razorpayOrderId String @unique
+
+  razorpayPaymentId String?
+
+  amount Int
+
+  currency String @default("INR")
+
+  type PaymentType
+
+  status PaymentStatus @default(PENDING)
+
+  referenceId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outlet Outlet @relation(fields: [outletId], references: [id])
+
+  @@index([outletId])
+  @@index([status])
+  @@index([type])
+}
+
+enum PaymentType {
+  SUBSCRIPTION
+  CREDIT_PURCHASE
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
 }
 
 enum Role {

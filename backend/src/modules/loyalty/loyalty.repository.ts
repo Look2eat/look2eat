@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { AppError } from "../../common/errors/AppError";
 import { prisma } from "../../prisma/client";
 import { DEFAULT_EXPIRY_DAYS } from "./loyalty.constants";
+import { string } from "zod";
 
 
 export const loyaltyRepository = {
@@ -113,6 +114,7 @@ export const loyaltyRepository = {
   async recordPurchaseTransaction(
     customerPhoneNumber: string,
     brandId: string,
+    outletId: string,
     purchaseAmount: number,
     coinsEarned: number,
     cashierPhoneNumber: string
@@ -127,6 +129,7 @@ export const loyaltyRepository = {
       await prisma.transaction.create({
         data: {
           walletId: wallet.id,
+          outletId,
           type: "PURCHASE",
           purchaseAmount,
           coinsEarned,
@@ -161,101 +164,105 @@ export const loyaltyRepository = {
       transaction,
       wallet: updatedWallet,
     };
-  },
+  }
+  ,
 
   async redeemAndPurchase(
-    customerPhoneNumber: string,
-    brandId: string,
-    milestoneId: string,
-    coinsRedeemed: number,
-    cashbackApplied: number,
-    purchaseAmount: number,
-    coinsEarned: number,
-    cashierPhoneNumber: string
-  ) {
-    return prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
-        const wallet =
-          await tx.coinWallet.findUnique({
-            where: {
-              brandId_phoneNumber: {
-                brandId,
-                phoneNumber:
-                  customerPhoneNumber,
-              },
+  customerPhoneNumber: string,
+  brandId: string,
+  outletId: string,
+  milestoneId: string,
+  coinsRedeemed: number,
+  cashbackApplied: number,
+  purchaseAmount: number,
+  coinsEarned: number,
+  cashierPhoneNumber: string
+) {
+  return prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      const wallet =
+        await tx.coinWallet.findUnique({
+          where: {
+            brandId_phoneNumber: {
+              brandId,
+              phoneNumber:
+                customerPhoneNumber,
             },
-          });
+          },
+        });
 
-        if (!wallet) {
-          throw new AppError(
-            "Wallet not found",
-            404
-          );
-        }
+      if (!wallet) {
+        throw new AppError(
+          "Wallet not found",
+          404
+        );
+      }
 
-        const redemptionTransaction =
-          await tx.transaction.create({
-            data: {
-              walletId: wallet.id,
-              type: "REDEMPTION",
-              coinsRedeemed,
-              cashbackApplied,
-              milestoneId,
-              cashierPhoneNumber,
-            },
-          });
+      const redemptionTransaction =
+        await tx.transaction.create({
+          data: {
+            walletId: wallet.id,
+            outletId,
+            type: "REDEMPTION",
+            coinsRedeemed,
+            cashbackApplied,
+            milestoneId,
+            cashierPhoneNumber,
+          },
+        });
 
+      await tx.coinWallet.update({
+        where: {
+          id: wallet.id,
+        },
+        data: {
+          currentCoins: {
+            decrement: coinsRedeemed,
+          },
+        },
+      });
+
+      const purchaseTransaction =
+        await tx.transaction.create({
+          data: {
+            walletId: wallet.id,
+            outletId,
+            type: "PURCHASE",
+            purchaseAmount,
+            coinsEarned,
+            cashierPhoneNumber,
+          },
+        });
+
+      const updatedWallet =
         await tx.coinWallet.update({
           where: {
             id: wallet.id,
           },
           data: {
             currentCoins: {
-              decrement: coinsRedeemed,
+              increment: coinsEarned,
             },
+            totalCoinsEarned: {
+              increment: coinsEarned,
+            },
+            expiryDate: new Date(
+              Date.now() +
+                DEFAULT_EXPIRY_DAYS *
+                  24 *
+                  60 *
+                  60 *
+                  1000
+            ),
           },
         });
 
-        const purchaseTransaction =
-          await tx.transaction.create({
-            data: {
-              walletId: wallet.id,
-              type: "PURCHASE",
-              purchaseAmount,
-              coinsEarned,
-              cashierPhoneNumber,
-            },
-          });
-
-        const updatedWallet =
-          await tx.coinWallet.update({
-            where: {
-              id: wallet.id,
-            },
-            data: {
-              currentCoins: {
-                increment: coinsEarned,
-              },
-              totalCoinsEarned: {
-                increment: coinsEarned,
-              },
-              expiryDate: new Date(
-                Date.now() +
-                  DEFAULT_EXPIRY_DAYS *
-                    24 *
-                    60 *
-                    60 *
-                    1000
-              ),
-            },
-          });
-
-        return {
-          redemptionTransaction,
-          purchaseTransaction,
-          wallet: updatedWallet,
-        };
-      }
-    );
-  },
+      return {
+        redemptionTransaction,
+        purchaseTransaction,
+        wallet: updatedWallet,
+      };
+    }
+  );
+}
 };

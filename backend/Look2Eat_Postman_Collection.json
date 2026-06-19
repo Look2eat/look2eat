@@ -154,6 +154,26 @@
               }
             }
           ]
+        },
+        {
+          "name": "Get Logged-in Owner Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Retrieve details of the currently logged-in brand owner. Required role: OWNER.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          }
         }
       ]
     },
@@ -709,35 +729,6 @@
           }
         },
         {
-          "name": "Purchase Subscription",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"outletId\": \"{{outletId}}\",\n  \"planId\": \"{{planId}}\"\n}"
-            },
-            "description": "Subscribe an outlet to a platform subscription plan.",
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/subscriptions/purchase",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "subscriptions",
-                "purchase"
-              ]
-            }
-          }
-        },
-        {
           "name": "Get Active Subscription",
           "request": {
             "method": "GET",
@@ -759,36 +750,6 @@
           }
         },
         {
-          "name": "Purchase Credits",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"outletId\": \"{{outletId}}\",\n  \"credits\": 100,\n  \"amountPaid\": 200\n}"
-            },
-            "description": "Add credits to an outlet's platform wallet.",
-            "url": {
-              "raw": "{{baseUrl}}/api/v1/subscriptions/credits/purchase",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "v1",
-                "subscriptions",
-                "credits",
-                "purchase"
-              ]
-            }
-          }
-        },
-        {
           "name": "Consume Credits",
           "request": {
             "method": "POST",
@@ -804,14 +765,13 @@
             },
             "description": "Deduct credits from an outlet's balance for a consumption event.",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/subscriptions/credits/consume",
+              "raw": "{{baseUrl}}/api/v1/credits/consume",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "v1",
-                "subscriptions",
                 "credits",
                 "consume"
               ]
@@ -825,14 +785,13 @@
             "header": [],
             "description": "Fetch wallet balance and totals for an outlet.",
             "url": {
-              "raw": "{{baseUrl}}/api/v1/subscriptions/credits/{{outletId}}",
+              "raw": "{{baseUrl}}/api/v1/credits/{{outletId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "v1",
-                "subscriptions",
                 "credits",
                 "{{outletId}}"
               ]
@@ -991,7 +950,21 @@
                 "purchase"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.transactionId) {",
+                  "    pm.collectionVariables.set(\"transactionId\", jsonData.data.transactionId);",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Process Redemption",
@@ -1031,7 +1004,21 @@
                 "redeem"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.redemptionTransactionId) {",
+                  "    pm.collectionVariables.set(\"transactionId\", jsonData.data.redemptionTransactionId);",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -1145,6 +1132,97 @@
               ]
             }
           }
+        },
+        {
+          "name": "Submit Customer Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionId\": \"{{transactionId}}\",\n  \"rating\": 5,\n  \"feedback\": \"Excellent food and pleasant ambiance!\"\n}"
+            },
+            "description": "Submit customer review and rating for a transaction. If rating >= 4, indicates redirection to Google Review.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/feedback",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "feedback"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Payments",
+      "item": [
+        {
+          "name": "Create Payment Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"outletId\": \"{{outletId}}\",\n  \"type\": \"CREDIT_PURCHASE\",\n  \"credits\": 100\n}"
+            },
+            "description": "Create a Razorpay payment order for subscription plan or credit purchase.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/payments/create-order",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payments",
+                "create-order"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razorpay_order_id\": \"order_id_from_razorpay\",\n  \"razorpay_payment_id\": \"pay_id_from_razorpay\",\n  \"razorpay_signature\": \"signature_from_razorpay\"\n}"
+            },
+            "description": "Verify the Razorpay payment signature and mark payment as paid.",
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/payments/verify",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "payments",
+                "verify"
+              ]
+            }
+          }
         }
       ]
     }
@@ -1203,6 +1281,11 @@
     {
       "key": "phone",
       "value": "9123456789",
+      "type": "string"
+    },
+    {
+      "key": "transactionId",
+      "value": "",
       "type": "string"
     }
   ]

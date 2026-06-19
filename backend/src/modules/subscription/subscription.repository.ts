@@ -1,5 +1,5 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../../prisma/client";
-import { CreditTransactionType } from "@prisma/client";
 
 export const subscriptionRepository = {
   async createPlan(
@@ -27,8 +27,13 @@ export const subscriptionRepository = {
     });
   },
 
-  async getPlanById(planId: string) {
-    return prisma.subscriptionPlan.findUnique({
+  async getPlanById(
+    planId: string,
+    tx?: Prisma.TransactionClient
+  ) {
+    const db = tx ?? prisma;
+
+    return db.subscriptionPlan.findUnique({
       where: {
         id: planId,
       },
@@ -39,9 +44,12 @@ export const subscriptionRepository = {
     outletId: string,
     planId: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    tx?: Prisma.TransactionClient
   ) {
-    return prisma.outletSubscription.create({
+    const db = tx ?? prisma;
+
+    return db.outletSubscription.create({
       data: {
         outletId,
         planId,
@@ -54,8 +62,13 @@ export const subscriptionRepository = {
     });
   },
 
-  async getActiveSubscription(outletId: string) {
-    return prisma.outletSubscription.findFirst({
+  async getActiveSubscription(
+    outletId: string,
+    tx?: Prisma.TransactionClient
+  ) {
+    const db = tx ?? prisma;
+
+    return db.outletSubscription.findFirst({
       where: {
         outletId,
         isActive: true,
@@ -72,8 +85,33 @@ export const subscriptionRepository = {
     });
   },
 
-  async deactivateSubscriptions(outletId: string) {
-    return prisma.outletSubscription.updateMany({
+  async hasActiveSubscription(
+    outletId: string
+  ): Promise<boolean> {
+    const subscription =
+      await prisma.outletSubscription.findFirst({
+        where: {
+          outletId,
+          isActive: true,
+          endDate: {
+            gt: new Date(),
+          },
+        },
+        select: {
+          id: true,
+        },
+      });
+
+    return !!subscription;
+  },
+
+  async deactivateSubscriptions(
+    outletId: string,
+    tx?: Prisma.TransactionClient
+  ) {
+    const db = tx ?? prisma;
+
+    return db.outletSubscription.updateMany({
       where: {
         outletId,
         isActive: true,
@@ -84,74 +122,18 @@ export const subscriptionRepository = {
     });
   },
 
-  async getCreditWallet(outletId: string) {
-    return prisma.platformCreditWallet.findUnique({
-      where: {
-        outletId,
-      },
-    });
-  },
-
-  async createCreditWallet(outletId: string) {
-    return prisma.platformCreditWallet.create({
-      data: {
-        outletId,
-      },
-    });
-  },
-
-  async incrementCredits(
+  async outletExists(
     outletId: string,
-    credits: number
+    tx?: Prisma.TransactionClient
   ) {
-    return prisma.platformCreditWallet.update({
-      where: {
-        outletId,
-      },
-      data: {
-        balance: {
-          increment: credits,
-        },
-        totalPurchased: {
-          increment: credits,
-        },
-      },
-    });
-  },
+    const db = tx ?? prisma;
 
-  async decrementCredits(
-    outletId: string,
-    credits: number
-  ) {
-    return prisma.platformCreditWallet.update({
+    return db.outlet.findUnique({
       where: {
-        outletId,
+        id: outletId,
       },
-      data: {
-        balance: {
-          decrement: credits,
-        },
-        totalConsumed: {
-          increment: credits,
-        },
-      },
-    });
-  },
-
-  async createCreditTransaction(
-    outletId: string,
-    type: CreditTransactionType,
-    credits: number,
-    amountPaid?: number,
-    description?: string
-  ) {
-    return prisma.creditTransaction.create({
-      data: {
-        outletId,
-        type,
-        credits,
-        amountPaid,
-        description,
+      select: {
+        id: true,
       },
     });
   },

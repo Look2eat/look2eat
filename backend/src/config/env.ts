@@ -27,4 +27,6 @@ export const env = {
   whatsappTemplatePurchase: getEnv("WHATSAPP_TEMPLATE_PURCHASE"),
   whatsappTemplatePurchaseRedeem: getEnv("WHATSAPP_TEMPLATE_PURCHASE_REDEEM"),
   whatsappTemplateExpiryWarning: getEnv("WHATSAPP_TEMPLATE_EXPIRY_WARNING"),
+  razorpayKeyId: getEnv("RAZORPAY_KEY_ID"),
+  razorpayKeySecret: getEnv("RAZORPAY_KEY_SECRET"),
 };
