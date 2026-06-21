@@ -5,7 +5,7 @@ import CashierLayout from "@/components/cashier/CashierLayout";
 import CashierLoyaltyPreview from "@/components/cashier/CashierLoyaltyPreview";
 import CustomerPanel from "@/components/cashier/CustomerPanel";
 import { Customer } from "@/types/customer";
-import { getBrandIdFromToken } from "@/lib/auth";
+
 import AuthGuard from "@/components/dashboard/AuthGuard";
 
 export default function CashierPage() {
@@ -16,7 +16,7 @@ export default function CashierPage() {
     setSelectedCustomer(null);
     setLookupResetKey((prev) => prev + 1);
   }
-  const brandId = getBrandIdFromToken();
+  const brandId = "12345" // Placeholder, replace with actual brand ID retrieval logic
 
   return (
     <AuthGuard>
