@@ -19,46 +19,13 @@ import { MiniChart } from "@/components/ui/mini-chart"
 
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<DashboardKpis | null>(null)
-  const brandId = getBrandIdFromToken() // pull from context/localStorage/store
 
-  useEffect(() => {
-    async function load() {
-      const data = await getDashboardKpis(brandId)
-      console.log(data.data)
-      setStats(data)
-    }
-    load()
-  }, [brandId])
-
-  if (!stats) {
-    return (
-      <div className="p-4 md:p-10 min-h-screen space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-6">
-            <div className="grid grid-cols-2 gap-6">
-              <Skeleton className="h-40 rounded-2xl" />
-              <Skeleton className="h-40 rounded-2xl" />
-            </div>
-            <div className="grid grid-cols-2 gap-6">
-              <Skeleton className="h-40 rounded-2xl" />
-              <Skeleton className="h-40 rounded-2xl" />
-            </div>
-          </div>
-          <div className="flex flex-col gap-6">
-            <Skeleton className="h-86 rounded-2xl" />
-          </div>
-        </div>
-      </div>
-    )
-
-  }
 
   return (
 
     <div className=" min-h-screen">
       {/* <DashboardGrid stats={stats} /> */}
-      <div className="grid grid-cols-12 gap-6 p-6 max-w-7xl mx-auto">
+      <div className="grid grid-cols-12 gap-6 p-6  mx-auto">
         <div className="col-span-12">
           <StatisticsBlock />
         </div>
