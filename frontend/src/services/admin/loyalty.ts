@@ -49,16 +49,13 @@ export interface LoyaltyHistoryResponse {
   data: LoyaltyHistoryRow[];
   pagination: LoyaltyHistoryPagination;
 }
+
 /**
  * ---------------------------------------------------------------------------
  * Loyalty settings — service layer
  * ---------------------------------------------------------------------------
  * Raw fetch calls to the BFF proxy at /api/proxy/..., matching the rest of
  * the Zuplin services layer (no shared API client).
- *
- * NOTE: Merge these exports into the existing services/admin/loyalty.ts —
- * this file only contains the additions needed for the loyalty settings
- * dialog (theme, milestones, coin ratio, terms).
  * ---------------------------------------------------------------------------
  */
 
@@ -66,18 +63,34 @@ import { Milestone } from "@/types/loyalty";
 
 const PROXY_BASE = "/api/proxy";
 
+/**
+ * Reads the response body exactly once (as text) then parses it.
+ *
+ * Using res.json() can trigger "body stream already read" when the server
+ * returns a non-JSON or empty body, because the browser marks
+ * bodyUsed = true after the first failed internal read attempt.
+ * Reading as text first and then JSON.parse-ing avoids this entirely.
+ */
 async function parseOrThrow(res: Response, fallbackMessage: string) {
-    if (!res.ok) {
-        let message = fallbackMessage;
+    const text = await res.text();
+
+    let parsed: unknown = null;
+    if (text) {
         try {
-            const body = await res.json();
-            message = body?.message ?? fallbackMessage;
+            parsed = JSON.parse(text);
         } catch {
-            // response wasn't JSON, fall back to default message
+            // Non-JSON body (plain text, empty, HTML error page…).
+            // parsed stays null; error message extracted below if needed.
         }
+    }
+
+    if (!res.ok) {
+        const body = parsed as Record<string, string> | null;
+        const message = body?.message ?? body?.error ?? fallbackMessage;
         throw new Error(message);
     }
-    return res.json();
+
+    return parsed;
 }
 
 /**
@@ -90,18 +103,21 @@ export async function getMilestones(brandId: string): Promise<Milestone[]> {
     const res = await fetch(`${PROXY_BASE}/admin/brands/milestones`, {
         method: "GET",
     });
-    const data = await parseOrThrow(res, "Couldn't load milestones.");
+    // Cast to a loose record so we can safely probe nested keys without
+    // TypeScript complaining — parseOrThrow returns unknown intentionally.
+    const data = await parseOrThrow(res, "Couldn't load milestones.") as Record<string, unknown> | unknown[] | null;
 
     // Normalise every common API response shape into a plain array.
     // If none of the patterns match we log the actual shape in dev so
     // you can add it here, and return [] so the UI never crashes.
+    const d = data as Record<string, unknown> | null;
     const candidates = [
-        data,                        // plain array
-        data?.milestones,            // { milestones: [] }
-        data?.data,                  // { data: [] }
-        data?.data?.milestones,      // { data: { milestones: [] } }
-        data?.rewards,               // { rewards: [] }
-        data?.data?.rewards,         // { data: { rewards: [] } }
+        data,
+        d?.milestones,
+        d?.data,
+        (d?.data as Record<string, unknown> | null)?.milestones,
+        d?.rewards,
+        (d?.data as Record<string, unknown> | null)?.rewards,
     ];
 
     const found = candidates.find(Array.isArray);
@@ -125,7 +141,7 @@ export async function createMilestone(
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brandId, ...payload }),
     });
-    return parseOrThrow(res, "Couldn't create milestone.");
+    return parseOrThrow(res, "Couldn't create milestone.") as Promise<Milestone>;
 }
 
 export async function updateMilestone(
@@ -136,9 +152,13 @@ export async function updateMilestone(
     const res = await fetch(`${PROXY_BASE}/admin/milestones/${milestoneId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({name:payload.name, cashbackOffer:payload.name,coinsRequired:payload.coinsRequired}),
+        body: JSON.stringify({
+            name: payload.name,
+            cashbackOffer: payload.name,
+            coinsRequired: payload.coinsRequired,
+        }),
     });
-    return parseOrThrow(res, "Couldn't update milestone.");
+    return parseOrThrow(res, "Couldn't update milestone.") as Promise<Milestone>;
 }
 
 export async function deleteMilestone(milestoneId: string): Promise<void> {
@@ -164,7 +184,7 @@ export async function syncMilestones(
                 cashbackOffer: milestone.cashbackOffer,
             };
             if (milestone.id) {
-                const updated = await updateMilestone( brandId, milestone.id, payload);
+                const updated = await updateMilestone(brandId, milestone.id, payload);
                 return { ...milestone, ...updated };
             }
             const created = await createMilestone(brandId, payload);
@@ -198,20 +218,22 @@ export async function uploadBrandImages(
     images: { logo?: File | null; banner?: File | null }
 ) {
     const formData = new FormData();
-    // formData.append("brandId", brandId);
     if (images.logo) formData.append("logo", images.logo);
     if (images.banner) formData.append("banner", images.banner);
 
     const res = await fetch(`${PROXY_BASE}/brands/images`, {
         method: "POST",
         body: formData,
+        // Do NOT set Content-Type manually — the browser must set it so the
+        // multipart boundary token is included automatically.
     });
+
     return parseOrThrow(res, "Couldn't upload brand images.");
 }
 
 /**
- * Converts a remote image URL (e.g. an Unsplash photo) into a File so it can
- * be sent through the same multipart upload as a user-picked file.
+ * Converts a remote image URL (e.g. an Unsplash photo) into a File so it
+ * can be sent through the same multipart upload as a user-picked file.
  */
 export async function urlToFile(url: string, filename: string): Promise<File> {
     const res = await fetch(url);
@@ -231,7 +253,12 @@ export interface BrandDetailsPayload {
     email?: string;
     phoneNumber?: string;
     description?: string;
-    termsText?: string;
+    /**
+     * Terms sent as a string array, one item per line — e.g.
+     * ["Minimum purchase required.", "2 offers cannot be clubbed."]
+     * The backend joins or stores them however it needs to.
+     */
+    terms?: string[];
     gst?: string;
     address?: string;
     primaryColor?: string;
@@ -247,6 +274,7 @@ export async function updateBrandDetails(payload: BrandDetailsPayload) {
     });
     return parseOrThrow(res, "Couldn't save brand details.");
 }
+
 /**
  * Fetches the full loyalty dashboard (KPIs + repeat-rate breakdown +
  * campaign status + first page of history) for a single outlet, or for

@@ -91,14 +91,15 @@ export default function TermsStep({
 }
 
 /**
- * Builds the final terms text sent to the backend (termsText on PATCH
- * /api/v1/brands): the selected preset terms, joined, plus the dynamic
- * minimum-redeem-amount line appended at the end when set.
+ * Builds the terms array sent to the backend (terms: string[] on PATCH
+ * /api/v1/brands): each selected term is its own element, plus the
+ * dynamic minimum-redeem-amount line appended at the end when set.
+ * Sent line-by-line so the backend can store/display them individually.
  */
-export function buildTermsText(terms: LoyaltyTerm[], minRedeemAmount: number): string {
+export function buildTermsArray(terms: LoyaltyTerm[], minRedeemAmount: number): string[] {
     const lines = terms.filter((t) => !t.isDynamic && t.selected).map((t) => t.label);
     if (minRedeemAmount > 0) {
         lines.push(`Minimum ₹${minRedeemAmount} required to redeem rewards.`);
     }
-    return lines.join(" ");
+    return lines;
 }

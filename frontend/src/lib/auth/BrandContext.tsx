@@ -8,29 +8,40 @@ import {
     type ReactNode,
 } from "react";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { getPublicLoyaltyBySlug } from "@/services/public/loyalty";
 
 /**
- * In-memory cache (same pattern as AuthContext — no localStorage, no
- * persistence) for brand DISPLAY details: logo, banner, description,
- * loyalty settings, milestones. This is deliberately separate from
- * AuthContext, which answers "who is logged in" (id, role, brandId,
- * slug). This answers "what does their brand look like" — different
- * concerns, fetched from a different (genuinely public, no-auth)
- * endpoint.
+ * In-memory cache for brand details fetched from the authenticated
+ * GET /api/v1/brands endpoint (via BFF proxy at /api/proxy/brands).
  *
- * Has a real dependency on AuthContext: it needs `user.slug` before it
- * can call GET /public/loyalty/{slug}, so it does nothing until
- * AuthContext has resolved. See app/dashboard/layout.tsx for provider
- * nesting order — BrandProvider must be INSIDE AuthProvider.
+ * Deliberately separate from AuthContext, which answers "who is logged in"
+ * (id, role, brandId, slug). This answers "what does their brand look like"
+ * — logo, banner, primary color, coin ratio, terms, etc.
+ *
+ * Previously this used the public /public/loyalty/{slug} endpoint. Switched
+ * to the authenticated endpoint because:
+ *   1. It returns the full brand record (primaryColor, termsText, settings…)
+ *      needed to seed the LoyaltySettingsDialog on open.
+ *   2. refresh() is called after the dialog saves — the public endpoint has
+ *      cache lag; the authenticated one reflects writes immediately.
+ *
+ * Provider nesting: BrandProvider must be INSIDE AuthProvider so that
+ * useAuth() resolves before we attempt the fetch.
  */
 
 export interface BrandDetails {
     id: string;
     name: string;
+    slug: string;
+    email: string | null;
+    phoneNumber: string | null;
     logoUrl: string | null;
     bannerImageUrl: string | null;
     description: string | null;
+    primaryColor: string;
+    termsText: string | null;
+    gst: string | null;
+    address: string | null;
+    isActive: boolean;
     coinRatioValue: number;
 }
 
@@ -42,28 +53,62 @@ interface BrandContextValue {
 
 const BrandContext = createContext<BrandContextValue | undefined>(undefined);
 
+async function fetchBrandFromApi(): Promise<BrandDetails> {
+    const res = await fetch("/api/proxy/brands", { method: "GET" });
+
+    // Read body once — avoids "body stream already read" if the response
+    // is non-JSON (same pattern as the loyalty service layer).
+    const text = await res.text();
+    let parsed: Record<string, unknown> | null = null;
+    if (text) {
+        try {
+            parsed = JSON.parse(text);
+        } catch {
+            // Non-JSON body — treated as an opaque error below.
+        }
+    }
+
+    if (!res.ok) {
+        const body = parsed as Record<string, string> | null;
+        throw new Error(body?.message ?? body?.error ?? "Couldn't load brand details.");
+    }
+
+    // Response shape: { data: { ...brand, settings: { coinRatioValue } } }
+    const data = (parsed as { data: Record<string, unknown> }).data;
+
+    const settings = data.settings as { coinRatioValue: number } | null;
+
+    return {
+        id: data.id as string,
+        name: data.name as string,
+        slug: data.slug as string,
+        email: (data.email as string) ?? null,
+        phoneNumber: (data.phoneNumber as string) ?? null,
+        logoUrl: (data.logoUrl as string) ?? null,
+        bannerImageUrl: (data.bannerImageUrl as string) ?? null,
+        description: (data.description as string) ?? null,
+        primaryColor: (data.primaryColor as string) ?? "#F43F5E",
+        termsText: (data.termsText as string) ?? null,
+        gst: (data.gst as string) ?? null,
+        address: (data.address as string) ?? null,
+        isActive: (data.isActive as boolean) ?? true,
+        coinRatioValue: settings?.coinRatioValue ?? 1,
+    };
+}
+
 export function BrandProvider({ children }: { children: ReactNode }) {
     const { user, isLoading: isAuthLoading } = useAuth();
     const [brand, setBrand] = useState<BrandDetails | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchBrand = async (slug: string) => {
+    const loadBrand = async () => {
         try {
-            const res = await getPublicLoyaltyBySlug(slug);
-            setBrand({
-                id: res.data.brand.id,
-                name: res.data.brand.name,
-                logoUrl: res.data.brand.logoUrl,
-                bannerImageUrl: res.data.brand.bannerImageUrl,
-                description: res.data.brand.description,
-                coinRatioValue: res.data.settings.coinRatioValue,
-            });
+            const details = await fetchBrandFromApi();
+            setBrand(details);
         } catch {
             // Brand details are DISPLAY data, not auth-critical — fail soft.
-            // A failed fetch here should never block the dashboard from being
-            // usable; components reading useBrand() should already handle
-            // brand === null (e.g. fall back to a wordmark, same pattern as
-            // WelcomeCard's logoUrl fallback).
+            // Components reading useBrand() should handle brand === null
+            // (e.g. fall back to a wordmark).
             setBrand(null);
         } finally {
             setIsLoading(false);
@@ -71,27 +116,24 @@ export function BrandProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
-        // Wait for AuthContext to resolve first — slug doesn't exist until
-        // it does. Once it has, fetch exactly once; this effect re-runs only
-        // if slug itself changes (e.g. a different user logs in without a
-        // full page reload, which shouldn't normally happen given logout
-        // does a hard redirect, but guards against it regardless).
+        // Wait for AuthContext to resolve before attempting the authenticated
+        // fetch — there's no token until it does.
         if (isAuthLoading) return;
 
-        if (!user?.slug) {
+        if (!user) {
             setIsLoading(false);
             setBrand(null);
             return;
         }
 
-        fetchBrand(user.slug);
+        loadBrand();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthLoading, user?.slug]);
+    }, [isAuthLoading, user?.id]);
 
     const refresh = async () => {
-        if (!user?.slug) return;
+        if (!user) return;
         setIsLoading(true);
-        await fetchBrand(user.slug);
+        await loadBrand();
     };
 
     return (

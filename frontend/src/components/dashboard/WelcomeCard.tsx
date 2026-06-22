@@ -3,6 +3,7 @@
 import { useAuth } from "@/lib/auth/AuthContext";
 import { ToggleTheme } from "../ui/toggle-theme";
 import { useBrand } from "@/lib/auth/BrandContext";
+import Image from "next/image";
 
 // REMOVED: useAppStore (Zustand + persist). That store was (a) holding
 // hardcoded dummy data ("Burger King" / "Avneet") instead of the real
@@ -37,19 +38,30 @@ export default function WelcomeCard() {
         // rather than crash if the session check somehow comes back empty.
         return null;
     }
-
+    const logo = brand?.logoUrl
     const brandInitial = brand?.name?.trim().charAt(0).toUpperCase() || "?";
 
     return (
         <div className="w-66 rounded-[36px] bg-background py-6 px-4 mx-2 mt-6">
             <div className="flex items-start justify-between">
-                <div
+                {logo ? <div
+                    className="relative flex h-10 w-10  overflow-hidden rounded-xl "
+                    aria-label={brand?.name}
+                    title={brand?.name}
+                >
+                    <Image
+                        src={logo}
+                        alt="Logo"
+                        fill
+                        className="object-contain p-1"
+                    />
+                </div> : <div
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D2033] text-base font-semibold text-white dark:bg-[#FDFEFF] dark:text-[#1D2033]"
                     aria-label={brand?.name}
                     title={brand?.name}
                 >
                     {brandInitial}
-                </div>
+                </div>}
 
                 <ToggleTheme />
             </div>

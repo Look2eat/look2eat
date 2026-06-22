@@ -35,7 +35,48 @@ import {
 
 import ThemeStep from "./ThemeStep";
 import MilestonesStep from "./MilestonesStep";
-import TermsStep, { DEFAULT_LOYALTY_TERMS, buildTermsText } from "./TermsStep";
+import TermsStep, { DEFAULT_LOYALTY_TERMS, buildTermsArray } from "./TermsStep";
+import type { BrandDetails } from "@/lib/auth/BrandContext";
+
+/**
+ * Re-hydrates the terms checklist and minRedeemAmount from the flat
+ * termsText string stored on the brand. Each DEFAULT_LOYALTY_TERMS label
+ * is matched with String.includes so the server order does not matter.
+ * The dynamic "Minimum Rs X required to redeem rewards." line is extracted
+ * separately and turned back into the numeric minRedeemAmount field.
+ */
+function parseTermsFromBrand(termsText: string | null): {
+    terms: typeof DEFAULT_LOYALTY_TERMS;
+    minRedeemAmount: number;
+} {
+    if (!termsText) return { terms: DEFAULT_LOYALTY_TERMS, minRedeemAmount: 0 };
+
+    const terms = DEFAULT_LOYALTY_TERMS.map((t) => ({
+        ...t,
+        selected: termsText.includes(t.label),
+    })) as typeof DEFAULT_LOYALTY_TERMS;
+
+    const match = termsText.match(/Minimum ?₹(\d+)\s+required\s+to\s+redeem\s+rewards/);
+    const altMatch = termsText.match(/Minimum\s+[^\d]*(\d+)[^\d]+required\s+to\s+redeem/);
+    const minRedeemAmount = match
+        ? parseInt(match[1], 10)
+        : altMatch
+            ? parseInt(altMatch[1], 10)
+            : 0;
+
+    return { terms, minRedeemAmount };
+}
+
+/** Seeds theme state from saved brand record. */
+function seedThemeFromBrand(brand: BrandDetails | null) {
+    return {
+        logoFile: null as File | null,
+        logoPreview: brand?.logoUrl ?? null,
+        bannerFile: null as File | null,
+        bannerPreview: brand?.bannerImageUrl ?? null,
+        primaryColor: brand?.primaryColor ?? "#F43F5E",
+    };
+}
 
 const STEPS = [
     { step: 1, label: "Theme" },
@@ -107,9 +148,14 @@ export default function LoyaltySettingsDialog({
         setError(null);
         setCurrentStep(1);
 
-        // Seed coin ratio from what BrandContext already holds so the field
-        // isn't blank while milestones load.
-        if (brand?.coinRatioValue) setCoinRatioValue(brand.coinRatioValue);
+        // Seed all non-async state from BrandContext immediately so the
+        // form is never blank while milestones are loading.
+        setTheme(seedThemeFromBrand(brand));
+        setCoinRatioValue(brand?.coinRatioValue ?? 1);
+        const { terms: seededTerms, minRedeemAmount: seededMin } =
+            parseTermsFromBrand(brand?.termsText ?? null);
+        setTerms(seededTerms);
+        setMinRedeemAmount(seededMin);
 
         getMilestones(brandId)
             .then((data) => {
@@ -132,13 +178,26 @@ export default function LoyaltySettingsDialog({
         setSaving(true);
         setError(null);
         try {
-            // Theme — upload images, save brand color
-            if (theme.logoFile || theme.bannerFile || theme.bannerPreview) {
-                let bannerFile = theme.bannerFile;
-                if (!bannerFile && theme.bannerPreview) {
+            // Only upload images when the user actually changed them:
+            //   logo   — a new File was picked
+            //   banner — a new File was picked OR the preview URL changed
+            //            (e.g. user selected a different Unsplash photo)
+            // This avoids re-downloading + re-uploading unchanged Cloudinary
+            // URLs on every save.
+            const logoChanged = !!theme.logoFile;
+            const bannerChanged =
+                !!theme.bannerFile ||
+                theme.bannerPreview !== (brand?.bannerImageUrl ?? null);
+
+            if (logoChanged || bannerChanged) {
+                let bannerFile: File | null = theme.bannerFile;
+                if (bannerChanged && !bannerFile && theme.bannerPreview) {
                     bannerFile = await urlToFile(theme.bannerPreview, "loyalty-banner.jpg");
                 }
-                await uploadBrandImages({ logo: theme.logoFile, banner: bannerFile });
+                await uploadBrandImages({
+                    logo: logoChanged ? theme.logoFile : null,
+                    banner: bannerFile,
+                });
             }
 
             // Milestones + coin ratio
@@ -147,7 +206,7 @@ export default function LoyaltySettingsDialog({
 
             // Terms, brand color, points expiry
             await updateBrandDetails({
-                termsText: buildTermsText(terms, minRedeemAmount),
+                terms: buildTermsArray(terms, minRedeemAmount),
                 primaryColor: theme.primaryColor,
                 pointsExpiryDays,
             });
