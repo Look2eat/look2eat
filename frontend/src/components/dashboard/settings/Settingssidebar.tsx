@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { TabsList, TabsTab } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
     Dialog, DialogClose, DialogDescription, DialogFooter,
     DialogHeader, DialogPopup, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog";
+import { logout } from "@/services/auth/login";
 
 const TAB_ITEMS = [
     { value: "profile", label: "Profile" },
@@ -14,10 +16,26 @@ const TAB_ITEMS = [
     { value: "wallet", label: "Wallet" },
     { value: "security", label: "Security" },
     { value: "billing", label: "Billing" },
-    { value: "wallet", label: "Wallet" },
 ];
 
 export function SettingsSidebar() {
+    const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+    const handleLogout = async () => {
+        setIsLoggingOut(true);
+        try {
+            // Clears l2e_session + l2e_has_session cookies server-side via
+            // /api/auth/logout, then hard-redirects to /login. See
+            // services/auth/login.ts — scoped to THIS browser only, no
+            // server-side token revocation exists yet.
+            await logout();
+        } catch {
+            // logout() shouldn't normally throw, but don't strand the user
+            // on a spinner if the network call fails.
+            setIsLoggingOut(false);
+        }
+    };
+
     return (
         <div className="border-r border-gray-100 dark:border-neutral-900 bg-gray-50/40 dark:bg-neutral-800/20 text-base">
             <TabsList variant="underline" className="flex flex-col items-stretch gap-5 p-3 w-40 pt-8">
@@ -47,7 +65,9 @@ export function SettingsSidebar() {
                             </DialogHeader>
                             <DialogFooter>
                                 <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
-                                <Button type="button">Log Out</Button>
+                                <Button type="button" loading={isLoggingOut} onClick={handleLogout}>
+                                    Log Out
+                                </Button>
                             </DialogFooter>
                         </DialogPopup>
                     </Dialog>

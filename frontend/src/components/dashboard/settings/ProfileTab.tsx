@@ -11,10 +11,23 @@ import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { mockData } from "../../../lib/mock-settings";
 import { VerifiedBadge, SectionRow } from "./Shared";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 export function ProfileTab() {
-    const p = mockData.profile;
-    const [name, setName] = useState(p.name);
+
+
+    const { user, isLoading } = useAuth();
+    if (isLoading) {
+        return (
+            <div className="h-44 w-full animate-pulse rounded-[36px] bg-gray-100" />
+        );
+    }
+
+    if (!user) {
+        // Shouldn't normally happen inside AuthGuard, but render nothing
+        // rather than crash if the session check somehow comes back empty.
+        return null;
+    }
 
     return (
         <div className="space-y-1">
@@ -24,7 +37,7 @@ export function ProfileTab() {
                 description="Your display name across the platform."
                 action={
                     <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-700 dark:text-neutral-200">{name}</span>
+                        <span className="text-sm text-gray-700 dark:text-neutral-200">{user.name}</span>
                         <Dialog>
                             <DialogTrigger render={<Button variant="outline" className="text-xs" />}>Edit</DialogTrigger>
                             <DialogPopup className="sm:max-w-sm">
@@ -36,7 +49,8 @@ export function ProfileTab() {
                                     <DialogPanel className="grid gap-4">
                                         <Field>
                                             <FieldLabel>Full Name</FieldLabel>
-                                            <Input value={name} onChange={(e) => setName(e.target.value)} type="text" />
+                                            <Input value={user.name} type="text" />
+                                            {/* <Input value={user.name} onChange={(e) => setUser({...user, name: e.target.value})} type="text" /> */}
                                         </Field>
                                     </DialogPanel>
                                     <DialogFooter>
@@ -54,12 +68,12 @@ export function ProfileTab() {
             <div className="flex items-center justify-between border-b border-gray-100  dark:border-neutral-900 py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Email Address</p>
-                    <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">Used for login and notifications.</p>
+                    <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">Used for billing and notifications.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-right">
-                        <p className="text-sm text-gray-700 dark:text-neutral-200">{p.email}</p>
-                        <VerifiedBadge verified={p.emailVerified} />
+                        <p className="text-sm text-gray-700 dark:text-neutral-200">{user.email}</p>
+                        {/* <VerifiedBadge verified={p.emailVerified} /> */}
                     </div>
                     <Dialog>
                         <DialogTrigger render={<Button variant="outline" className="text-xs" />}>Edit</DialogTrigger>
@@ -72,7 +86,7 @@ export function ProfileTab() {
                                 <DialogPanel className="grid gap-4">
                                     <Field>
                                         <FieldLabel>Email Address</FieldLabel>
-                                        <Input defaultValue={p.email} type="email" />
+                                        <Input defaultValue={user.email} type="email" />
                                     </Field>
                                 </DialogPanel>
                                 <DialogFooter>
@@ -89,13 +103,13 @@ export function ProfileTab() {
             <div className="flex items-center justify-between border-b border-gray-100 dark:border-neutral-900 py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Mobile Number</p>
-                    <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">For OTP and account alerts.</p>
+                    <p className="mt-0.5 text-xs text-gray-700 dark:text-neutral-200">Used for loggin and account alerts.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="text-right">
-                        <p className="text-sm text-gray-700 dark:text-neutral-200">{p.mobile}</p>
-                        <VerifiedBadge verified={p.mobileVerified} />
-                    </div>
+                        <p className="text-sm text-gray-700 dark:text-neutral-200">+91 {user.phoneNumber}</p>
+                        {/* <VerifiedBadge verified={p.mobileVerified} /> */}
+                        {/* </div>
                     <Dialog>
                         <DialogTrigger render={<Button variant="outline" className="text-xs" />}>Edit</DialogTrigger>
                         <DialogPopup className="sm:max-w-sm">
@@ -116,7 +130,8 @@ export function ProfileTab() {
                                 </DialogFooter>
                             </Form>
                         </DialogPopup>
-                    </Dialog>
+                    </Dialog> */}
+                    </div>
                 </div>
             </div>
 
@@ -126,7 +141,7 @@ export function ProfileTab() {
                 description="Your role cannot be changed. Contact support to transfer ownership."
                 action={
                     <span className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold text-indigo-600">
-                        {p.role}
+                        {user.role}
                     </span>
                 }
             />
