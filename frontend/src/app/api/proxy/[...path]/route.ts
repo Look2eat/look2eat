@@ -40,10 +40,39 @@ async function handler(
   const search = req.nextUrl.search; // preserves ?brandId=...&limit=50 etc.
   const targetUrl = `${EXPRESS_API_URL}/${targetPath}${search}`;
 
-  let body: string | undefined;
-  if (req.method !== "GET" && req.method !== "HEAD") {
+  // ------------------------------------------------------------------
+  // Body + Content-Type handling
+  //
+  // For multipart/form-data (file uploads) we must:
+  //   1. Forward the original Content-Type header unchanged — it carries
+  //      the boundary token that Express uses to split fields/files.
+  //      Overwriting it with "application/json" corrupts the upload.
+  //   2. Read the body as an ArrayBuffer and pass the raw bytes through
+  //      rather than text(), which would corrupt binary file data.
+  //
+  // For every other method we keep the previous behaviour (raw JSON
+  // string forwarded as-is so we remain a transparent relay).
+  // ------------------------------------------------------------------
+  const incomingContentType = req.headers.get("content-type") ?? "";
+  const isMultipart = incomingContentType.startsWith("multipart/form-data");
+
+  let body: string | Buffer | undefined;
+  let contentTypeHeader: string;
+
+  if (req.method === "GET" || req.method === "HEAD") {
+    body = undefined;
+    contentTypeHeader = "application/json";
+  } else if (isMultipart) {
+    // Preserve the full multipart header including the boundary parameter,
+    // e.g. "multipart/form-data; boundary=----WebKitFormBoundaryXYZ".
+    // Reading as ArrayBuffer keeps binary file bytes intact.
+    const buf = await req.arrayBuffer();
+    body = buf.byteLength > 0 ? Buffer.from(buf) : undefined;
+    contentTypeHeader = incomingContentType;
+  } else {
     const text = await req.text();
-    if (text) body = text;
+    body = text || undefined;
+    contentTypeHeader = "application/json";
   }
 
   try {
@@ -51,11 +80,11 @@ async function handler(
       url: targetUrl,
       method: req.method as Method,
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": contentTypeHeader,
         Authorization: `Bearer ${token}`,
       },
-      // Pass the raw JSON string through as-is rather than re-parsing +
-      // re-stringifying — we're a transparent relay, not a transform step.
+      // Pass the raw body through as-is — we're a transparent relay,
+      // not a transform step.
       data: body,
       // Don't let axios throw on 4xx/5xx — we want to relay the upstream
       // status/body to the client as-is, same as the fetch version did.
