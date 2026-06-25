@@ -17,6 +17,7 @@ import SalesOverviewChart from "@/components/shadcn-space/blocks/dashboard-shell
 import PreviewTabs from "@/components/shadcn-space/blocks/dashboard-shell-01/tabs"
 import { MiniChart } from "@/components/ui/mini-chart"
 import { useOutlet } from "@/lib/auth/OutletContext"
+import { DashboardProvider } from "@/lib/auth/DashboardContext"
 
 
 export default function DashboardPage() {
@@ -29,13 +30,19 @@ export default function DashboardPage() {
       {/* <DashboardGrid stats={stats} /> */}
       <div className="grid grid-cols-12 gap-6 p-6  mx-auto">
         <div className="col-span-12">
-          <StatisticsBlock />
+          <DashboardProvider>
+            <StatisticsBlock />
+          </DashboardProvider>
         </div>
         <div className="xl:col-span-8 col-span-12">
-          <SalesOverviewChart />
+          <DashboardProvider>
+            <SalesOverviewChart />
+          </DashboardProvider>
         </div>
         <div className="xl:col-span-4 col-span-12">
-          <MiniChart />
+          <DashboardProvider>
+            <MiniChart />
+          </DashboardProvider>
         </div>
         <div className="col-span-12">
           <div className="flex items-start justify-start mb-4">

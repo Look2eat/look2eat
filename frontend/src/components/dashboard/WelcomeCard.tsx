@@ -45,7 +45,7 @@ export default function WelcomeCard() {
         <div className="w-66 rounded-[36px] bg-background py-6 px-4 mx-2 mt-6">
             <div className="flex items-start justify-between">
                 {logo ? <div
-                    className="relative flex h-10 w-10  overflow-hidden rounded-xl "
+                    className="relative flex h-10 w-10  overflow-hidden rounded-lg "
                     aria-label={brand?.name}
                     title={brand?.name}
                 >
@@ -53,7 +53,7 @@ export default function WelcomeCard() {
                         src={logo}
                         alt="Logo"
                         fill
-                        className="object-contain p-1"
+                        className="object-contain "
                     />
                 </div> : <div
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D2033] text-base font-semibold text-white dark:bg-[#FDFEFF] dark:text-[#1D2033]"
