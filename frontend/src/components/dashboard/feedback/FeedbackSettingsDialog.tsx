@@ -32,74 +32,127 @@ import { GripVertical, Check, Loader2 } from "lucide-react";
  * Types
  * ---------------------------------------------------------------------------
  */
+
+/** Shape returned by GET /api/v1/feedback/settings (via our Next.js proxy) */
+interface ApiCategory {
+    name: string;
+    enabled: boolean;
+    displayOrder: number;
+}
+
+interface ApiSettings {
+    id: string;
+    brandId: string;
+    isFeedbackEnabled: boolean;
+    categories: ApiCategory[];
+    isRewardEnabled: boolean;
+    rewardCoins: number;
+    feedbackTrigger: "IMMEDIATE" | "DELAY";
+    delayHours: number | null;
+    notifyManager: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+interface ApiGetResponse {
+    data: {
+        configured: boolean;
+        settings: ApiSettings;
+    };
+}
+
+/** Internal component state — decoupled from the wire format */
 interface FeedbackCategory {
+    /** Stable UI key — just the display name since the API has no separate id */
     id: string;
     label: string;
     enabled: boolean;
+    displayOrder: number;
 }
 
-type TimingOption = "immediate" | "delayed";
+type TimingOption = "IMMEDIATE" | "DELAY";
 
-interface FeedbackSettings {
-    categories: FeedbackCategory[];
-    reward: {
-        enabled: boolean;
-        points: number;
-    };
-    timing: TimingOption;
-    delayHours: number;
-    negativeAlert: {
-        enabled: boolean;
-    };
+/** Shape we POST/PUT back to the API */
+interface ApiPutBody {
+    isFeedbackEnabled: boolean;
+    categories: ApiCategory[];
+    isRewardEnabled: boolean;
+    rewardCoins: number;
+    feedbackTrigger: TimingOption;
+    delayHours: number | null;
+    notifyManager: boolean;
 }
 
-/**
- * ---------------------------------------------------------------------------
- * Dummy API layer
- * ---------------------------------------------------------------------------
- * Swap these out for real calls to your backend once the endpoint exists.
- * GET  /api/proxy/feedback-settings   -> fetch current settings
- * PUT  /api/proxy/feedback-settings   -> persist settings (categories order,
- *                                        reward, timing, delay hours, alert)
- * ---------------------------------------------------------------------------
- */
+// ---------------------------------------------------------------------------
+// Mappers
+// ---------------------------------------------------------------------------
+
+function apiToCategories(apiCats: ApiCategory[]): FeedbackCategory[] {
+    return [...apiCats]
+        .sort((a, b) => a.displayOrder - b.displayOrder)
+        .map((c) => ({
+            id: c.name.toLowerCase().replace(/\s+/g, "-"),
+            label: c.name,
+            enabled: c.enabled,
+            displayOrder: c.displayOrder,
+        }));
+}
+
+function categoriesToApi(cats: FeedbackCategory[]): ApiCategory[] {
+    return cats.map((c, i) => ({
+        name: c.label,
+        enabled: c.enabled,
+        displayOrder: i + 1, // re-derive order from current array index after DnD
+    }));
+}
+
+// ---------------------------------------------------------------------------
+// Fallback defaults (used only when the API returns unconfigured)
+// ---------------------------------------------------------------------------
 
 const DEFAULT_CATEGORIES: FeedbackCategory[] = [
-    { id: "food", label: "Food", enabled: true },
-    { id: "service", label: "Service", enabled: true },
-    { id: "ambience", label: "Ambience", enabled: true },
-    { id: "cleanliness", label: "Cleanliness", enabled: true },
-    { id: "value", label: "Value for money", enabled: true },
+    { id: "food", label: "Food", enabled: true, displayOrder: 1 },
+    { id: "service", label: "Service", enabled: true, displayOrder: 2 },
+    { id: "ambience", label: "Ambience", enabled: true, displayOrder: 3 },
+    { id: "cleanliness", label: "Cleanliness", enabled: true, displayOrder: 4 },
+    { id: "value", label: "Value for Money", enabled: true, displayOrder: 5 },
 ];
 
-let mockServerState: FeedbackSettings = {
-    categories: DEFAULT_CATEGORIES,
-    reward: {
-        enabled: true,
-        points: 100,
-    },
-    timing: "immediate",
-    delayHours: 2,
-    negativeAlert: {
-        enabled: true,
-    },
-};
+// ---------------------------------------------------------------------------
+// API calls (routed through the Next.js BFF proxy that attaches the JWT)
+// ---------------------------------------------------------------------------
 
-function delay(ms: number) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+async function fetchFeedbackSettings(): Promise<{
+    categories: FeedbackCategory[];
+    isRewardEnabled: boolean;
+    rewardCoins: number;
+    feedbackTrigger: TimingOption;
+    delayHours: number | null;
+    notifyManager: boolean;
+}> {
+    const res = await fetch("/api/proxy/feedback/settings", { method: "GET" });
+    if (!res.ok) throw new Error(`GET feedback/settings failed: ${res.status}`);
+
+    const json: ApiGetResponse = await res.json();
+    const s = json.data.settings;
+
+    return {
+        categories: s?.categories ? apiToCategories(s.categories) : DEFAULT_CATEGORIES,
+        isRewardEnabled: s?.isRewardEnabled ?? true,
+        rewardCoins: s?.rewardCoins ?? 50,
+        feedbackTrigger: s?.feedbackTrigger ?? "IMMEDIATE",
+        delayHours: s?.delayHours ?? null,
+        notifyManager: s?.notifyManager ?? true,
+    };
 }
 
-async function fetchFeedbackSettings(): Promise<FeedbackSettings> {
-    await delay(600);
-    return JSON.parse(JSON.stringify(mockServerState));
-}
-
-async function saveFeedbackSettings(
-    payload: FeedbackSettings
-): Promise<{ success: true; data: FeedbackSettings }> {
-    await delay(700);
-    mockServerState = JSON.parse(JSON.stringify(payload));
-    return { success: true, data: mockServerState };
+async function saveFeedbackSettings(body: ApiPutBody): Promise<void> {
+    const res = await fetch("/api/proxy/feedback/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+    });
+    if (!res.ok) throw new Error(`PUT feedback/settings failed: ${res.status}`);
 }
 
 /**
@@ -118,6 +171,8 @@ interface FeedbackSettingsDialogProps {
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     trigger?: React.ReactElement;
+    /** Called after a successful save so the parent can refetch dashboard data */
+    onSaved?: () => void;
 }
 
 /**
@@ -132,6 +187,7 @@ export default function FeedbackSettingsDialog({
     open: openProp,
     onOpenChange: onOpenChangeProp,
     trigger,
+    onSaved,
 }: FeedbackSettingsDialogProps = {}) {
     const isControlled = openProp !== undefined;
     const [internalOpen, setInternalOpen] = useState(false);
@@ -144,20 +200,21 @@ export default function FeedbackSettingsDialog({
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Step 1 state
+    // Step 1 — categories (order + enabled flags)
     const [categories, setCategories] = useState<FeedbackCategory[]>(DEFAULT_CATEGORIES);
 
-    // Step 2 state
-    const [rewardEnabled, setRewardEnabled] = useState(true);
-    const [rewardPoints, setRewardPoints] = useState(100);
+    // Step 2 — reward
+    const [isRewardEnabled, setIsRewardEnabled] = useState(true);
+    const [rewardCoins, setRewardCoins] = useState(50);
 
-    // Step 3 state
-    const [timing, setTiming] = useState<TimingOption>("immediate");
-    const [delayHours, setDelayHours] = useState(2);
+    // Step 3 — timing
+    const [feedbackTrigger, setFeedbackTrigger] = useState<TimingOption>("IMMEDIATE");
+    const [delayHours, setDelayHours] = useState<number>(2);
 
-    // Step 4 state
-    const [negativeAlertEnabled, setNegativeAlertEnabled] = useState(true);
+    // Step 4 — alerts
+    const [notifyManager, setNotifyManager] = useState(true);
 
+    // Fetch settings whenever the dialog is opened
     useEffect(() => {
         if (!open) return;
         let cancelled = false;
@@ -168,12 +225,12 @@ export default function FeedbackSettingsDialog({
         fetchFeedbackSettings()
             .then((data) => {
                 if (cancelled) return;
-                setCategories(data.categories ?? DEFAULT_CATEGORIES);
-                setRewardEnabled(data.reward?.enabled ?? true);
-                setRewardPoints(data.reward?.points ?? 100);
-                setTiming(data.timing ?? "immediate");
+                setCategories(data.categories);
+                setIsRewardEnabled(data.isRewardEnabled);
+                setRewardCoins(data.rewardCoins);
+                setFeedbackTrigger(data.feedbackTrigger);
                 setDelayHours(data.delayHours ?? 2);
-                setNegativeAlertEnabled(data.negativeAlert?.enabled ?? true);
+                setNotifyManager(data.notifyManager);
             })
             .catch(() => {
                 if (!cancelled) setError("Couldn't load feedback settings. Try again.");
@@ -192,13 +249,16 @@ export default function FeedbackSettingsDialog({
         setError(null);
         try {
             await saveFeedbackSettings({
-                categories,
-                reward: { enabled: rewardEnabled, points: rewardPoints },
-                timing,
-                delayHours,
-                negativeAlert: { enabled: negativeAlertEnabled },
+                isFeedbackEnabled: true,
+                categories: categoriesToApi(categories),
+                isRewardEnabled,
+                rewardCoins,
+                feedbackTrigger,
+                delayHours: feedbackTrigger === "DELAY" ? delayHours : null,
+                notifyManager,
             });
             setOpen(false);
+            onSaved?.();
         } catch {
             setError("Couldn't save your changes. Try again.");
         } finally {
@@ -219,7 +279,7 @@ export default function FeedbackSettingsDialog({
             )}
             <DialogPopup className="font-poppins sm:max-w-2xl w-full p-0 overflow-hidden">
                 <DialogHeader className="px-8 pt-8 pb-2">
-                    <DialogTitle className="text-2xl font-semibold">Feedback settings</DialogTitle>
+                    <DialogTitle className="text-xl font-semibold">Feedback settings</DialogTitle>
                     <DialogDescription className="text-muted-foreground">
                         Configure how your business collects and rewards customer feedback.
                     </DialogDescription>
@@ -258,22 +318,22 @@ export default function FeedbackSettingsDialog({
                             </StepperContent>
                             <StepperContent value={2}>
                                 <RewardStep
-                                    enabled={rewardEnabled}
-                                    setEnabled={setRewardEnabled}
-                                    points={rewardPoints}
-                                    setPoints={setRewardPoints}
+                                    enabled={isRewardEnabled}
+                                    setEnabled={setIsRewardEnabled}
+                                    points={rewardCoins}
+                                    setPoints={setRewardCoins}
                                 />
                             </StepperContent>
                             <StepperContent value={3}>
                                 <TimingStep
-                                    timing={timing}
-                                    setTiming={setTiming}
+                                    timing={feedbackTrigger}
+                                    setTiming={setFeedbackTrigger}
                                     delayHours={delayHours}
                                     setDelayHours={setDelayHours}
                                 />
                             </StepperContent>
                             <StepperContent value={4}>
-                                <AlertStep enabled={negativeAlertEnabled} setEnabled={setNegativeAlertEnabled} />
+                                <AlertStep enabled={notifyManager} setEnabled={setNotifyManager} />
                             </StepperContent>
                         </StepperPanel>
 
@@ -369,7 +429,7 @@ function CategoryStep({
         const label = newLabel.trim();
         if (!label) return;
         const id = label.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + Date.now();
-        setCategories((prev) => [...prev, { id, label, enabled: true }]);
+        setCategories((prev) => [...prev, { id, label, enabled: true, displayOrder: prev.length + 1 }]);
         setNewLabel("");
     };
 
@@ -425,8 +485,8 @@ function CategoryStep({
                                     toggleCategory(cat.id);
                                 }}
                                 className={`flex h-6 w-6 items-center justify-center rounded-md border transition-colors cursor-pointer ${cat.enabled
-                                    ? "bg-primary border-primary"
-                                    : "bg-background border-input hover:border-primary/50"
+                                        ? "bg-primary border-primary"
+                                        : "bg-background border-input hover:border-primary/50"
                                     }`}
                             >
                                 {cat.enabled && <Check className="h-3.5 w-3.5 text-primary-foreground" />}
@@ -542,10 +602,10 @@ function TimingStep({
                 className="space-y-3"
             >
                 <Label
-                    className={`flex items-start gap-3.5 rounded-xl border p-5 cursor-pointer transition-colors ${timing === "immediate" ? "border-primary bg-primary/5" : ""
+                    className={`flex items-start gap-3.5 rounded-xl border p-5 cursor-pointer transition-colors ${timing === "IMMEDIATE" ? "border-primary bg-primary/5" : ""
                         }`}
                 >
-                    <Radio value="immediate" className="mt-1" />
+                    <Radio value="IMMEDIATE" className="mt-1" />
                     <span className="space-y-1">
                         <span className="block font-medium text-sm">Immediately with purchase</span>
                         <span className="block text-sm text-muted-foreground leading-relaxed">
@@ -556,10 +616,10 @@ function TimingStep({
                 </Label>
 
                 <Label
-                    className={`flex items-start gap-3.5 rounded-xl border p-5 cursor-pointer transition-colors ${timing === "delayed" ? "border-primary bg-primary/5" : ""
+                    className={`flex items-start gap-3.5 rounded-xl border p-5 cursor-pointer transition-colors ${timing === "DELAY" ? "border-primary bg-primary/5" : ""
                         }`}
                 >
-                    <Radio value="delayed" className="mt-1" />
+                    <Radio value="DELAY" className="mt-1" />
                     <span className="space-y-1 flex-1">
                         <span className="block font-medium text-sm">After a delay</span>
                         <span className="block text-sm text-muted-foreground leading-relaxed">
@@ -567,7 +627,7 @@ function TimingStep({
                             service.
                         </span>
 
-                        {timing === "delayed" && (
+                        {timing === "DELAY" && (
                             <span
                                 className="block pt-3 mt-2 border-t"
                                 onClick={(e) => e.preventDefault()}
