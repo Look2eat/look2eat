@@ -258,3 +258,12 @@ body {
   height: 100%;
   overflow-x: hidden;
 }
+.razorpay-backdrop {
+    display: none !important;
+}
+iframe[src*="razorpay"] {
+    color-scheme: light;
+}
+main {
+    transition: filter 0.2s ease;
+}

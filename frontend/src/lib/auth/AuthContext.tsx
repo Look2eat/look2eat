@@ -38,8 +38,20 @@ export interface AuthUser {
 interface AuthContextValue {
     user: AuthUser | null;
     isLoading: boolean;
-    /** Re-fetch /api/auth/me on demand — e.g. after a profile update. */
+    /** Re-fetch /api/auth/me on demand — e.g. after a role/slug change. */
     refresh: () => Promise<void>;
+    /**
+     * Merge a partial update into the in-memory user object WITHOUT
+     * re-fetching /api/auth/me. Use this after a successful profile update
+     * (name, email) where the API response already has the new values —
+     * re-fetching /auth/me would just return the OLD JWT claims anyway,
+     * since the JWT is stateless and was issued before the update. The
+     * inconsistency (in-memory state differs from JWT claims until next
+     * login) is intentional and acceptable for display-only fields like
+     * name and email. Do NOT use this for security-sensitive fields like
+     * role or brandId — those should always come from a re-verified token.
+     */
+    patchUser: (partial: Partial<AuthUser>) => void;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -69,9 +81,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         });
 
-        // Avoids a state update on an unmounted component if the user
-        // navigates away before the fetch resolves (e.g. fast nav off
-        // /dashboard right after landing on it).
         return () => {
             cancelled = true;
         };
@@ -84,8 +93,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
     };
 
+    const patchUser = (partial: Partial<AuthUser>) => {
+        setUser((prev) => (prev ? { ...prev, ...partial } : prev));
+    };
+
     return (
-        <AuthContext.Provider value={{ user, isLoading, refresh }}>
+        <AuthContext.Provider value={{ user, isLoading, refresh, patchUser }}>
             {children}
         </AuthContext.Provider>
     );

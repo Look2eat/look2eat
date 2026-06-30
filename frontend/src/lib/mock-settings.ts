@@ -7,6 +7,16 @@ export const mockData = {
     mobileVerified: true,
     role: "Owner",
   },
+  outlet: {
+    name: "Zuplin - Sector 62",
+    addressLine1: "Plot 12, Block B",
+    addressLine2: "Sector 62",
+    city: "Noida",
+    state: "Uttar Pradesh",
+    pincode: "201301",
+    gst: "09AAAAA0000A1Z5",
+    googleReviewUrl: "https://g.page/r/your-place-id/review",
+},
   business: {
     name: "Zuplin Loyalty",
     logo: null as string | null,
@@ -19,8 +29,8 @@ export const mockData = {
   },
   team: {
     cashiers: [
-      { id: "c1", name: "Rahul Sharma", username: "rahul_s", password: "Cash@1234" },
-      { id: "c2", name: "Priya Verma", username: "priya_v", password: "Priya@5678" },
+      { id: "c1", name: "Rahul Sharma", phoneNumber: "9876543210", password: "Cash@1234", outletId: "outlet-1", active: true},
+      { id: "c2", name: "Priya Verma", phoneNumber: "1234567890", password: "Priya@5678", outletId: "outlet-1", active: true},
     ],
   },
   security: {
@@ -50,7 +60,6 @@ export const mockData = {
 };
 
 // Types
-export type Cashier = { id: string; name: string; username: string; password: string };
+export type Cashier = { id: string; name: string; phoneNumber: string; password: string; outletId: string; active: boolean };
 export type BillingRow = { id: string; date: string; amount: string; status: string };
-
 export type RechargeRow = { id: string; date: string; amount: number; customers: number; status: string };

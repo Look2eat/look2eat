@@ -3,18 +3,16 @@
 import { Tabs, TabsPanel } from "@/components/ui/tabs";
 import { SettingsSidebar } from "../../../components/dashboard/settings/Settingssidebar";
 import { ProfileTab } from "../../../components/dashboard/settings/ProfileTab";
-import { BusinessTab } from "../../../components/dashboard/settings/Businesstab";
+import { OutletTab } from "../../../components/dashboard/settings/Outlettab";
 import { TeamTab } from "../../../components/dashboard/settings/Teamtab";
-import { SecurityTab } from "../../../components/dashboard/settings/Securitytab";
+
 import { BillingTab } from "../../../components/dashboard/settings/Billingtab";
 import { WalletTab } from "@/components/dashboard/settings/Wallettab";
 
 const PANELS = [
     { value: "profile", title: "My Profile", component: <ProfileTab /> },
-    { value: "business", title: "Business Settings", component: <BusinessTab /> },
-    { value: "team", title: "Team", component: <TeamTab /> },
+    { value: "outlet", title: "Outlet Settings", component: <OutletTab /> },
     { value: "wallet", title: "Wallet", component: <WalletTab /> },
-    { value: "security", title: "Security", component: <SecurityTab /> },
     { value: "billing", title: "Billing", component: <BillingTab /> },
 ];
 

@@ -1,22 +1,27 @@
 "use client"
 
 import * as React from "react"
-import { Cog, Heart, Megaphone, Wallet, } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Cog, Heart, Megaphone, Wallet } from "lucide-react"
 import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@/components/ui/sidebar"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
 import Image from "next/image";
 import WelcomeCard from "./dashboard/WelcomeCard";
 import Cashier02Icon from '@iconify-react/hugeicons/cashier-02';
 import SparkleIcon from '@iconify-react/fluent-emoji-high-contrast/sparkle';
 import CoinsIcon from '@iconify-react/majesticons/coins';
+import SelectOutletCard from "./dashboard/SelectOutletCard";
+import { useOutlet } from "@/lib/auth/OutletContext";
 
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const router = useRouter();
   const pathname = usePathname();
+  const { outlets } = useOutlet();
+
+
   const sidebarItems = [
     {
       label: "Dashboard",
@@ -56,13 +61,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       disabled: false,
     },
   ];
+
   return (
-    <Sidebar variant="inset"  {...props} className="py-7">
+    <Sidebar variant="inset" {...props} className="py-7 pb-5">
       <SidebarHeader className="p-0">
         <SidebarMenu>
           <SidebarMenuItem>
             <a href="#">
-              <div className="flex items-start justify-start  px-2">
+              <div className="flex items-start justify-start px-2">
                 <Image
                   src="/logo.svg"
                   alt="Zuplin"
@@ -82,16 +88,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <WelcomeCard />
 
-      {/* Core Navigation */}
+      <WelcomeCard />
 
       <SidebarContent>
         <div className="px-4 py-4 bg-background rounded-4xl mt-6 ml-2 w-66 text-[#48494C] dark:text-white">
           <SidebarMenu className="space-y-1">
             {sidebarItems.map((item) => {
               const Icon = item.icon;
-
               return (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
@@ -118,23 +122,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </div>
       </SidebarContent>
-      <SidebarFooter className="px-2 gap-2">
+
+      <SidebarFooter className="gap-2 pb-2">
         <SidebarMenu>
           <SidebarMenuItem>
-            {/* <SidebarMenuButton
-              className="h-11 rounded-xl px-4 py-3 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
-              onClick={() => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('brandId');
-                router.push('/login');
-              }}
-            >
-              <LogOut className="w-4 h-4" />
-              <span>Logout</span>
-            </SidebarMenuButton> */}
+            {outlets.length > 0 && (
+              <SelectOutletCard />
+            )}
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-  )
+  );
 }

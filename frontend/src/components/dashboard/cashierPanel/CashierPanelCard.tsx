@@ -3,27 +3,33 @@
 import { useState } from "react";
 import { Copy, Check, ExternalLink } from "lucide-react";
 import { QRCode } from "@/components/kibo-ui/qr-code";
+import { useOutlet } from "@/lib/auth/OutletContext";
 
 interface CashierPanelCardProps {
-    cashierLink: string;
+    cashierLink: string; // base URL e.g. "https://zuplin.in/cashier"
 }
 
 export default function CashierPanelCard({
     cashierLink,
 }: CashierPanelCardProps) {
     const [copied, setCopied] = useState(false);
+    const { selectedOutlet, outlets } = useOutlet();
+
+    // Derive the full link from selected outlet
+    const currentOutlet = outlets.find((o) => o.id === selectedOutlet);
+    const fullCashierLink = `${cashierLink}/${currentOutlet?.id ?? ""}`;
 
     const handleCopy = async () => {
-        await navigator.clipboard.writeText(cashierLink);
+        await navigator.clipboard.writeText(fullCashierLink);
         setCopied(true);
-
-        setTimeout(() => {
-            setCopied(false);
-        }, 2000);
+        setTimeout(() => setCopied(false), 2000);
     };
 
+
+
+
     return (
-        <div className="w-full rounded-3xl bg-white dark:bg-[#121214] p-5 ">
+        <div className="w-full rounded-3xl bg-white dark:bg-[#121214] p-5">
             {/* Heading */}
             <h2 className="text-center text-lg md:text-xl font-semibold leading-snug">
                 To open cashier panel on another device scan QR code or copy the
@@ -33,12 +39,12 @@ export default function CashierPanelCard({
             {/* Link */}
             <div className="mt-6 flex items-center justify-center gap-2">
                 <a
-                    href={cashierLink}
+                    href={fullCashierLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="truncate text-blue-600 dark:text-blue-500 underline text-sm md:text-base max-w-[220px] sm:max-w-full"
                 >
-                    {cashierLink}
+                    {fullCashierLink}
                 </a>
 
                 <button
@@ -64,15 +70,14 @@ export default function CashierPanelCard({
             {/* QR */}
             <div className="flex flex-col items-center">
                 <p className="text-neutral-500 dark:text-neutral-300 text-lg mb-5">Scan QR</p>
-
                 <div className="rounded-xl bg-white p-3">
-                    <QRCode data={cashierLink} background="#121214" foreground="#121214" />
+                    <QRCode data={fullCashierLink} background="#121214" foreground="#121214" />
                 </div>
             </div>
 
             {/* CTA */}
             <button
-                onClick={() => window.open(cashierLink, "_blank")}
+                onClick={() => window.open(fullCashierLink, "_blank")}
                 className="mt-8 w-full rounded-2xl bg-[#0C2D83] py-4 text-white font-semibold text-lg hover:opacity-90 transition flex items-center justify-center gap-2"
             >
                 Open Cashier Panel

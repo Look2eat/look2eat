@@ -41,7 +41,7 @@ export default function WelcomeCard() {
     const brandInitial = brand?.name?.trim().charAt(0).toUpperCase() || "?";
 
     return (
-        <div className="w-66 rounded-[36px] bg-background py-6 px-3 mx-2 mt-6">
+        <div className="w-66 rounded-[36px] bg-background py-6 px-4 mx-2 mt-6">
             <div className="flex items-start justify-between">
                 <div
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1D2033] text-base font-semibold text-white dark:bg-[#FDFEFF] dark:text-[#1D2033]"

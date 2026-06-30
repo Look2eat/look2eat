@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
 import { Customer } from "@/types/customer";
 import { useState } from "react";
 import RedeemConfirmationModal from "./Confiramtion";
-import { processStandardPurchase } from "@/services/api";
+import { processStandardPurchase } from "@/services/cashier/transactions";
 
 interface Props {
   customer: Customer;
@@ -26,13 +26,11 @@ export default function CustomerForm({ customer, onSuccess, brandId }: Props) {
     setLoading(true);
     setError("");
     try {
-      console.log("Submitting purchase for:", { phone: customer.phone, brandId, amount });
       const res = await processStandardPurchase(customer.phone, brandId, Number(amount));
       setCoinsEarned(res.data.coinsEarned);
       setIsModalOpen(true);
     } catch (err) {
-      console.error("Purchase failed:", err);
-      setError("Transaction failed. Please try again.");
+      setError(err instanceof Error ? err.message : "Transaction failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -64,9 +62,12 @@ export default function CustomerForm({ customer, onSuccess, brandId }: Props) {
       </div>
 
       <div className="flex items-center gap-2 mb-4">
-        <input type="checkbox" checked={isChecked}
+        <input
+          type="checkbox"
+          checked={isChecked}
           onChange={(e) => setIsChecked(e.target.checked)}
-          className="bg-white border-gray-300 accent-blue-600" />
+          className="bg-white border-gray-300 accent-blue-600"
+        />
         <p className="text-sm text-gray-600">Customer agrees to receive WhatsApp updates</p>
       </div>
 
@@ -84,7 +85,7 @@ export default function CustomerForm({ customer, onSuccess, brandId }: Props) {
       <RedeemConfirmationModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        coinsEarned={coinsEarned}   // ← replaced purchaseAmount
+        coinsEarned={coinsEarned}
         customerName={name}
         onConfirm={onSuccess}
       />

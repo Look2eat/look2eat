@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ElasticSwitch } from "@/components/ui/elastic-switch-shadcnui";
+import FeedbackSettingsDialog from "./FeedbackSettingsDialog";
 
 export function FeedbackHeader() {
     return (
@@ -15,9 +16,13 @@ export function FeedbackHeader() {
 
             </div>
             <div className="flex items-end justify-end">
-                <Button variant="default" className="w-full md:w-auto">
-                    Edit Feedback
-                </Button>
+                <FeedbackSettingsDialog
+                    trigger={
+                        <Button variant="default" className="w-full md:w-auto">
+                            Edit Feedback
+                        </Button>
+                    }
+                />
             </div>
         </div>
     )

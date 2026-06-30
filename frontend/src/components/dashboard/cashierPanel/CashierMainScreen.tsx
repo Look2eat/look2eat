@@ -1,9 +1,24 @@
+"use client";
+import { useOutlet } from "@/lib/auth/OutletContext";
 import { TeamTab } from "../settings/Teamtab";
 import CashierPanelCard from "./CashierPanelCard";
 
-export default function CashierMainScreen() {
-    const cashierLink = "https://zuplin.in/cashier/1234";
 
+const ALL_OUTLETS = "all";
+export default function CashierMainScreen() {
+    const cashierLink = "https://zuplin.in/cashier";
+    const { selectedOutlet } = useOutlet();
+
+    const isAllOutlets = selectedOutlet === ALL_OUTLETS || selectedOutlet === "";
+    if (isAllOutlets) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[calc(100vh-200px)] gap-4">
+                <h1 className="text-2xl font-bold text-center font-poppins">
+                    Please select an outlet to manage cashier accounts.
+                </h1>
+            </div>
+        );
+    }
     return (
         <div className="font-poppins ">
             <div className="flex flex-col lg:flex-row gap-6">

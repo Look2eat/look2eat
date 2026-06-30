@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Customer } from "@/types/customer";
-import { lookupCustomer } from "@/services/api";
+import { lookupCustomer } from "@/services/cashier/transactions";
 
 interface Props {
   onCustomerSelect: (customer: Customer | null) => void;
@@ -48,8 +48,8 @@ export default function CustomerLookup({ onCustomerSelect, resetKey, brandId }: 
             name: data.name || "",
             phone: data.customerPhoneNumber,
             points: data.walletBalance || 0,
-            expiryDate: new Date(data.coinsExpiry).toLocaleDateString('en-IN', {
-              day: 'numeric', month: 'short', year: 'numeric'
+            expiryDate: new Date(data.coinsExpiry).toLocaleDateString("en-IN", {
+              day: "numeric", month: "short", year: "numeric",
             }),
             negativeReview: data.negativeReview || false,
             lastVisit: data.lastVisit || "",
@@ -57,8 +57,8 @@ export default function CustomerLookup({ onCustomerSelect, resetKey, brandId }: 
               .filter((m) => m.isActive)
               .map((m) => ({
                 id: m.id,
-                pointsRequired: m.coinsRequired,        // coinsRequired → pointsRequired
-                description: `₹${m.cashbackAmount} Cashback`,  // cashbackAmount → description
+                pointsRequired: m.coinsRequired,
+                description: `₹${m.cashbackAmount} Cashback`,
               })),
             promotionalrewards: data.promotionalRewards?.map((p) => ({
               ...p,
@@ -125,7 +125,7 @@ export default function CustomerLookup({ onCustomerSelect, resetKey, brandId }: 
             onCustomerSelect({
               name: "", phone, points: 0,
               negativeReview: false, lastVisit: "",
-              expiryDate: "", rewards: [], isNew: true
+              expiryDate: "", rewards: [], isNew: true,
             });
             setOpen(false);
           }}

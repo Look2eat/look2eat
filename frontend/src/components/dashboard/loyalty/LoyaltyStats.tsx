@@ -3,26 +3,34 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card";
 import { Box, ChartColumnIncreasing, Handbag, UserCheck } from "lucide-react";
 
+interface LoyaltyStatsProps {
+    classname?: string;
+    pointsRedeemed: number;
+    pointsIssued: number;
+    repeatCustomers: number; // percentage, 0-100
+}
 
-export default function LoyaltyStats({ classname }: { classname?: string }) {
+export default function LoyaltyStats({
+    classname,
+    pointsRedeemed,
+    pointsIssued,
+    repeatCustomers,
+}: LoyaltyStatsProps) {
     const EcommerceActions = [
         {
             title: "Points Reedemed",
-            subtitle: "1200",
+            subtitle: pointsRedeemed?.toLocaleString(),
             cardIcon: Handbag,
-
         },
         {
             title: "Points Issued",
-            subtitle: "5900",
+            subtitle: pointsIssued?.toLocaleString(),
             cardIcon: Box,
-
         },
         {
             title: "Repeat Customers",
-            subtitle: "45%",
+            subtitle: `${repeatCustomers}%`,
             cardIcon: ChartColumnIncreasing,
-
         },
         {
             title: "Profile Completion",
@@ -30,6 +38,9 @@ export default function LoyaltyStats({ classname }: { classname?: string }) {
             cardIcon: UserCheck,
 
         },
+        // Profile Completion card removed — backend returns
+        // profileCompletion: null with no defined shape yet. Re-add once
+        // the API contract for it is settled.
     ];
 
     return (
@@ -47,7 +58,7 @@ export default function LoyaltyStats({ classname }: { classname?: string }) {
                     {EcommerceActions.map((item, index) => (
                         <div
                             key={index}
-                            className="lg:w-3/12 md:w-6/12 w-full"
+                            className="lg:w-4/12 md:w-6/12 w-full"
                         >
                             <div className="p-6 flex items-start justify-between">
                                 <div className="flex flex-col gap-4">

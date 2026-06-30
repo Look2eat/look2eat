@@ -1,27 +1,16 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
-
-
-
-
-// --- TYPE DEFINITIONS ---
-
-export interface Testimonial {
-  avatarSrc: string;
-  name: string;
-  handle: string;
-  text: string;
-}
+import { Button } from './button';
 
 interface SignInPageProps {
   title?: React.ReactNode;
   description?: React.ReactNode;
   heroImageSrc?: string;
-  testimonials?: Testimonial[];
   onSignIn?: (event: React.FormEvent<HTMLFormElement>) => void;
   onGoogleSignIn?: () => void;
   onResetPassword?: () => void;
   onCreateAccount?: () => void;
+  loading?: boolean;
 }
 
 // --- SUB-COMPONENTS ---
@@ -32,16 +21,7 @@ const GlassInputWrapper = ({ children }: { children: React.ReactNode }) => (
   </div>
 );
 
-const TestimonialCard = ({ testimonial, delay }: { testimonial: Testimonial, delay: string }) => (
-  <div className={`animate-testimonial ${delay} flex items-start gap-3 rounded-3xl bg-card/40 dark:bg-zinc-800/40 backdrop-blur-xl border border-white/10 p-5 w-64`}>
-    <img src={testimonial.avatarSrc} className="h-10 w-10 object-cover rounded-2xl" alt="avatar" />
-    <div className="text-sm leading-snug">
-      <p className="flex items-center gap-1 font-medium">{testimonial.name}</p>
-      <p className="text-muted-foreground">{testimonial.handle}</p>
-      <p className="mt-1 text-foreground/80">{testimonial.text}</p>
-    </div>
-  </div>
-);
+
 
 // --- MAIN COMPONENT ---
 
@@ -49,13 +29,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   title = <span className="font-light text-foreground tracking-tighter">Welcome Back</span>,
   description = "Enter your details to sign in to your account",
   heroImageSrc,
-  testimonials = [],
   onSignIn,
+  loading = false,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
 
+
   return (
-    <div className="h-[100dvh] flex flex-col md:flex-row font-geist w-[100dvw]">
+    <div className="h-dvh flex flex-col md:flex-row font-geist w-dvw">
       {/* Left column: sign-in form */}
       <section className="flex-1 flex items-start pt-60 justify-center p-8">
         <div className="w-full max-w-md">
@@ -84,9 +65,14 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               </div>
 
 
-              <button type="submit" className="animate-element animate-delay-600 w-full rounded-xl bg-primary py-3 font-bold text-primary-foreground hover:bg-primary/90 transition-colors">
+              <Button
+                type="submit"
+                loading={loading}
+                variant="default"
+                className="animate-element animate-delay-600 w-full"
+              >
                 Sign In
-              </button>
+              </Button>
             </form>
 
 
@@ -96,17 +82,10 @@ export const SignInPage: React.FC<SignInPageProps> = ({
         </div>
       </section>
 
-      {/* Right column: hero image + testimonials */}
+      {/* Right column: hero image   */}
       {heroImageSrc && (
         <section className="hidden md:block flex-1 relative p-4">
           <div className="animate-slide-right animate-delay-300 absolute inset-4 rounded-3xl bg-cover bg-center" style={{ backgroundImage: `url(${heroImageSrc})` }}></div>
-          {testimonials.length > 0 && (
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 px-8 w-full justify-center">
-              <TestimonialCard testimonial={testimonials[0]} delay="animate-delay-1000" />
-              {testimonials[1] && <div className="hidden xl:flex"><TestimonialCard testimonial={testimonials[1]} delay="animate-delay-1200" /></div>}
-              {testimonials[2] && <div className="hidden 2xl:flex"><TestimonialCard testimonial={testimonials[2]} delay="animate-delay-1400" /></div>}
-            </div>
-          )}
         </section>
       )}
     </div>

@@ -11,10 +11,8 @@ import { logout } from "@/services/auth/login";
 
 const TAB_ITEMS = [
     { value: "profile", label: "Profile" },
-    { value: "business", label: "Business" },
-    { value: "team", label: "Team" },
+    { value: "outlet", label: "Outlet" },
     { value: "wallet", label: "Wallet" },
-    { value: "security", label: "Security" },
     { value: "billing", label: "Billing" },
 ];
 
@@ -65,7 +63,7 @@ export function SettingsSidebar() {
                             </DialogHeader>
                             <DialogFooter>
                                 <DialogClose render={<Button variant="ghost" />}>Cancel</DialogClose>
-                                <Button type="button" loading={isLoggingOut} onClick={handleLogout}>
+                                <Button variant="destructive" type="button" loading={isLoggingOut} onClick={handleLogout}>
                                     Log Out
                                 </Button>
                             </DialogFooter>

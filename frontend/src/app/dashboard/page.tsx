@@ -16,9 +16,11 @@ import SalesOverviewChart from "@/components/shadcn-space/blocks/dashboard-shell
 
 import PreviewTabs from "@/components/shadcn-space/blocks/dashboard-shell-01/tabs"
 import { MiniChart } from "@/components/ui/mini-chart"
+import { useOutlet } from "@/lib/auth/OutletContext"
 
 
 export default function DashboardPage() {
+  const { selectedOutlet } = useOutlet();
 
 
   return (

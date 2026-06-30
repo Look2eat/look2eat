@@ -12,7 +12,13 @@ import {
 } from "@/components/ui/dialog";
 import { OTPInput, SlotProps } from "input-otp";
 import { useEffect, useRef, useState } from "react";
-import { processRedemption, verifyCustomerOtp } from "@/services/api";
+import {
+
+    processRedemption,
+
+    verifyCustomerOtp,
+
+} from "@/services/cashier/transactions";
 
 interface Props {
     open: boolean;

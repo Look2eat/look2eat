@@ -2,7 +2,7 @@ import { Customer } from "@/types/customer";
 import { useState } from "react";
 import RedeemOtpModal from "./OtpLayout";
 import BillAmountModal from "./LoyaltyPayment";
-import { requestCustomerOtp } from "@/services/api";
+import { requestCustomerOtp } from "@/services/cashier/transactions";
 
 interface Props extends Customer {
     rewards: {
@@ -16,7 +16,7 @@ interface Props extends Customer {
         expiry: Date;
     }[]
     onOtpSuccess?: () => void;
-    brandId: string;  // add
+    brandId: string;
 }
 
 export default function CashierLoyaltyPreview({
@@ -28,11 +28,11 @@ export default function CashierLoyaltyPreview({
     lastVisit,
     promotionalrewards = [],
     onOtpSuccess,
-    phone,      // add
-    brandId,    // add
+    phone,
+    brandId,
 }: Props) {
     const [selectedReward, setSelectedReward] = useState<{
-        id: string;          // add id
+        id: string;
         description: string;
         pointsRequired: number;
     } | null>(null);
@@ -50,7 +50,7 @@ export default function CashierLoyaltyPreview({
             console.error("Failed to send OTP");
         }
         setBillModalOpen(false);
-        setOtpModalOpen(true);  // open only after OTP request completes
+        setOtpModalOpen(true);
     }
 
     return (
@@ -93,7 +93,6 @@ export default function CashierLoyaltyPreview({
                         return (
                             <>
                                 <div className="bg-[#3b2a26] text-white p-6 rounded-2xl space-y-6">
-
                                     <div className="flex justify-between items-center">
                                         <h2 className="text-lg font-medium">Hello {name}</h2>
                                         <p className="text-xs opacity-70 text-right">(Points Expires {expiryDate})</p>
@@ -126,7 +125,7 @@ export default function CashierLoyaltyPreview({
                                                 <span className={`transition-transform duration-300 ${promoOpen ? "rotate-180" : ""}`}>▼</span>
                                             </div>
 
-                                            <div className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 ${promoOpen ? "max-h-[500px] opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
+                                            <div className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 ${promoOpen ? "max-h-125 opacity-100 mt-2" : "max-h-0 opacity-0"}`}>
                                                 {promotionalrewards.map((promo, index) => (
                                                     <div key={promo.id}>
                                                         <div className="p-4 flex justify-between items-center text-black">
@@ -223,9 +222,7 @@ export default function CashierLoyaltyPreview({
                                     customerPhone={phone}
                                     brandId={brandId}
                                     milestoneId={selectedReward?.id || ""}
-                                    onConfirm={() => {
-                                        onOtpSuccess?.();
-                                    }}
+                                    onConfirm={() => { onOtpSuccess?.(); }}
                                 />
                             </>
                         );

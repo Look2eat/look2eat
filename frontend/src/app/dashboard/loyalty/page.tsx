@@ -1,128 +1,117 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { fetchLoyaltyDashboardData } from "@/lib/mockDashboardApi"
-import { LoyaltyDashboardData } from "@/types/rewards"
-import LoyaltyCard from "@/components/dashboard/LoyaltyCard"
-import { TopCustomersCard } from "@/components/dashboard/loyalty/topCustomersCard"
-import { TopRewardsCard } from "@/components/dashboard/loyalty/topRewards"
+import { useState, useEffect, useCallback } from "react"
+import { useOutlet, ALL_OUTLETS } from "@/lib/auth/OutletContext"
+import { useBrand } from "@/lib/auth/BrandContext"
+import {
+  getLoyaltyDashboard,
+  type LoyaltyDashboardResponse,
+} from "@/services/admin/loyalty"
 import ReedemTable from "@/components/dashboard/ReedemTable"
 import { LoyaltyCampaign } from "@/components/dashboard/loyalty/LoyaltyCampaign"
 import { Skeleton } from "@/components/ui/skeleton"
 import LoyaltyStats from "@/components/dashboard/loyalty/LoyaltyStats"
 import CustomerRepeatRateCard from "@/components/dashboard/loyalty/CustomerRepeat"
-
+import PageHeading from "@/components/dashboard/PageHeader"
 
 export default function LoyaltyDashboardPage() {
-  const [loyaltyData, setLoyaltyData] = useState<LoyaltyDashboardData | null>(null)
+  const { selectedOutlet } = useOutlet()
+  const { brand } = useBrand()
+
+  const [loyaltyData, setLoyaltyData] = useState<LoyaltyDashboardResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const isAllOutlets = selectedOutlet === ALL_OUTLETS
+
+  const loadDashboard = useCallback(async () => {
+    if (!selectedOutlet) return
+    if (isAllOutlets && !brand?.id) return // brand not resolved yet — wait
+
+    setIsLoading(true)
+    setError(null)
+    try {
+      const data = isAllOutlets
+        ? await getLoyaltyDashboard({ type: "all", brandId: brand!.id })
+        : await getLoyaltyDashboard({ type: "outlet", outletId: selectedOutlet })
+      setLoyaltyData(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong.")
+      setLoyaltyData(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [selectedOutlet, isAllOutlets, brand?.id])
 
   useEffect(() => {
-    async function loadLoyaltyDashboard() {
-      const data = await fetchLoyaltyDashboardData()
-      setLoyaltyData(data)
-    }
+    loadDashboard()
+  }, [loadDashboard])
 
-    loadLoyaltyDashboard()
-  }, [])
-
-  if (!loyaltyData) {
+  if (isLoading || !loyaltyData) {
     return (
       <div className="flex flex-col gap-6 p-6">
-
-        {/* Loyalty Card */}
         <Skeleton className="h-52 rounded-2xl" />
-
-        {/* Top Section */}
         <div className="grid grid-cols-1 xl:grid-cols-[30%_70%] gap-6 mt-4">
-
-          {/* Top Customers */}
           <Skeleton className="h-137 rounded-2xl" />
-
-          {/* Campaign / Right Panel */}
           <Skeleton className="h-137 rounded-2xl" />
-
         </div>
-
-        {/* Optional Rewards Section */}
-        {/* <Skeleton className="h-[250px] rounded-2xl" /> */}
-
-        {/* Table Skeleton */}
-        <div className="flex flex-col gap-3 mt-8">
-          <Skeleton className="h-10 w-1/3 rounded-lg" />
-
-          {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 rounded-lg" />
-          ))}
-        </div>
-
+        {!isAllOutlets && (
+          <div className="flex flex-col gap-3 mt-8">
+            <Skeleton className="h-10 w-1/3 rounded-lg" />
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-12 rounded-lg" />
+            ))}
+          </div>
+        )}
       </div>
     )
   }
 
-  return (
-
-    <div className=" px-6 py-6 font-poppins flex flex-col gap-6">
-      <div>
-        <h1 className="mb-6 text-3xl font-bold tracking-tight text-[#1D2033] dark:text-[#FDFEFF]">Loyalty</h1>
-        <LoyaltyStats />
+  if (error) {
+    return (
+      <div className="px-6 py-6 font-poppins">
+        <p className="text-sm text-destructive">{error}</p>
       </div>
-      <div className="grid grid-cols-1 xl:grid-cols-[60%_40%] gap-6 max-w-full pr-6 ">
-        <CustomerRepeatRateCard data={{ visit1: 10, visit2: 20, visit3to5: 30, visit6plus: 40 }} />
+    )
+  }
+
+  const { kpis, customerRepeatRate } = loyaltyData.data
+  const { data: history, pagination } = loyaltyData.history
+
+  return (
+    <div className="px-6 py-6 font-poppins flex flex-col gap-6">
+      <div>
+        <PageHeading />
+        <LoyaltyStats
+          pointsRedeemed={kpis.pointsRedeemed}
+          pointsIssued={kpis.pointsIssued}
+          repeatCustomers={kpis.repeatCustomers}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-[60%_40%] gap-6 max-w-full pr-6">
+        <CustomerRepeatRateCard
+          data={{
+            visit1: customerRepeatRate.visit1Time,
+            visit2: customerRepeatRate.visit2Times,
+            visit3to5: customerRepeatRate.visit3To5Times,
+            visit6plus: customerRepeatRate.visit6PlusTimes,
+          }}
+        />
         <LoyaltyCampaign />
       </div>
-      <ReedemTable history={loyaltyData.history} />
+
+      {/* History is outlet-specific — backend has no aggregate history
+          across outlets (the all-outlets payload always returns an
+          empty history array), so we hide the table entirely rather
+          than show a misleading empty one. */}
+      {!isAllOutlets && (
+        <ReedemTable
+          history={history}
+          pagination={pagination}
+          outletId={selectedOutlet}
+        />
+      )}
     </div>
-
-    // <div className="flex flex-col gap-6 p-6">
-    //   <LoyaltyCard
-    //     pointsRedeemed={5900}
-    //     pointsEarned={1200}
-    //     profileComplete={60}
-    //     revenueGain={50000}
-    //     redemptionRate={22.39}
-    //     clickable={false}
-    //     className="mt-0 mb-4"
-    //   />
-
-    //   <div className="grid grid-cols-1 xl:grid-cols-[30%_70%] gap-6 max-w-full pr-6">
-
-    //     <TopCustomersCard
-
-    //       className="max-w-md"
-    //       theme={"blue"}
-    //       variant={"expanded"}
-    //       title="Top 5 Customers by Rewards Redeemed"
-    //       percentage={65}
-    //       buttonText="Continue Setup"
-    //       animationDuration={2500}
-    //       staggerDelay={0.25}
-    //       rounded="xl"
-    //       showPercentage={false}
-    //       enableAnimations={true}
-    //       customer={loyaltyData.topCustomers}
-    //     />
-    //     <LoyaltyCampaign />
-    //   </div>
-    //   <div>
-    //     {/* <TopRewardsCard
-
-    //       className="w-full h-full"
-    //       theme={"blue"}
-    //       variant={"expanded"}
-    //       title="Most Redeemed Rewards"
-    //       percentage={65}
-    //       buttonText="Continue Setup"
-    //       animationDuration={2000}
-    //       staggerDelay={0.15}
-    //       rounded="xl"
-    //       showPercentage={false}
-    //       enableAnimations={true}
-    //       rewards={loyaltyData.rewardLeaderboard}
-    //     /> */}
-    //   </div>
-    //   <ReedemTable history={loyaltyData.history} />
-
-    // </div>
   )
 }
