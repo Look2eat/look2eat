@@ -13,23 +13,28 @@ if (!EXPRESS_API_URL) {
 
 const COOKIE_NAME = "l2e_session";
 
-interface LoginRequestBody {
-  phone: string;
+interface RegisterRequestBody {
+  brandName: string;
+  email: string;
+  name: string;
   password: string;
+  phone: string;
+  slug: string;
 }
 
-interface LoginApiResponse {
-  token: string;
-  user: {
-    id: string;
-    brandId: string;
-    name: string;
-    email: string;
-    phoneNumber: string;
-    role: string;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
+/**
+ * Actual shape returned by Express's POST /auth/register-owner.
+ * Everything is nested one level under `data`. The full identity fields
+ * (brandId, email, isActive, timestamps) live on `owner`, NOT on `user` —
+ * `user` here is a stripped-down object (id, phoneNumber, role, name)
+ * with no brandId/email. `brand` is a sibling of `owner`/`user`, not
+ * nested inside either of them. This is the backend inconsistency noted
+ * in lib/auth/register.ts — worth fixing server-side eventually, but
+ * until then this route normalizes it.
+ */
+interface RegisterApiResponse {
+  data: {
+    token: string;
     brand: {
       id: string;
       name: string;
@@ -45,11 +50,28 @@ interface LoginApiResponse {
       createdAt: string;
       updatedAt: string;
     };
+    owner: {
+      id: string;
+      brandId: string;
+      name: string;
+      email: string;
+      phoneNumber: string;
+      role: string;
+      isActive: boolean;
+      createdAt: string;
+      updatedAt: string;
+    };
+    user: {
+      id: string;
+      phoneNumber: string;
+      role: string;
+      name: string;
+    };
   };
 }
 
 export async function POST(req: NextRequest) {
-  let body: LoginRequestBody;
+  let body: RegisterRequestBody;
   try {
     body = await req.json();
   } catch {
@@ -63,14 +85,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  let data: LoginApiResponse;
+  let raw: RegisterApiResponse;
   try {
-    const upstream = await axios.post<LoginApiResponse>(
-      `${EXPRESS_API_URL}/auth/login`,
-      { phone: body.phone, password: body.password },
+    const upstream = await axios.post<RegisterApiResponse>(
+      `${EXPRESS_API_URL}/auth/register-owner`,
+      {
+        phone: body.phone,
+        password: body.password,
+        name: body.name,
+        brandName: body.brandName,
+        slug: body.slug,
+        email: body.email,
+      },
       { headers: { "Content-Type": "application/json" } },
     );
-    data = upstream.data;
+    raw = upstream.data;
   } catch (err) {
     const axiosErr = err as AxiosError<{ message?: string; error?: string }>;
 
@@ -82,36 +111,37 @@ export async function POST(req: NextRequest) {
     }
 
     const status = axiosErr.response.status === 500 ? 502 : axiosErr.response.status;
+    console.log(axiosErr)
     const message =
       axiosErr.response.data?.message ||
       axiosErr.response.data?.error ||
-      "Invalid phone number or password.";
+      "Could not create your account.";
     return NextResponse.json({ error: message }, { status });
   }
 
-  if (!data?.token || !data?.user) {
+  if (!raw?.data?.token || !raw?.data?.owner || !raw?.data?.brand) {
     return NextResponse.json(
       { error: "Unexpected response from authentication service." },
       { status: 502 },
     );
   }
 
-  const { token, user } = data;
+  const { token, owner, brand } = raw.data;
 
-  // NEW: verify the token Express just issued, by asking Express itself
+  // Verify the token Express just issued, by asking Express itself
   // (GET /auth/me) to confirm it's genuinely valid — a real signature
   // check, not a local decode. If this fails, we do NOT set the cookie
-  // and the whole login fails, per explicit decision: a token that
-  // Express can't immediately verify indicates something is genuinely
-  // wrong (clock skew, backend bug, etc.) and shouldn't be silently
-  // accepted.
+  // and the whole registration fails, per explicit decision: a token
+  // that Express can't immediately verify indicates something is
+  // genuinely wrong (clock skew, backend bug, etc.) and shouldn't be
+  // silently accepted.
   try {
     await verifyToken(token);
   } catch (err) {
     const message =
       err instanceof TokenVerificationError
         ? err.message
-        : "Could not verify the session after login.";
+        : "Could not verify the session after registration.";
     return NextResponse.json({ error: message }, { status: 502 });
   }
 
@@ -134,14 +164,14 @@ export async function POST(req: NextRequest) {
 
   return NextResponse.json({
     user: {
-      id: user.id,
-      brandId: user.brandId,
-      name: user.name,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      role: user.role,
-      brandName: user.brand.name,
-      slug: user.brand.slug,
+      id: owner.id,
+      brandId: owner.brandId,
+      name: owner.name,
+      email: owner.email,
+      phoneNumber: owner.phoneNumber,
+      role: owner.role,
+      brandName: brand.name,
+      slug: brand.slug,
     },
   });
 }

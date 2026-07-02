@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { listOutlets, type Outlet } from "../../services/admin/outlet";
+import RequiredOutletDialog from "@/components/dashboard/Outlet";
 
 const ALL_OUTLETS = "all";
 
@@ -11,7 +12,8 @@ type OutletContextType = {
     outlets: Outlet[];
     setOutlets: (outlets: Outlet[]) => void;
     patchOutlet: (id: string, patch: Partial<Outlet>) => void;
-    addOutlet: (outlet: Outlet) => void; // ← new
+    addOutlet: (outlet: Outlet) => void;
+    isLoading: boolean;
 };
 
 const OutletContext = createContext<OutletContextType | null>(null);
@@ -19,11 +21,13 @@ const OutletContext = createContext<OutletContextType | null>(null);
 export function OutletProvider({ children }: { children: React.ReactNode }) {
     const [outlets, setOutlets] = useState<Outlet[]>([]);
     const [selectedOutlet, setSelectedOutletState] = useState<string>("");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         listOutlets()
             .then((res) => setOutlets(res.data ?? []))
-            .catch(() => setOutlets([]));
+            .catch(() => setOutlets([]))
+            .finally(() => setIsLoading(false));
     }, []);
 
     useEffect(() => {
@@ -56,7 +60,6 @@ export function OutletProvider({ children }: { children: React.ReactNode }) {
         setOutlets(outlets.map((o) => o.id === id ? { ...o, ...patch } : o));
     };
 
-    // Appends new outlet and auto-selects it
     const addOutlet = (outlet: Outlet) => {
         setOutlets((prev) => [...prev, outlet]);
         setSelectedOutletState(outlet.id);
@@ -69,8 +72,11 @@ export function OutletProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <OutletContext.Provider value={{ selectedOutlet, setSelectedOutlet, outlets, setOutlets, patchOutlet, addOutlet }}>
+        <OutletContext.Provider
+            value={{ selectedOutlet, setSelectedOutlet, outlets, setOutlets, patchOutlet, addOutlet, isLoading }}
+        >
             {children}
+            <RequiredOutletDialog />
         </OutletContext.Provider>
     );
 }
