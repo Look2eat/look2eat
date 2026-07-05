@@ -151,7 +151,7 @@ export function ProfileTab() {
     const { user, isLoading, patchUser } = useAuth();
 
     if (isLoading) {
-        return <div className="h-44 w-full animate-pulse rounded-[36px] bg-gray-100" />;
+        return <div className="h-44 w-full animate-pulse rounded-[36px] bg-gray-200/50" />;
     }
 
     if (!user) return null;
