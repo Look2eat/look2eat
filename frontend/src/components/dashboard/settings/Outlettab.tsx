@@ -114,7 +114,7 @@ function AddOutletDialog({ onCreated }: { onCreated: (outlet: Outlet) => void })
 function NoOutletState({ onCreated }: { onCreated: (outlet: Outlet) => void }) {
     return (
         <div className="flex flex-col items-center justify-center py-20 gap-4 text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-100 dark:bg-neutral-800 text-2xl">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gray-200/50 dark:bg-neutral-800 text-2xl">
                 🏪
             </div>
             <div>
