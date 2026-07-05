@@ -84,7 +84,7 @@ export default function BillAmountModal({
               onKeyDown={(e) => e.key === "Enter" && handleContinue()}
               placeholder="0.00 (Enter bill amount after discount)"
               disabled={isLoading}
-              className="w-full bg-gray-100 rounded-xl pl-10 pr-4 py-4 text-lg 
+              className="w-full bg-gray-200/50 rounded-xl pl-10 pr-4 py-4 text-lg 
                 focus:outline-none dark:text-black
                 disabled:opacity-50 disabled:cursor-not-allowed
                 [appearance:textfield]
