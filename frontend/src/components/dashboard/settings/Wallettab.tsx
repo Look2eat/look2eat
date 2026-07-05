@@ -447,7 +447,7 @@ function WalletSkeleton() {
             <div className="space-y-3">
                 <div className="h-4 w-40 rounded bg-gray-200 dark:bg-neutral-800" />
                 {[...Array(3)].map((_, i) => (
-                    <div key={i} className="h-10 rounded-xl bg-gray-100 dark:bg-neutral-800" />
+                    <div key={i} className="h-10 rounded-xl bg-gray-200/50 dark:bg-neutral-800" />
                 ))}
             </div>
         </div>
