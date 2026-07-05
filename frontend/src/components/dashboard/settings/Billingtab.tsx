@@ -119,7 +119,7 @@ export function BillingTab() {
     }
 
     if (isLoading) {
-        return <div className="h-44 w-full animate-pulse rounded-2xl bg-gray-100 dark:bg-neutral-800" />;
+        return <div className="h-44 w-full animate-pulse rounded-2xl bg-gray-200/50 dark:bg-neutral-800" />;
     }
 
     if (error) {
