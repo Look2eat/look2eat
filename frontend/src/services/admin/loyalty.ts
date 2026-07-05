@@ -136,7 +136,7 @@ export async function createMilestone(
     brandId: string,
     payload: Pick<Milestone, "name" | "coinsRequired" | "cashbackOffer">
 ): Promise<Milestone> {
-    const res = await fetch(`${PROXY_BASE}/admin/brands/milestones`, {
+    const res = await fetch(`${PROXY_BASE}/admin/milestones`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ brandId, ...payload }),
