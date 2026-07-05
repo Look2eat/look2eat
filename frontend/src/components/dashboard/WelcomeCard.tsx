@@ -29,7 +29,7 @@ export default function WelcomeCard() {
 
     if (isLoading) {
         return (
-            <div className="h-44 w-full animate-pulse rounded-[36px] bg-gray-100" />
+            <div className="h-44 w-full animate-pulse rounded-[36px] bg-gray-200/50" />
         );
     }
 
