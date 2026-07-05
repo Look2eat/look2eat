@@ -42,11 +42,11 @@ export default function CustomerForm({ customer, onSuccess, brandId }: Props) {
       <input
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="w-full rounded-xl px-4 py-3 mb-4 bg-gray-100 dark:text-black outline-0"
+        className="w-full rounded-xl px-4 py-3 mb-4 bg-gray-200/50  dark:text-black outline-0"
         placeholder="Enter Customer Name"
       />
 
-      <label className="block mb-2 font-medium dark:text-black">Bill Amount</label>
+      <label className="block mb-2 font-medium dark:text-black ">Bill Amount</label>
       <div className="relative mb-4">
         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-medium pointer-events-none">₹</span>
         <input
@@ -56,7 +56,7 @@ export default function CustomerForm({ customer, onSuccess, brandId }: Props) {
           onChange={(e) => setAmount(e.target.value)}
           onWheel={(e) => (e.target as HTMLInputElement).blur()}
           placeholder="0.00 (Enter bill amount after discount)"
-          className="w-full bg-gray-100 rounded-xl pl-10 pr-4 py-4 text-lg focus:outline-none dark:text-black
+          className="w-full bg-gray-200/50 rounded-xl pl-10 pr-4 py-4 text-lg focus:outline-none dark:text-black
             [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
         />
       </div>
