@@ -19,7 +19,7 @@ type Cashier = {
 function CashierEmptyState({ onCreated }: { onCreated: () => void }) {
     return (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-200 dark:border-neutral-700 py-16 text-center font-poppins">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-100">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-gray-200/50">
                 <svg className="h-6 w-6 text-gray-500 dark:text-neutral-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                         d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"
@@ -49,7 +49,7 @@ function CashierRow({
             <td className="px-4 py-3">
                 <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cashier.isActive
                     ? "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400"
-                    : "bg-gray-100 text-gray-500 dark:bg-neutral-700 dark:text-neutral-400"
+                    : "bg-gray-200/50 text-gray-500 dark:bg-neutral-700 dark:text-neutral-400"
                     }`}>
                     {cashier.isActive ? "Active" : "Inactive"}
                 </span>
@@ -125,7 +125,7 @@ export function TeamTab({ footer = false }: { footer?: boolean }) {
     }
 
     if (isLoading) {
-        return <div className="h-44 w-full animate-pulse rounded-2xl bg-gray-100 dark:bg-neutral-800" />;
+        return <div className="h-44 w-full animate-pulse rounded-2xl bg-gray-200/50 dark:bg-neutral-800" />;
     }
 
     if (error) {
