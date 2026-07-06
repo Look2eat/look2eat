@@ -36,9 +36,7 @@ async function handler(
   const targetPath = path.join("/");
   const search = req.nextUrl.search;
   const targetUrl = `${EXPRESS_API_URL}/${targetPath}${search}`;
-console.log("Proxy:", req.method, req.nextUrl.pathname);
-console.log("Token exists:", !!token);
-console.log("Target URL:", targetUrl);
+
   let body: string | undefined;
   if (req.method !== "GET" && req.method !== "HEAD") {
     const text = await req.text();
@@ -57,9 +55,9 @@ console.log("Target URL:", targetUrl);
       data: body,
       validateStatus: () => true,
     });
-    console.log("Upstream status:", upstream.status);
 
-console.log("Upstream response:", upstream.data)
+
+
     return NextResponse.json(upstream.data, { status: upstream.status });
   } catch (err) {
     const axiosErr = err as AxiosError;

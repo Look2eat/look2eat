@@ -5,8 +5,10 @@ import PointsCard from "@/components/customer/PointsCard";
 import RestaurantHeader from "@/components/customer/RestaurantHeader";
 import RewardsCard from "@/components/customer/RewardCard";
 import TermsAndConditions from "@/components/customer/Terms";
-import { getPublicLoyaltyPage } from "@/services/api";
+
 import { notFound } from "next/navigation";
+import { getPublicLoyaltyData } from "../../../../services/public/loyalty";
+import FeedbackDrawer from "@/components/customer/FeedbackDrawer";
 
 interface PageProps {
   params: Promise<{
@@ -20,7 +22,7 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
   let pageData;
 
   try {
-    pageData = await getPublicLoyaltyPage(restaurantSlug, wallet_id);
+    pageData = await getPublicLoyaltyData(restaurantSlug, wallet_id);
   } catch {
     notFound();
   }
@@ -52,15 +54,15 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
 
   return (
     <MobileContainer>
-      <HeroBanner imageUrl={brand.bannerImageUrl} />
+      <HeroBanner imageUrl={brand.bannerImageUrl ?? ""} />
       <RestaurantHeader
         name={brand.name}
-        logoUrl={brand.logoUrl}
+        logoUrl={brand.logoUrl ?? ""}
         bonus={false}
         bonusPoints={0}
       />
       <PointsCard
-        userName=""
+        userName={brand.customerName ?? ""}
         points={wallet.currentCoins}
         nextRewardPoints={nextMilestone?.coinsRequired ?? wallet.currentCoins}
         expiryDate={expiryDate}
@@ -82,6 +84,12 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
           "Valid only at the brand outlet.",
           "2 Offers cannot be clubbed together",
         ]}
+      />
+      <FeedbackDrawer
+        walletId={wallet.id}
+        feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
+        categories={pageData.data.categories}
+        googleReviewUrl={null} // swap with brand.googleReviewUrl if your backend adds it
       />
     </MobileContainer>
   );

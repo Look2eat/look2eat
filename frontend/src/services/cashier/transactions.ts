@@ -84,10 +84,11 @@ export const processStandardPurchase = async (
   customerPhoneNumber: string,
   brandId: string,
   amount: number,
+  name?:string,
 ): Promise<StandardPurchaseResponse> => {
   const res = await cashierClient.post<StandardPurchaseResponse>(
     "/cashier/transaction/purchase",
-    { customerPhoneNumber, brandId, purchaseAmount: amount },
+    { customerPhoneNumber, brandId, purchaseAmount: amount, name},
   );
   return res.data;
 };

@@ -138,11 +138,12 @@ export interface StandardPurchaseResponse {
 export const processStandardPurchase = async (
   customerPhoneNumber: string,
   brandId: string,
-  amount: number
+  amount: number,
+  name?: string 
 ): Promise<StandardPurchaseResponse> => {
   return fetchApi<StandardPurchaseResponse>('/cashier/transaction/purchase', {
     method: 'POST',
-    body: JSON.stringify({ customerPhoneNumber, brandId, purchaseAmount:amount }),
+    body: JSON.stringify({ customerPhoneNumber, brandId, purchaseAmount: amount, name }),
   });
 };
 
