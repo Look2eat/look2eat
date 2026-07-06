@@ -26,7 +26,7 @@ export default function CustomerForm({ customer, onSuccess, brandId }: Props) {
     setLoading(true);
     setError("");
     try {
-      const res = await processStandardPurchase(customer.phone, brandId, Number(amount));
+      const res = await processStandardPurchase(customer.phone, brandId, Number(amount), name);
       setCoinsEarned(res.data.coinsEarned);
       setIsModalOpen(true);
     } catch (err) {
