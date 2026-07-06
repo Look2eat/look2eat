@@ -74,7 +74,7 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
         rewards={milestones.map((m) => ({
           id: m.id,
           pointsRequired: m.coinsRequired,
-          description: `${m.name} — ₹${m.cashbackAmount} cashback`,
+          description: m.name,
         }))}
       />
       <HowToRedeem />
