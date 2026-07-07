@@ -3,8 +3,13 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card";
 import { Box, ChartColumnIncreasing, Handbag, UserCheck } from "lucide-react";
 
+function NumberSkeleton() {
+    return <div className="h-9 w-20 rounded-md bg-muted animate-pulse" />
+}
+
 interface LoyaltyStatsProps {
     classname?: string;
+    isLoading?: boolean;
     pointsRedeemed: number;
     pointsIssued: number;
     repeatCustomers: number; // percentage, 0-100
@@ -12,6 +17,7 @@ interface LoyaltyStatsProps {
 
 export default function LoyaltyStats({
     classname,
+    isLoading = false,
     pointsRedeemed,
     pointsIssued,
     repeatCustomers,
@@ -36,7 +42,6 @@ export default function LoyaltyStats({
             title: "Profile Completion",
             subtitle: "0%",
             cardIcon: UserCheck,
-
         },
         // Profile Completion card removed — backend returns
         // profileCompletion: null with no defined shape yet. Re-add once
@@ -44,7 +49,6 @@ export default function LoyaltyStats({
     ];
 
     return (
-
         <div className="w-full font-poppins">
             <Card className={cn("p-0 shadow-xs", classname)}>
                 <CardContent
@@ -66,9 +70,13 @@ export default function LoyaltyStats({
                                         {item.title}
                                     </p>
                                     <div>
-                                        <p className="text-3xl font-semibold text-card-foreground">
-                                            {item.subtitle}
-                                        </p>
+                                        {isLoading ? (
+                                            <NumberSkeleton />
+                                        ) : (
+                                            <p className="text-3xl font-semibold text-card-foreground">
+                                                {item.subtitle}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
