@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils"
 
 interface Props {
+    isLoading?: boolean
     data: {
         visit1: number
         visit2: number
@@ -11,7 +12,7 @@ interface Props {
     }
 }
 
-export default function CustomerRepeatRateCard({ data }: Props) {
+export default function CustomerRepeatRateCard({ isLoading = false, data }: Props) {
 
     const rows = [
         { label: "Visit 1 time", value: data.visit1 },
@@ -50,21 +51,31 @@ export default function CustomerRepeatRateCard({ data }: Props) {
                                 {row.label}
                             </span>
 
-                            {/* Bar — takes up more space on mobile since label/value cols are smaller */}
+                            {/* Bar */}
                             <div className="relative w-full h-4 md:h-6 bg-foreground/10 rounded-full overflow-hidden">
-                                <div
-                                    className={cn(
-                                        "h-full rounded-full transition-all duration-700 ease-out",
-                                        percent > 0 ? "dark:bg-white bg-neutral-800" : "bg-foreground/10"
-                                    )}
-                                    style={{ width: `${percent}%` }}
-                                />
+                                {isLoading ? (
+                                    <div className="h-full w-full rounded-full bg-muted animate-pulse" />
+                                ) : (
+                                    <div
+                                        className={cn(
+                                            "h-full rounded-full transition-all duration-700 ease-out",
+                                            percent > 0 ? "dark:bg-white bg-neutral-800" : "bg-foreground/10"
+                                        )}
+                                        style={{ width: `${percent}%` }}
+                                    />
+                                )}
                             </div>
 
                             {/* Percent */}
                             <span className="text-[10px] md:text-sm font-semibold text-right">
-                                {percent}%
-                                <span className="hidden md:inline"> | {row.value.toFixed(2)}</span>
+                                {isLoading ? (
+                                    <span className="inline-block h-3 w-8 rounded bg-muted animate-pulse align-middle" />
+                                ) : (
+                                    <>
+                                        {percent}%
+                                        <span className="hidden md:inline"> | {row.value.toFixed(2)}</span>
+                                    </>
+                                )}
                             </span>
                         </div>
                     )
