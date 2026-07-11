@@ -9,7 +9,6 @@ import {
 } from "@/services/admin/loyalty"
 import ReedemTable from "@/components/dashboard/ReedemTable"
 import { LoyaltyCampaign } from "@/components/dashboard/loyalty/LoyaltyCampaign"
-import { Skeleton } from "@/components/ui/skeleton"
 import LoyaltyStats from "@/components/dashboard/loyalty/LoyaltyStats"
 import CustomerRepeatRateCard from "@/components/dashboard/loyalty/CustomerRepeat"
 import PageHeading from "@/components/dashboard/PageHeader"
@@ -47,26 +46,6 @@ export default function LoyaltyDashboardPage() {
     loadDashboard()
   }, [loadDashboard])
 
-  if (isLoading || !loyaltyData) {
-    return (
-      <div className="flex flex-col gap-6 p-6">
-        <Skeleton className="h-52 rounded-2xl" />
-        <div className="grid grid-cols-1 xl:grid-cols-[30%_70%] gap-6 mt-4">
-          <Skeleton className="h-137 rounded-2xl" />
-          <Skeleton className="h-137 rounded-2xl" />
-        </div>
-        {!isAllOutlets && (
-          <div className="flex flex-col gap-3 mt-8">
-            <Skeleton className="h-10 w-1/3 rounded-lg" />
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="h-12 rounded-lg" />
-            ))}
-          </div>
-        )}
-      </div>
-    )
-  }
-
   if (error) {
     return (
       <div className="px-6 py-6 font-poppins">
@@ -75,42 +54,48 @@ export default function LoyaltyDashboardPage() {
     )
   }
 
-  const { kpis, customerRepeatRate } = loyaltyData.data
-  const { data: history, pagination } = loyaltyData.history
+  const kpis = loyaltyData?.data.kpis
+  const customerRepeatRate = loyaltyData?.data.customerRepeatRate
+  const history = loyaltyData?.history.data ?? []
+  const pagination = loyaltyData?.history.pagination
 
   return (
     <div className="px-6 py-6 font-poppins flex flex-col gap-6">
       <div>
         <PageHeading />
         <LoyaltyStats
-          pointsRedeemed={kpis.pointsRedeemed}
-          pointsIssued={kpis.pointsIssued}
-          repeatCustomers={kpis.repeatCustomers}
+          isLoading={isLoading}
+          pointsRedeemed={kpis?.pointsRedeemed ?? 0}
+          pointsIssued={kpis?.pointsIssued ?? 0}
+          repeatCustomers={kpis?.repeatCustomers ?? 0}
         />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-[60%_40%] gap-6 max-w-full pr-6">
         <CustomerRepeatRateCard
+          isLoading={isLoading}
           data={{
-            visit1: customerRepeatRate.visit1Time,
-            visit2: customerRepeatRate.visit2Times,
-            visit3to5: customerRepeatRate.visit3To5Times,
-            visit6plus: customerRepeatRate.visit6PlusTimes,
+            visit1: customerRepeatRate?.visit1Time ?? 0,
+            visit2: customerRepeatRate?.visit2Times ?? 0,
+            visit3to5: customerRepeatRate?.visit3To5Times ?? 0,
+            visit6plus: customerRepeatRate?.visit6PlusTimes ?? 0,
           }}
         />
         <LoyaltyCampaign />
       </div>
 
       {/* History is outlet-specific — backend has no aggregate history
-          across outlets (the all-outlets payload always returns an
-          empty history array), so we hide the table entirely rather
-          than show a misleading empty one. */}
-      {!isAllOutlets && (
+          across outlets, so we hide the table entirely for all-outlets.
+          For a single outlet we wait for pagination to exist rather
+          than rendering with an empty/undefined shape. */}
+      {!isAllOutlets  && (
         <ReedemTable
-          history={history}
-          pagination={pagination}
-          outletId={selectedOutlet}
-        />
+    key={selectedOutlet}
+    history={history}
+    pagination={pagination}
+    outletId={selectedOutlet}
+    isInitialLoading={isLoading}
+  />
       )}
     </div>
   )
