@@ -3,7 +3,6 @@
 import Image from "next/image"
 
 interface Props {
-    title: string
     subtitle?: string
     description?: string
 
@@ -16,13 +15,8 @@ interface Props {
 }
 
 export default function LoyaltyEditCard({
-    title,
-    subtitle,
-    description,
-    primaryButtonText = "View",
-    secondaryButtonText = "Edit",
+    primaryButtonText = "Edit",
     onPrimaryClick,
-    onSecondaryClick,
     imageUrl,
 }: Props) {
     return (
@@ -57,12 +51,7 @@ export default function LoyaltyEditCard({
                         {primaryButtonText}
                     </button>
 
-                    <button
-                        onClick={onSecondaryClick}
-                        className="px-8 py-3 rounded-2xl bg-[#f2d39b] text-black font-semibold text-lg hover:opacity-90 transition"
-                    >
-                        {secondaryButtonText}
-                    </button>
+                    
                 </div>
             </div>
 
