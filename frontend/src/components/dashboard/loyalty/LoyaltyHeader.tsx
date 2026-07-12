@@ -9,7 +9,7 @@ export function LoyaltyHeader() {
             </div>
 
 
-            <ElasticSwitch />
+            {/* <ElasticSwitch /> */}
         </div>
     )
 }
