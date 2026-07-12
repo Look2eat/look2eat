@@ -230,11 +230,7 @@ export default function LoyaltySettingsDialog({
         <Dialog open={open} onOpenChange={setOpen}>
             {trigger ? (
                 <DialogTrigger render={trigger} />
-            ) : (
-                <DialogTrigger render={<Button variant="outline" />}>
-                    Edit loyalty settings
-                </DialogTrigger>
-            )}
+            ) : null }
             <DialogPopup className="font-poppins sm:max-w-2xl w-full p-0 overflow-hidden">
                 <DialogHeader className="px-8 pt-8 pb-2">
                     <DialogTitle className="text-2xl font-semibold">Loyalty settings</DialogTitle>
