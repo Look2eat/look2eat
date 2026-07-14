@@ -75,7 +75,7 @@ function WalletCard({
 
     return (
         <svg
-            viewBox="0 0 900 200"
+            viewBox="0 0 1100 200"
             xmlns="http://www.w3.org/2000/svg"
             width="100%"
             height="200"
@@ -92,11 +92,11 @@ function WalletCard({
                     <stop offset="100%" stopColor="#ffffff" stopOpacity="0.03" />
                 </linearGradient>
                 <clipPath id="cardClip">
-                    <rect x="0" y="0" width="900" height="200" rx="20" ry="20" />
+                    <rect x="0" y="0" width="1100" height="200" rx="20" ry="20" />
                 </clipPath>
             </defs>
 
-            <rect x="0" y="0" width="900" height="200" rx="20" ry="20" fill="url(#walletGrad)" />
+            <rect x="0" y="0" width="1100" height="200" rx="20" ry="20" fill="url(#walletGrad)" />
             <circle cx="800" cy="-30" r="160" fill="url(#circleGrad)" clipPath="url(#cardClip)" />
             <circle cx="860" cy="190" r="110" fill="url(#circleGrad)" clipPath="url(#cardClip)" />
             <circle cx="30" cy="170" r="70" fill="url(#circleGrad)" clipPath="url(#cardClip)" />
@@ -111,13 +111,13 @@ function WalletCard({
             <text x="28" y="132" fontFamily="Poppins, sans-serif" fontSize="38" fill="white" fontWeight="700" letterSpacing="-0.5">
                 {balance < 0 ? `- ₹${Math.abs(balance).toLocaleString("en-IN")}` : `₹${balance.toLocaleString("en-IN")}`}
             </text>
-            <line x1="28" y1="148" x2="872" y2="148" stroke="white" strokeOpacity="0.2" strokeWidth="1" />
+            <line x1="28" y1="148" x2="1072" y2="148" stroke="white" strokeOpacity="0.2" strokeWidth="1" />
             {balance < 0 ? (
                 <>
                     <text x="28" y="168" fontFamily="Poppins, sans-serif" fontSize="13" fill="#fca5a5" fontWeight="600">
                         ⚠ Please recharge - service stops at - ₹100 balance
                     </text>
-                    <text x="872" y="168" fontFamily="Poppins, sans-serif" fontSize="13" fill="white" textAnchor="end">
+                    <text x="1072" y="168" fontFamily="Poppins, sans-serif" fontSize="13" fill="white" textAnchor="end">
                         ₹{customerRate} / customer
                     </text>
                 </>
@@ -171,7 +171,7 @@ function RechargeTable({ rows }: { rows: RechargeRow[] }) {
         <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-neutral-700">
             <table className="w-full text-sm">
                 <thead>
-                    <tr className="border-b border-gray-100 dark:border-neutral-900 bg-gray-50/60 dark:bg-neutral-800">
+                    <tr className="border-b border-gray-100 dark:border-neutral-1100 bg-gray-50/60 dark:bg-neutral-800">
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-neutral-200">ID</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-neutral-200">Date</th>
                         <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-neutral-200">Amount</th>
@@ -181,7 +181,7 @@ function RechargeTable({ rows }: { rows: RechargeRow[] }) {
                 </thead>
                 <tbody>
                     {rows.map((row) => (
-                        <tr key={row.id} className="border-b border-gray-100 dark:border-neutral-700 last:border-0 hover:bg-gray-50/40 dark:hover:bg-neutral-900">
+                        <tr key={row.id} className="border-b border-gray-100 dark:border-neutral-700 last:border-0 hover:bg-gray-50/40 dark:hover:bg-neutral-1100">
                             <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-neutral-200">{row.id}</td>
                             <td className="px-4 py-3 text-gray-700 dark:text-neutral-200">{row.date}</td>
                             <td className="px-4 py-3 font-semibold text-black dark:text-white">₹{row.amount.toLocaleString("en-IN")}</td>
