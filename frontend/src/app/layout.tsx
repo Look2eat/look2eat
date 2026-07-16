@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { site, siteUrl } from "@/lib/site";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
 import "./globals.css";
@@ -20,8 +21,45 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zuplin",
-  description: "Zuplin is a powerful WhatsApp marketing platform designed to help restaurants grow their business by engaging with customers directly through WhatsApp. With Zuplin, you can create personalized campaigns, send targeted messages, and analyze customer interactions to boost your restaurant's growth and customer loyalty.",
+  // metadataBase lets every page declare a relative canonical and still emit
+  // an absolute URL, and is what makes the generated OG image resolve.
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: site.title,
+    // Child routes set only their own name; this appends the brand.
+    template: `%s — ${site.name}`,
+  },
+  description: site.description,
+  applicationName: site.name,
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large" },
+  },
+  openGraph: {
+    type: "website",
+    siteName: site.name,
+    title: site.title,
+    description: site.description,
+    url: "/",
+    locale: site.locale,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: site.title,
+    description: site.description,
+  },
+  // Matches the landing page's ground so mobile browser chrome blends in.
+  other: { "format-detection": "telephone=no,address=no,email=no" },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#08090C" },
+  ],
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({
@@ -30,7 +68,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // next-themes writes the resolved theme onto <html> before React
+    // hydrates, so the server markup can never match. This is the fix the
+    // library documents, and it silences a hydration error on every route.
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* <link
           href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@160..700&display=swap"
