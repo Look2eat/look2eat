@@ -1,10 +1,19 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/blocks/footer-section";
+
+export const metadata: Metadata = {
+  title: "Data Protection",
+  description:
+    "How Zuplin safeguards the integrity and confidentiality of data on the platform.",
+  alternates: { canonical: "/policy/data-protection-policy" },
+};
+
 
 
 export default function DataProtectionPage() {
     return (
         <>
-            <div className="max-w-3xl mx-auto px-6 py-12">
+            <main className="max-w-3xl mx-auto px-6 py-12">
 
                 <h1 className="text-4xl font-bold mb-6">
                     Data Protection
@@ -64,7 +73,7 @@ export default function DataProtectionPage() {
 
 
 
-            </div>
+            </main>
             <Footer />
         </>
     );
