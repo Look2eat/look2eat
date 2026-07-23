@@ -1,9 +1,18 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/blocks/footer-section";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "How Zuplin collects, uses and protects your personal data.",
+  alternates: { canonical: "/policy/privacy-policy" },
+};
+
 
 export default function PrivacyPolicyPage() {
     return (
         <>
-            <div className="max-w-3xl mx-auto px-6 py-12">
+            <main className="max-w-3xl mx-auto px-6 py-12">
 
                 <h1 className="text-4xl font-bold mb-6">
                     Privacy Policy
@@ -83,7 +92,7 @@ export default function PrivacyPolicyPage() {
 
 
 
-            </div>
+            </main>
             <Footer />
         </>
     );
