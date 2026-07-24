@@ -1,10 +1,19 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/blocks/footer-section";
+
+export const metadata: Metadata = {
+  title: "Refund Policy",
+  description:
+    "The terms under which refunds may be issued for Zuplin services.",
+  alternates: { canonical: "/policy/refund-policy" },
+};
+
 
 
 export default function RefundPolicyPage() {
     return (
         <>
-            <div className="max-w-3xl mx-auto px-6 py-12 h-[70%]">
+            <main className="max-w-3xl mx-auto px-6 py-12 h-[70%]">
 
                 <h1 className="text-4xl font-bold mb-6">
                     Refund Policy
@@ -45,7 +54,7 @@ export default function RefundPolicyPage() {
 
 
 
-            </div>
+            </main>
             <Footer />
         </>
     );
