@@ -35,6 +35,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <SidebarProvider>
                 <AppSidebar />
                 <SidebarInset className="bg-background flex-1 min-w-0">
+                  <DashboardHeader />
                   {children}
                 </SidebarInset>
               </SidebarProvider>
