@@ -35,7 +35,7 @@ export default function SelectOutletCard() {
 
     return (
         <div className="w-66 rounded-[28px] bg-background px-4 py-6 mx-2 mt-6">
-            <h1 className="text-2xl font-semibold text-[#1D2033] dark:text-[#FDFEFF] font-poppins">
+            <h1 className="text-lg md:text-2xl font-semibold text-[#1D2033] dark:text-[#FDFEFF] font-poppins">
                 Select Outlet
             </h1>
 
