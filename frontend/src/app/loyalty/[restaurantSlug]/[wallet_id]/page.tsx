@@ -57,79 +57,81 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
 
 
   return (
-      
-      <>
+
+    <>
       {restaurantSlug === "anie-s-coffee-co" ? (<MobileContainer>
-      <HeroBanner imageUrl={brand.bannerImageUrl ?? ""} />
-      <RestaurantHeader
-        name={brand.name}
-        logoUrl={brand.logoUrl ?? ""}
-        bonus={false}
-        bonusPoints={0}
-      />
-      <PointsCardAnies
-        userName={brand.customerName ?? ""}
-        points={wallet.currentCoins}
-       
-        expiryDate={expiryDate}
-        rewardCount={unlockedRewards}
-      />
-      <RedeemBanner points={wallet.currentCoins} />
-      <HowToRedeem />
-      <TermsAndConditions
-        terms={[
-          "2 offers cannot be clubbed together.",
-          "Minimum purchase of ₹200 required.",
-          "Rewards can only be redeemed in-store."
-        ]}
-      />
-      <FeedbackDrawer
-        walletId={wallet.id}
-        feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
-        categories={pageData.data.categories}
-        googleReviewUrl="https://search.google.com/local/writereview?placeid=ChIJ41aha-EDDTkRSwFFHW6sKpc" // swap with brand.googleReviewUrl if your backend adds it
-      />
-      </MobileContainer>) :(
+        <HeroBanner imageUrl={brand.bannerImageUrl ?? ""} />
+        <RestaurantHeader
+          name={brand.name}
+          logoUrl={brand.logoUrl ?? ""}
+          bonus={false}
+          bonusPoints={0}
+        />
+        <PointsCardAnies
+          userName={brand.customerName ?? ""}
+          points={wallet.currentCoins}
+
+          expiryDate={expiryDate}
+          rewardCount={unlockedRewards}
+        />
+        <RedeemBanner points={wallet.currentCoins} />
+        <HowToRedeem />
+        <TermsAndConditions
+          terms={[
+            "2 offers cannot be clubbed together.",
+            "Minimum purchase of ₹200 required.",
+            "Rewards can only be redeemed in-store."
+          ]}
+          cardColor="#F2187A"
+        />
+        <FeedbackDrawer
+          walletId={wallet.id}
+          feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
+          categories={pageData.data.categories}
+          googleReviewUrl="https://search.google.com/local/writereview?placeid=ChIJ41aha-EDDTkRSwFFHW6sKpc" // swap with brand.googleReviewUrl if your backend adds it
+        />
+      </MobileContainer>) : (
         <MobileContainer>
-      <HeroBanner imageUrl={brand.bannerImageUrl ?? ""} />
-      <RestaurantHeader
-        name={brand.name}
-        logoUrl={brand.logoUrl ?? ""}
-        bonus={false}
-        bonusPoints={0}
-      />
-      <PointsCard
-        userName={brand.customerName ?? ""}
-        points={wallet.currentCoins}
-        nextRewardPoints={nextMilestone?.coinsRequired ?? wallet.currentCoins}
-        expiryDate={expiryDate}
-        rewardCount={unlockedRewards}
-      />
-      <RewardsCard
-        userPoints={wallet.currentCoins}
-        earnRule={earnRule}
-        rewards={milestones.map((m) => ({
-          id: m.id,
-          pointsRequired: m.coinsRequired,
-          description: m.name,
-        }))}
-      />
-      <HowToRedeem />
-      <TermsAndConditions
-        terms={[
-          "Points are non-transferable.",
-          "Valid only at the brand outlet.",
-          "2 Offers cannot be clubbed together",
-        ]}
-      />
-      <FeedbackDrawer
-        walletId={wallet.id}
-        feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
-        categories={pageData.data.categories}
-        googleReviewUrl={null} // swap with brand.googleReviewUrl if your backend adds it
-      />
-      
-    </MobileContainer>)}
+          <HeroBanner imageUrl={brand.bannerImageUrl ?? ""} />
+          <RestaurantHeader
+            name={brand.name}
+            logoUrl={brand.logoUrl ?? ""}
+            bonus={false}
+            bonusPoints={0}
+          />
+          <PointsCard
+            userName={brand.customerName ?? ""}
+            points={wallet.currentCoins}
+            nextRewardPoints={nextMilestone?.coinsRequired ?? wallet.currentCoins}
+            expiryDate={expiryDate}
+            rewardCount={unlockedRewards}
+          />
+          <RewardsCard
+            userPoints={wallet.currentCoins}
+            earnRule={earnRule}
+            rewards={milestones.map((m) => ({
+              id: m.id,
+              pointsRequired: m.coinsRequired,
+              description: m.name,
+            }))}
+          />
+          <HowToRedeem />
+          <TermsAndConditions
+            terms={[
+              "Points are non-transferable.",
+              "Valid only at the brand outlet.",
+              "2 Offers cannot be clubbed together",
+            ]}
+
+          />
+          <FeedbackDrawer
+            walletId={wallet.id}
+            feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
+            categories={pageData.data.categories}
+            googleReviewUrl={null} // swap with brand.googleReviewUrl if your backend adds it
+          />
+
+        </MobileContainer>)}
     </>
   );
 }
