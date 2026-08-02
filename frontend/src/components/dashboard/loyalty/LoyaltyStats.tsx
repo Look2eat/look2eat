@@ -34,7 +34,7 @@ export default function LoyaltyStats({
         },
         {
             title: "Profile Completion",
-            subtitle: "60%",
+            subtitle: "0%",
             cardIcon: UserCheck,
 
         },

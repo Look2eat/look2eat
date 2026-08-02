@@ -127,7 +127,7 @@ export default function FeedbackDrawer({
                         <span className="text-3xl">🎁</span>
                         <div>
                             <p className="font-semibold text-sm leading-tight" style={{ color: "#ffffff" }}>
-                                Earn 50 coins by giving feedback!
+                                Earn 35 coins by giving feedback!
                             </p>
                             <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.9)" }}>
                                 Takes less than a minute ✨
