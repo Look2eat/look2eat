@@ -11,7 +11,7 @@ export default function RedeemBanner({ points }: RedeemBannerProps) {
         Get Any Item Worth Up To
       </p>
 
-      <h2 className="mt-3 text-3xl font-extrabold leading-none text-black">
+      <h2 className="mt-3 text-4xl font-extrabold leading-none text-black">
         ₹{points}{" "} for
         <span className="text-pink-500 ">
           Free
