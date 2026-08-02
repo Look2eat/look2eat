@@ -3,7 +3,7 @@ interface RedeemBannerProps {
 }
 
 export default function RedeemBanner({ points }: RedeemBannerProps) {
-  if (points < 0) return null;
+  if (points <= 0) return null;
 
   return (
     <div className="mx-4 mt-6 rounded-3xl  py-8 px-6 text-center">
