@@ -9,6 +9,8 @@ import TermsAndConditions from "@/components/customer/Terms";
 import { notFound } from "next/navigation";
 import { getPublicLoyaltyData } from "../../../../services/public/loyalty";
 import FeedbackDrawer from "@/components/customer/FeedbackDrawer";
+import PointsCardAnies from "@/components/customer/PointsCardAnies";
+import RedeemBanner from "@/components/customer/RedeemBanner";
 
 interface PageProps {
   params: Promise<{
@@ -51,9 +53,44 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
   // Display as: spend ₹X to earn 1 coin
   const spendPerCoin = (1 / settings.coinRatioValue).toFixed(0);
   const earnRule = `₹${spendPerCoin} spent = 1 coin`;
+  console.log(restaurantSlug, wallet_id)
+
 
   return (
-    <MobileContainer>
+      
+      <>
+      {restaurantSlug === "anie-s-coffee-co" ? (<MobileContainer>
+      <HeroBanner imageUrl={brand.bannerImageUrl ?? ""} />
+      <RestaurantHeader
+        name={brand.name}
+        logoUrl={brand.logoUrl ?? ""}
+        bonus={false}
+        bonusPoints={0}
+      />
+      <PointsCardAnies
+        userName={brand.customerName ?? ""}
+        points={wallet.currentCoins}
+       
+        expiryDate={expiryDate}
+        rewardCount={unlockedRewards}
+      />
+      <RedeemBanner points={wallet.currentCoins} />
+      <HowToRedeem />
+      <TermsAndConditions
+        terms={[
+          "2 offers cannot be clubbed together.",
+          "Minimum purchase of ₹200 required.",
+          "Rewards can only be redeemed in-store."
+        ]}
+      />
+      <FeedbackDrawer
+        walletId={wallet.id}
+        feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
+        categories={pageData.data.categories}
+        googleReviewUrl="https://search.google.com/local/writereview?placeid=ChIJ41aha-EDDTkRSwFFHW6sKpc" // swap with brand.googleReviewUrl if your backend adds it
+      />
+      </MobileContainer>) :(
+        <MobileContainer>
       <HeroBanner imageUrl={brand.bannerImageUrl ?? ""} />
       <RestaurantHeader
         name={brand.name}
@@ -91,6 +128,8 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
         categories={pageData.data.categories}
         googleReviewUrl={null} // swap with brand.googleReviewUrl if your backend adds it
       />
-    </MobileContainer>
+      
+    </MobileContainer>)}
+    </>
   );
 }

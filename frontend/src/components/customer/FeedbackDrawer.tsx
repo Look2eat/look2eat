@@ -87,6 +87,7 @@ export default function FeedbackDrawer({
             console.error(e);
         } finally {
             setSubmitting(false);
+            setStep("done");
         }
     };
 

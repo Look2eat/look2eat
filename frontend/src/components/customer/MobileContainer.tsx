@@ -7,7 +7,7 @@ export default function MobileContainer({ children }: Props) {
     <div className="min-h-screen bg-white flex justify-center">
       <div
         id="mobile-container"
-        className="relative w-full max-w-105 min-h-screen bg-white shadow-xl overflow-hidden"
+        className="relative w-full max-w-105 min-h-screen bg-white  overflow-hidden"
       >
         {children}
       </div>
