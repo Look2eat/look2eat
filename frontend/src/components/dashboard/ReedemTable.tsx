@@ -75,6 +75,7 @@ export default function ReedemTable({
     }
 
     const showSkeletonRows = isInitialLoading
+    console.log(history)
 
     return (
         <div>
@@ -101,6 +102,7 @@ export default function ReedemTable({
                                     ? Array.from({ length: 6 }).map((_, i) => <RowSkeleton key={i} />)
                                     : rows.map((item) => {
                                         const isEarned = item.action === "Earned"
+                                        
                                         return (
                                             <tr key={item.id} className="border-b border-border/60">
                                                 <td className="py-3 pr-4 text-muted-foreground">
