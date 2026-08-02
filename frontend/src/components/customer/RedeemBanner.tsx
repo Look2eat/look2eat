@@ -12,7 +12,7 @@ export default function RedeemBanner({ points }: RedeemBannerProps) {
       </p>
 
       <h2 className="mt-3 text-4xl font-extrabold leading-none text-black">
-        ₹{points}{" "} for
+        ₹{points}{" "} for{" "}
         <span className="text-pink-500 ">
           Free
         </span>
