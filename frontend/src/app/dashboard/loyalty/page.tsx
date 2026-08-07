@@ -71,7 +71,7 @@ export default function LoyaltyDashboardPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[60%_40%] gap-6 max-w-full pr-6">
+      <div className="grid grid-cols-1 xl:grid-cols-[60%_40%] gap-6 max-w-full xl:pr-6">
         <CustomerRepeatRateCard
           isLoading={isLoading}
           data={{
