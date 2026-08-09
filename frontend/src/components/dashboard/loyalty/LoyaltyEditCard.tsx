@@ -46,7 +46,7 @@ export default function LoyaltyEditCard({
                 <div className="flex gap-6 mt-4">
                     <button
                         onClick={onPrimaryClick}
-                        className="px-8 py-3 rounded-2xl dark:bg-white dark:text-black font-semibold text-lg  hover:opacity-90 transition bg-neutral-800 text-white"
+                        className="px-6 py-2 rounded-xl dark:bg-white dark:text-black font-semibold text-base  hover:opacity-90 transition bg-neutral-800 text-white"
                     >
                         {primaryButtonText}
                     </button>
