@@ -30,7 +30,7 @@ export default function CustomerRepeatRateCard({ isLoading = false, data }: Prop
     return (
         <div className="p-4 md:p-6 rounded-2xl bg-white dark:bg-[#121214] flex flex-col gap-6 md:gap-10">
 
-            <h3 className="text-base md:text-xl font-semibold">
+            <h3 className="text-xl font-semibold">
                 Customer Repeat Rate
             </h3>
 
@@ -47,7 +47,7 @@ export default function CustomerRepeatRateCard({ isLoading = false, data }: Prop
                             className="grid grid-cols-[90px_1fr_60px] md:grid-cols-[150px_1fr_90px] items-center gap-2 md:gap-4"
                         >
                             {/* Label */}
-                            <span className="text-[10px] md:text-sm font-medium leading-tight">
+                            <span className="text-[12px] md:text-sm font-medium leading-tight">
                                 {row.label}
                             </span>
 
@@ -67,7 +67,7 @@ export default function CustomerRepeatRateCard({ isLoading = false, data }: Prop
                             </div>
 
                             {/* Percent */}
-                            <span className="text-[10px] md:text-sm font-semibold text-right">
+                            <span className="text-[12px] md:text-sm font-semibold text-right">
                                 {isLoading ? (
                                     <span className="inline-block h-3 w-8 rounded bg-muted animate-pulse align-middle" />
                                 ) : (
