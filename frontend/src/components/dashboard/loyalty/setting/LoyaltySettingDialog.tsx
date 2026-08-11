@@ -245,8 +245,8 @@ export default function LoyaltySettingsDialog({
                         <p className="text-sm text-muted-foreground">Loading your settings…</p>
                     </div>
                 ) : (
-                    <Stepper value={currentStep} onValueChange={setCurrentStep} className="space-y-0">
-                        <StepperNav className="px-8 pt-4 pb-2">
+                    <Stepper value={currentStep} onValueChange={setCurrentStep} className="flex flex-1 min-h-0 flex-col">
+                        <StepperNav className="shrink-0 px-8 pt-4 pb-2">
                             {STEPS.map(({ step, label }) => (
                                 <StepperItem key={step} step={step}>
                                     <StepperTrigger asChild>
@@ -266,7 +266,7 @@ export default function LoyaltySettingsDialog({
                             ))}
                         </StepperNav>
 
-                        <StepperPanel className="min-h-[400px] max-h-[60vh] overflow-y-auto px-8 py-6">
+                        <StepperPanel className="flex-1 min-h-0 overflow-y-auto px-8 py-6">
                             <StepperContent value={1}>
                                 <ThemeStep theme={theme} setTheme={setTheme} />
                             </StepperContent>
@@ -290,9 +290,9 @@ export default function LoyaltySettingsDialog({
                             </StepperContent>
                         </StepperPanel>
 
-                        {error && <p className="text-sm text-destructive px-8 pb-2">{error}</p>}
+                        {error && <p className="shrink-0 text-sm text-destructive px-8 pb-2">{error}</p>}
 
-                        <DialogFooter className="flex items-center justify-between gap-2.5 sm:justify-between px-8 py-6 border-t bg-muted/30">
+                        <DialogFooter className="flex flex-row shrink-0 items-center justify-between gap-2.5 px-8 py-6 border-t bg-muted/30">
                             <Button
                                 variant="outline"
                                 onClick={() => setCurrentStep((prev) => prev - 1)}
