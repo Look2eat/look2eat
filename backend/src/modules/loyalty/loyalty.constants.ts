@@ -1,1 +1,0 @@
-export const DEFAULT_EXPIRY_DAYS = 30;
