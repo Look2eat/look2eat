@@ -59,7 +59,7 @@ export default function MilestonesStep({
                     Set how many coins a customer earns for every ₹1 they spend.
                 </p>
                 <div className="space-y-3 mt-2">
-                    <div className="rounded-xl border p-5 flex items-center gap-3.5">
+                    <div className="rounded-xl border p-5 flex flex-wrap items-center gap-3.5">
                         <span className="text-sm text-muted-foreground shrink-0">₹1 spent =</span>
                         <Input
                             type="number"
@@ -67,19 +67,19 @@ export default function MilestonesStep({
                             step={0.1}
                             value={coinRatioValue}
                             onChange={(e) => setCoinRatioValue(Number(e.target.value))}
-                            className="max-w-[120px]"
+                            className="w-24 max-w-[120px]"
                         />
                         <span className="text-sm text-muted-foreground">coins earned</span>
                     </div>
 
-                    <div className="rounded-xl border p-5 flex items-center gap-3.5">
+                    <div className="rounded-xl border p-5 flex flex-wrap items-center gap-3.5">
                         <span className="text-sm text-muted-foreground shrink-0">Points expire after</span>
                         <Input
                             type="number"
                             min={1}
                             value={pointsExpiryDays}
                             onChange={(e) => setPointsExpiryDays(Number(e.target.value))}
-                            className="max-w-[120px]"
+                            className="w-24 max-w-[120px]"
                         />
                         <span className="text-sm text-muted-foreground">days of inactivity</span>
                     </div>
