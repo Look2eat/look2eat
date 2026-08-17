@@ -17,7 +17,7 @@ export function SecurityTab() {
     return (
         <div className=" space-y-1">
             {/* Change Password */}
-            <div className="flex items-center justify-between border-b border-gray-100 py-5 dark:border-neutral-900">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 py-5 dark:border-neutral-900">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Password</p>
                     <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">Set a unique password to protect your account.</p>
@@ -56,7 +56,7 @@ export function SecurityTab() {
             </div>
 
             {/* 2FA Toggle */}
-            <div className="flex items-center justify-between border-b border-gray-100 py-5 dark:border-neutral-900">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-gray-100 py-5 dark:border-neutral-900">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">2-Step Verification</p>
                     <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">Add an extra layer of security with OTP on login.</p>
@@ -76,7 +76,7 @@ export function SecurityTab() {
             </div>
 
             {/* Delete Account */}
-            <div className="flex items-center justify-between py-5">
+            <div className="flex flex-wrap items-center justify-between gap-3 py-5">
                 <div>
                     <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Delete Account</p>
                     <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">Permanently delete your account and all associated data.</p>
