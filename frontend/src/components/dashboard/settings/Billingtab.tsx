@@ -33,8 +33,8 @@ function BillingHistoryTable({ rows }: { rows: PurchaseHistoryRow[] }) {
     }
 
     return (
-        <div className="overflow-hidden rounded-xl border border-gray-100 dark:border-neutral-700">
-            <table className="w-full text-base">
+        <div className="overflow-x-auto rounded-xl border border-gray-100 dark:border-neutral-700">
+            <table className="w-full min-w-[560px] text-base">
                 <thead>
                     <tr className="border-b border-gray-100 bg-gray-50/60 dark:border-neutral-700 dark:bg-neutral-900">
                         <th className="px-4 py-2.5 text-left text-base font-semibold text-gray-500 dark:text-neutral-200">Order ID</th>
