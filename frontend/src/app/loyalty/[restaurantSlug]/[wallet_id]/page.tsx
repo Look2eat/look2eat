@@ -89,6 +89,8 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
           feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
           categories={pageData.data.categories}
           googleReviewUrl="https://search.google.com/local/writereview?placeid=ChIJ41aha-EDDTkRSwFFHW6sKpc" // swap with brand.googleReviewUrl if your backend adds it
+          cardColor="#F2187A"
+          feedbackPoints={35}
         />
       </MobileContainer>) : (
         <MobileContainer>
@@ -129,6 +131,8 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
             feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
             categories={pageData.data.categories}
             googleReviewUrl={null} // swap with brand.googleReviewUrl if your backend adds it
+            cardColor={"#F2187A"}
+            feedbackPoints={35}
           />
 
         </MobileContainer>)}
