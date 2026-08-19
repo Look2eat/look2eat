@@ -117,7 +117,7 @@ function WalletCard({
                     <text x="28" y="168" fontFamily="Poppins, sans-serif" fontSize="13" fill="#fca5a5" fontWeight="600">
                         ⚠ Please recharge - service stops at - ₹100 balance
                     </text>
-                    <text x="1072" y="168" fontFamily="Poppins, sans-serif" fontSize="13" fill="white" textAnchor="end">
+                    <text x="calc(95%)" y="168" fontFamily="Poppins, sans-serif" fontSize="13" fill="white" textAnchor="end">
                         ₹{customerRate} / customer
                     </text>
                 </>
