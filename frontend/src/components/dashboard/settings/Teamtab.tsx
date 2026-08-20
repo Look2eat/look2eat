@@ -139,7 +139,7 @@ export function TeamTab({ footer = false }: { footer?: boolean }) {
     return (
         <div>
             {!footer && cashiers.length >= 1 && (
-                <div className="mb-4 flex items-center justify-between">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Cashier Accounts</p>
                         <p className="text-xs text-gray-500 dark:text-neutral-200">Manage POS operator logins.</p>
@@ -151,8 +151,8 @@ export function TeamTab({ footer = false }: { footer?: boolean }) {
             {cashiers.length === 0 ? (
                 <CashierEmptyState onCreated={fetchCashiers} />
             ) : (
-                <div className="overflow-hidden rounded-2xl border border-gray-100 dark:border-neutral-700">
-                    <table className="w-full text-sm">
+                <div className="overflow-x-auto rounded-2xl border border-gray-100 dark:border-neutral-700">
+                    <table className="w-full min-w-[560px] text-sm">
                         <thead>
                             <tr className="border-b border-gray-100 dark:border-neutral-900 bg-gray-50/60 dark:bg-neutral-800">
                                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-neutral-200">Name</th>
