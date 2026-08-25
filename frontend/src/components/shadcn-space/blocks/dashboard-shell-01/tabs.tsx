@@ -13,7 +13,7 @@ import FeedbackCard from "./FeedbackCard"
 
 export default function PreviewTabs() {
     return (
-        <Tabs defaultValue="tab1" variant="rounded" className="w-full  ">
+        <Tabs defaultValue="tab1" variant="rounded" className="w-full ">
             <TabsList>
                 <TabsTrigger value="tab1">Loyalty </TabsTrigger>
                 <TabsTrigger value="tab2">Feedback</TabsTrigger>
