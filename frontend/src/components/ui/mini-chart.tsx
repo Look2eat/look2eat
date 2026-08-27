@@ -57,7 +57,7 @@ export function MiniChart() {
       ref={containerRef}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={handleContainerLeave}
-      className="group relative w-full h-full p-6 rounded-2xl bg-white dark:bg-[#121214] flex flex-col gap-4 font-poppins"
+      className="group relative w-full h-full p-6 rounded-2xl bg-white dark:bg-[#121214] flex flex-col gap-4 font-poppins min-h-80"
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
