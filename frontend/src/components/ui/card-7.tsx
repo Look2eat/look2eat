@@ -79,7 +79,7 @@ export const TravelRouteCard: React.FC<TravelRouteCardProps> = ({
         {/* Divider */}
         <motion.div
           variants={itemVariants}
-          className="mx-8 h-full w-px shrink-0 bg-white/30"
+          className="mx-4 sm:mx-8 h-full w-px shrink-0 bg-white/30"
         />
 
         {/* Right — Google Reviews */}

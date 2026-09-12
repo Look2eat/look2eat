@@ -247,6 +247,73 @@
   body {
     @apply bg-background text-foreground;
   }
+
+  /* The rule above sets an outline COLOUR but leaves `outline-style: none`,
+     so nothing on the site had a visible keyboard focus indicator — a
+     WCAG 2.4.7 failure. `:focus-visible` restores one for keyboard and
+     assistive-tech users without putting a ring on mouse clicks. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* The landing page is dark; the themed --ring is too low-contrast on it. */
+  [data-landing] :focus-visible,
+  [data-landing-dark] :focus-visible {
+    outline-color: #9ec0ff;
+  }
+}
+
+/* Drives the progress rail under the active step in CounterStepper. */
+@keyframes zp-step-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Blue scrollbar, landing page only. Scoped through :has() so the dashboard
+   and the customer wallet keep the platform default. Firefox gets the
+   two-keyword `scrollbar-color`; Chrome/Safari get the pseudo-elements. */
+html:has(main[data-landing]) {
+  scrollbar-color: #2135dd rgba(255, 255, 255, 0.06);
+  scrollbar-width: thin;
+}
+html:has(main[data-landing])::-webkit-scrollbar {
+  width: 11px;
+}
+html:has(main[data-landing])::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+html:has(main[data-landing])::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #4a63ff 0%, #2135dd 100%);
+  border-radius: 999px;
+  /* An inset border keeps the thumb clear of the track edges so it reads as
+     a floating pill rather than a full-width bar. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+html:has(main[data-landing])::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #6e86ff 0%, #2135dd 100%);
+  background-clip: content-box;
+}
+
+/* Anyone who has asked their OS for less motion gets none of the decorative
+   movement. GSAP scenes are already gated in code (see
+   components/landing/motion/gsap.ts) and framer-motion honours this itself;
+   this covers the plain CSS transitions and the marquee. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 @theme {
   --font-sans: var(--font-geist-sans);
@@ -257,6 +324,26 @@ html,
 body {
   height: 100%;
   overflow-x: hidden;
+}
+
+/* The rule above pins html and body to the viewport, which makes <body> the
+   scroll container instead of the document. The app shell wants that; a long
+   marketing page does not — a body scroller breaks native document scrolling,
+   scroll anchoring, and any scroll-linked animation that reads window scroll
+   (GSAP ScrollTrigger defaults to the window scroller). Released for the
+   landing page only, matched on its own root element so no other route is
+   affected. */
+html:has(main[data-landing]),
+html:has(main[data-landing]) body {
+  height: auto;
+  /* `overflow-x: hidden` makes the element a scroll container, and a scroll
+     container becomes the containing block for every `position: sticky`
+     descendant. Because the document scrolls here and body does not, sticky
+     elements were measuring against a box that never moves — so none of them
+     stuck. `clip` does the same visual job without creating a scroll
+     container, which is what keeps the hero pinned and the card deck
+     stacking. */
+  overflow-x: clip;
 }
 .razorpay-backdrop {
     display: none !important;

@@ -202,7 +202,8 @@ export default function SalesOverviewChart() {
                         : "text-muted-foreground/60"
                     )}
                   >
-                    {d.month}
+                    <span className="sm:hidden">{d.month.charAt(0)}</span>
+                    <span className="hidden sm:inline">{d.month}</span>
                   </div>
                 ))}
               </div>

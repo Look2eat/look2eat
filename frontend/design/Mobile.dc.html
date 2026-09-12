@@ -1,0 +1,573 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap">
+  <style>
+    body { margin: 0; background: #08090C; font-family: 'Poppins', system-ui, -apple-system, sans-serif; }
+    a { color: #9EC0FF; text-decoration: none; }
+    a:hover { color: #ffffff; }
+    * { box-sizing: border-box; }
+
+    @keyframes zp-marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .zp-marquee-track {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: max-content;
+      animation: zp-marquee 24s linear infinite;
+    }
+    .zp-marquee-mask {
+      overflow: hidden;
+      width: 100%;
+      mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+      -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .zp-marquee-track { animation: none; }
+    }
+
+    /* --- Counter stepper: 3-beat cycle -------------------------------
+       Timed loop here so every state is visible on a static artboard.
+       In React this binds to scroll progress (useScroll) instead — see
+       the MOTION SPEC annotation on the canvas. ---------------------- */
+    .zp-step {
+      opacity: .34;
+      border-left: 2px solid #e6ecf3;
+      animation: zp-step-cycle 13.5s linear infinite;
+    }
+    @keyframes zp-step-cycle {
+      0%   { opacity: .34; border-left-color: #e6ecf3; }
+      2%   { opacity: 1;   border-left-color: #2135DD; }
+      31%  { opacity: 1;   border-left-color: #2135DD; }
+      34%  { opacity: .34; border-left-color: #e6ecf3; }
+      100% { opacity: .34; border-left-color: #e6ecf3; }
+    }
+    .zp-scene {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      animation: zp-scene-cycle 13.5s linear infinite;
+    }
+    @keyframes zp-scene-cycle {
+      0%   { opacity: 0; transform: translateY(18px) scale(.975); }
+      4%   { opacity: 1; transform: translateY(0) scale(1); }
+      30%  { opacity: 1; transform: translateY(0) scale(1); }
+      34%  { opacity: 0; transform: translateY(-18px) scale(.975); }
+      100% { opacity: 0; transform: translateY(-18px) scale(.975); }
+    }
+    .zp-dot {
+      flex: 1;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.26);
+      animation: zp-dot-cycle 13.5s linear infinite;
+    }
+    @keyframes zp-dot-cycle {
+      0%   { background: rgba(255,255,255,0.26); }
+      2%   { background: #ffffff; }
+      31%  { background: #ffffff; }
+      34%  { background: rgba(255,255,255,0.26); }
+      100% { background: rgba(255,255,255,0.26); }
+    }
+    /* phase offsets — beat 2 starts at 4.5s, beat 3 at 9s */
+    .zp-c2 { animation-delay: -9s; }
+    .zp-c3 { animation-delay: -4.5s; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .zp-step, .zp-scene, .zp-dot { animation: none; }
+      .zp-step.zp-c1 { opacity: 1; border-left-color: #2135DD; }
+      .zp-scene.zp-c1 { opacity: 1; transform: none; }
+      .zp-dot.zp-c1 { background: #ffffff; }
+    }
+  </style>
+</helmet>
+
+<div style="width: 390px; background: #08090C; color: #ffffff;">
+
+  <!-- NAV -->
+  <div style="display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.07);">
+    <div style="display: flex; align-items: center; gap: 9px;">
+      <svg width="29" height="29" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="40" height="40" rx="8" fill="url(#zgm)"></rect>
+        <rect x="8.4" y="9" width="22.2" height="6.4" rx="3.2" fill="#ffffff"></rect>
+        <rect x="6.9" y="26.4" width="28.5" height="6.4" rx="3.2" transform="rotate(-45 6.9 26.4)" fill="#ffffff"></rect>
+        <circle cx="21" cy="29.3" r="2.7" fill="#ffffff"></circle>
+        <circle cx="28.7" cy="29.3" r="2.7" fill="#ffffff"></circle>
+        <defs>
+          <linearGradient id="zgm" x1="37" y1="38" x2="3" y2="1.5" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#9EC0FF"></stop>
+            <stop offset="1" stop-color="#2135DD"></stop>
+          </linearGradient>
+        </defs>
+      </svg>
+      <span style="font-size: 18px; font-weight: 600;">Zuplin</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 9px;">
+      <div style="display: flex; align-items: center; justify-content: center; height: 44px; padding: 0 17px; border-radius: 10px; background: #2135DD; font-size: 14px; font-weight: 600; box-shadow: 0 0 22px -5px rgba(74,99,255,0.8);">Book a demo</div>
+      <div style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 11px; background: rgba(255,255,255,0.07);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 60px 20px 76px; overflow: hidden; text-align: center;">
+    <div style="position: absolute; top: -120px; left: 50%; width: 560px; height: 460px; margin-left: -280px; background: radial-gradient(ellipse at center, rgba(33,53,221,0.34) 0%, rgba(8,9,12,0) 66%);"></div>
+
+    <h1 style="position: relative; margin: 0; font-size: 40px; line-height: 1.1; font-weight: 600; letter-spacing: -0.032em;">
+      <span style="display: block; color: #565C6B;">A diner walks in,</span>
+      <span style="display: block; color: #565C6B;">pays, and disappears.</span>
+      <span style="display: flex; align-items: center; justify-content: center; gap: 11px; color: #ffffff; padding-top: 6px; flex-wrap: wrap;">
+        Unless
+        <span style="display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 14px; background: linear-gradient(150deg, #2135DD 0%, #6f86ff 100%); box-shadow: 0 0 30px -6px rgba(110,134,255,0.85);">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"></circle><path d="M12 7.4v9.2M9.6 9.9h4.8M9.6 14.1h4.8"></path></svg>
+        </span>
+        you keep them
+      </span>
+    </h1>
+
+    <p style="position: relative; margin: 0; font-size: 16px; line-height: 1.62; color: #9BA1AF;">Zuplin runs your loyalty programme, collects real feedback and pushes your happiest tables to Google — all over WhatsApp. Nothing to install.</p>
+
+    <div style="position: relative; display: flex; flex-direction: column; gap: 10px; width: 100%; padding-top: 4px;">
+      <div style="display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 12px; background: #2135DD; font-size: 16px; font-weight: 600; box-shadow: 0 0 40px -8px rgba(74,99,255,0.9);">Book a demo</div>
+      <div style="display: flex; align-items: center; justify-content: center; height: 54px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); font-size: 16px; font-weight: 600;">Start free</div>
+    </div>
+
+    <span style="position: relative; font-size: 13px; color: #6B7180;">Free to start · No card required</span>
+  </div>
+
+  <!-- PARTNERS (marquee) -->
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 0 0 56px;">
+    <span style="font-size: 11px; font-weight: 500; letter-spacing: 0.13em; text-transform: uppercase; color: #565C6B; text-align: center;">Built on the platforms you already run on</span>
+    <div class="zp-marquee-mask">
+      <div class="zp-marquee-track">
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[META]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">Meta Verified</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[WA]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">WhatsApp API</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[PP]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">Petpooja</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[RP]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">Razorpay</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[?]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">[NOSNIA?]</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[META]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">Meta Verified</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[WA]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">WhatsApp API</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[PP]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">Petpooja</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[RP]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">Razorpay</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 11px; height: 72px; padding: 0 20px; border-radius: 15px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 70px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.22); font-size: 9px; color: #565C6B;">[?]</div>
+          <span style="font-size: 12.5px; color: #C9CDD6; white-space: nowrap;">[NOSNIA?]</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHITE SHEET -->
+  <div style="background: #ffffff; border-radius: 32px 32px 0 0; margin-top: -24px; color: #1D2033;">
+
+    <div style="display: flex; flex-direction: column; gap: 26px; padding: 52px 20px 44px;">
+      <h2 style="margin: 0; font-size: 32px; line-height: 1.14; font-weight: 600; letter-spacing: -0.028em;">One system. <span style="color: #2135DD;">Two happy people.</span></h2>
+
+      <div style="position: relative; display: flex; flex-direction: column; gap: 16px; padding: 28px 24px; border-radius: 24px; background: #0D0F14; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(33,53,221,0.42) 0%, rgba(13,15,20,0) 68%);"></div>
+        <h3 style="position: relative; margin: 0; font-size: 22px; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">For your counter</h3>
+        <p style="position: relative; margin: 0; font-size: 14.5px; line-height: 1.6; color: #9BA1AF;">Your cashier keeps billing exactly as they do now. Zuplin is one extra screen.</p>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 9px;">
+          <div style="display: flex; align-items: center; gap: 9px;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #6f86ff;"></span><span style="font-size: 14px; color: #C9CDD6;">Phone number, bill amount, done</span></div>
+          <div style="display: flex; align-items: center; gap: 9px;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #6f86ff;"></span><span style="font-size: 14px; color: #C9CDD6;">Any phone, tablet or the billing PC</span></div>
+          <div style="display: flex; align-items: center; gap: 9px;"><span style="width: 5px; height: 5px; border-radius: 999px; background: #6f86ff;"></span><span style="font-size: 14px; color: #C9CDD6;">Rewards locked behind the customer's OTP</span></div>
+        </div>
+        <div style="position: relative; display: flex; align-items: center; gap: 11px; padding: 13px 14px; border-radius: 13px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);">
+          <div style="display: flex; align-items: center; justify-content: center; width: 68px; height: 28px; border-radius: 6px; border: 1px dashed rgba(255,255,255,0.24); font-size: 9px; color: #565C6B; flex-shrink: 0;">[PETPOOJA]</div>
+          <span style="font-size: 13px; line-height: 1.45; color: #C9CDD6;">Plugs into <span style="color: #ffffff; font-weight: 500;">Petpooja</span> and your existing billing</span>
+        </div>
+      </div>
+
+      <div style="position: relative; display: flex; flex-direction: column; gap: 16px; padding: 28px 24px; border-radius: 24px; background: #0D0F14; overflow: hidden;">
+        <div style="position: absolute; top: -50px; right: -40px; width: 220px; height: 220px; background: radial-gradient(circle, rgba(110,134,255,0.34) 0%, rgba(13,15,20,0) 68%);"></div>
+        <h3 style="position: relative; margin: 0; font-size: 22px; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">For your customer</h3>
+        <p style="position: relative; margin: 0; font-size: 14.5px; line-height: 1.6; color: #9BA1AF;">A loyalty card that lives in their browser, under your name — not an app they'll delete.</p>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 9px; padding: 18px 20px; border-radius: 18px; background: #171A22; border: 1px solid rgba(255,255,255,0.08);">
+          <span style="font-size: 10.5px; letter-spacing: 0.07em; text-transform: uppercase; color: #6B7180;">Your coins</span>
+          <span style="font-size: 30px; font-weight: 700; line-height: 1; color: #ffffff;">1,240</span>
+          <div style="height: 6px; border-radius: 999px; background: rgba(255,255,255,0.1);">
+            <div style="width: 62%; height: 6px; border-radius: 999px; background: linear-gradient(90deg, #2135DD, #9EC0FF);"></div>
+          </div>
+          <span style="font-size: 11.5px; color: #9BA1AF;">760 to ₹300 cashback</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stepper -->
+    <div style="display: flex; flex-direction: column; gap: 26px; padding: 20px 20px 56px;">
+      <h2 style="margin: 0; font-size: 32px; line-height: 1.14; font-weight: 600; letter-spacing: -0.028em;"><span style="color: #2135DD;">Three steps</span> at the counter. Nothing else changes.</h2>
+
+      <div style="display: flex; flex-direction: column; gap: 22px;">
+        <div class="zp-step zp-c1" style="display: flex; flex-direction: column; gap: 7px; padding-left: 18px;">
+          <h3 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.018em; color: #1D2033;"><span style="color: #2135DD;">Cashier</span> enters the bill</h3>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #6B7180;">Phone number and amount, after the bill is settled. Coins land instantly.</p>
+        </div>
+        <div class="zp-step zp-c2" style="display: flex; flex-direction: column; gap: 7px; padding-left: 18px;">
+          <h3 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.018em; color: #1D2033;">Message lands on <span style="color: #2135DD;">WhatsApp</span></h3>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #6B7180;">Coins, rewards and expiry &mdash; under your branding, in their browser.</p>
+        </div>
+        <div class="zp-step zp-c3" style="display: flex; flex-direction: column; gap: 7px; padding-left: 18px;">
+          <h3 style="margin: 0; font-size: 20px; font-weight: 600; letter-spacing: -0.018em; color: #1D2033;">They come back to <span style="color: #2135DD;">redeem</span></h3>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.6; color: #6B7180;">A one-time code from their phone unlocks the reward. Never without them.</p>
+        </div>
+      </div>
+
+      <div style="position: relative; height: 300px; border-radius: 24px; background: linear-gradient(150deg, #2135DD 0%, #4a63ff 48%, #9EC0FF 100%); overflow: hidden;">
+
+        <div class="zp-scene zp-c1">
+          <div style="position: absolute; left: 18px; top: 24px; width: 214px; padding: 16px; border-radius: 16px; background: #ffffff; box-shadow: 0 18px 42px -16px rgba(8,9,12,0.45);">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <span style="font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #8D9098;">Cashier &middot; Indiranagar</span>
+              <div style="padding: 9px 11px; border-radius: 9px; background: #f2f6fa; font-size: 12.5px; font-weight: 600; color: #1D2033;">+91 98765 4&bull;&bull;&bull;&bull;</div>
+              <div style="padding: 9px 11px; border-radius: 9px; background: #f2f6fa; font-size: 12.5px; font-weight: 600; color: #1D2033;">&#8377;620</div>
+              <div style="display: flex; align-items: center; justify-content: center; height: 34px; border-radius: 9px; background: #2135DD; color: #ffffff; font-size: 12px; font-weight: 600;">Credit coins</div>
+            </div>
+          </div>
+          <div style="position: absolute; right: 16px; bottom: 46px; display: flex; align-items: center; gap: 9px; padding: 13px 15px; border-radius: 15px; background: #0D0F14; box-shadow: 0 18px 42px -16px rgba(8,9,12,0.6);">
+            <div style="display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 9px; background: rgba(110,134,255,0.18); flex-shrink: 0;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9EC0FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.4"></circle><path d="M12 7.4v9.2M9.6 9.9h4.8M9.6 14.1h4.8"></path></svg>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <span style="font-size: 12px; font-weight: 600; color: #ffffff;">+124 coins</span>
+              <span style="font-size: 10px; color: #6B7180;">Bill of &#8377;620</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="zp-scene zp-c2">
+          <div style="position: absolute; left: 20px; top: 24px; width: 240px; border-radius: 17px; overflow: hidden; background: #ECE5DD; box-shadow: 0 18px 42px -16px rgba(8,9,12,0.5);">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #075E54;">
+              <div style="display: flex; align-items: center; justify-content: center; width: 25px; height: 25px; border-radius: 999px; background: #25D366; flex-shrink: 0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20z"></path></svg></div>
+              <span style="font-size: 11.5px; font-weight: 600; color: #ffffff;">Avv&aring;&#39;s Cafe</span>
+            </div>
+            <div style="padding: 12px 11px 14px;">
+              <div style="padding: 10px 11px; border-radius: 3px 12px 12px 12px; background: #ffffff; box-shadow: 0 1px 1.5px rgba(8,9,12,0.12);">
+                <span style="display: block; font-size: 11px; line-height: 1.5; color: #1D2033;">You&rsquo;ve earned <b>124 coins</b> on today&rsquo;s bill of &#8377;620.</span>
+                <div style="margin-top: 8px; padding-top: 7px; border-top: 1px solid #eceff3; font-size: 10.5px; font-weight: 600; color: #2135DD;">View your reward card &rarr;</div>
+              </div>
+            </div>
+          </div>
+          <div style="position: absolute; right: 16px; bottom: 44px; display: flex; align-items: center; gap: 9px; padding: 12px 14px; border-radius: 14px; background: #ffffff; box-shadow: 0 18px 42px -16px rgba(8,9,12,0.42);">
+            <div style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9px; background: #25D366; flex-shrink: 0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20z"></path></svg></div>
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #1D2033;">Delivered</span>
+              <span style="font-size: 10px; color: #8D9098;">Nothing to install</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="zp-scene zp-c3">
+          <div style="position: absolute; left: 20px; top: 28px; width: 226px; padding: 16px; border-radius: 16px; background: #0D0F14; box-shadow: 0 18px 42px -16px rgba(8,9,12,0.6);">
+            <div style="display: flex; flex-direction: column; gap: 11px;">
+              <span style="font-size: 9.5px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: #6B7180;">Redeeming at the counter</span>
+              <span style="font-size: 16px; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">&#8377;200 cashback</span>
+              <div style="display: flex; gap: 6px;">
+                <div style="display: flex; align-items: center; justify-content: center; width: 38px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(110,134,255,0.35); font-size: 17px; font-weight: 700; color: #ffffff;">4</div>
+                <div style="display: flex; align-items: center; justify-content: center; width: 38px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(110,134,255,0.35); font-size: 17px; font-weight: 700; color: #ffffff;">8</div>
+                <div style="display: flex; align-items: center; justify-content: center; width: 38px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(110,134,255,0.35); font-size: 17px; font-weight: 700; color: #ffffff;">2</div>
+                <div style="display: flex; align-items: center; justify-content: center; width: 38px; height: 42px; border-radius: 10px; background: rgba(255,255,255,0.06); border: 1px solid rgba(110,134,255,0.35); font-size: 17px; font-weight: 700; color: #ffffff;">1</div>
+              </div>
+            </div>
+          </div>
+          <div style="position: absolute; right: 16px; bottom: 42px; display: flex; align-items: center; gap: 9px; padding: 12px 14px; border-radius: 14px; background: #ffffff; box-shadow: 0 18px 42px -16px rgba(8,9,12,0.42);">
+            <div style="display: flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 9px; background: #E7F8EE; flex-shrink: 0;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 1px;">
+              <span style="font-size: 11.5px; font-weight: 600; color: #1D2033;">Code verified</span>
+              <span style="font-size: 10px; color: #8D9098;">640 coins left</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="position: absolute; left: 20px; right: 20px; bottom: 18px; display: flex; align-items: center; gap: 7px;">
+          <div class="zp-dot zp-c1"></div>
+          <div class="zp-dot zp-c2"></div>
+          <div class="zp-dot zp-c3"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOUR PILLARS -->
+    <div style="display: flex; flex-direction: column; gap: 22px; padding: 20px 20px 56px;">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <h2 style="margin: 0; font-size: 30px; line-height: 1.14; font-weight: 600; letter-spacing: -0.028em;">Everything that <span style="color: #2135DD;">brings a diner back</span></h2>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B7180;">Four things working together, not four tools you have to stitch.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+
+        <!-- 01 Loyalty -->
+        <div style="display: flex; flex-direction: column; gap: 16px; padding: 26px 22px; border-radius: 24px; background: linear-gradient(150deg, #241d0c 0%, #14110B 68%); border: 1px solid rgba(240,180,41,0.18);">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #f0b429;">01 · Loyalty Program</span>
+          <h3 style="margin: 0; font-size: 22px; line-height: 1.18; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">A rewards programme that looks like yours</h3>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.58; color: #9BA1AF;">Set what ₹1 earns, name your own currency, build the ladder — then let it run.</p>
+          <div style="display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 16px; background: #1a1410;">
+            <span style="font-size: 11px; color: #b9a684;">₹1 spent = 1 coin</span>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 13px; font-weight: 700; color: #f5e9d0;">100 <span style="font-size: 9px; font-weight: 400; color: #b9a684;">PTS</span></span><span style="font-size: 11px; color: #b9a684;">₹90 cashback</span></div>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 13px; font-weight: 700; color: #f5e9d0;">300 <span style="font-size: 9px; font-weight: 400; color: #b9a684;">PTS</span></span><span style="font-size: 11px; color: #b9a684;">₹200 cashback</span></div>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 13px; font-weight: 700; color: #f0b429;">600 <span style="font-size: 9px; font-weight: 400; color: #b9a684;">PTS</span></span><span style="font-size: 11px; color: #f0b429;">₹600 cashback</span></div>
+          </div>
+        </div>
+
+        <!-- 02 CRM -->
+        <div style="display: flex; flex-direction: column; gap: 16px; padding: 26px 22px; border-radius: 24px; background: linear-gradient(150deg, #1d1630 0%, #100D1A 68%); border: 1px solid rgba(167,139,250,0.18);">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #a78bfa;">02 · Ultimate CRM</span>
+          <h3 style="margin: 0; font-size: 22px; line-height: 1.18; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">Stop renting your guest list from aggregators</h3>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.58; color: #9BA1AF;">Birthdays, favourite dishes, visit rates and AOV — sorted into groups worth acting on.</p>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+            <div style="display: flex; flex-direction: column; gap: 3px; padding: 12px 11px; border-radius: 13px; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.16);"><span style="font-size: 9.5px; color: #86efac;">New</span><span style="font-size: 17px; font-weight: 700; color: #ffffff;">20%</span></div>
+            <div style="display: flex; flex-direction: column; gap: 3px; padding: 12px 11px; border-radius: 13px; background: rgba(110,134,255,0.12); border: 1px solid rgba(110,134,255,0.2);"><span style="font-size: 9.5px; color: #9EC0FF;">VIP</span><span style="font-size: 17px; font-weight: 700; color: #ffffff;">34%</span></div>
+            <div style="display: flex; flex-direction: column; gap: 3px; padding: 12px 11px; border-radius: 13px; background: rgba(248,113,113,0.1); border: 1px solid rgba(248,113,113,0.16);"><span style="font-size: 9.5px; color: #fca5a5;">Lost</span><span style="font-size: 17px; font-weight: 700; color: #ffffff;">5%</span></div>
+          </div>
+        </div>
+
+        <!-- 03 Campaigns -->
+        <div style="display: flex; flex-direction: column; gap: 16px; padding: 26px 22px; border-radius: 24px; background: linear-gradient(150deg, #2a1a0d 0%, #16100A 68%); border: 1px solid rgba(251,146,60,0.18);">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #fb923c;">03 · Automated Campaigns</span>
+          <h3 style="margin: 0; font-size: 22px; line-height: 1.18; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">The message that goes out while you're running service</h3>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.58; color: #9BA1AF;">Win-backs, birthdays and second-visit nudges. Set once, then automatic.</p>
+          <div style="display: flex; flex-direction: column; gap: 10px; padding: 16px; border-radius: 16px; background: #16100A; border: 1px solid rgba(255,255,255,0.07);">
+            <div style="padding: 12px 13px; border-radius: 12px 12px 12px 4px; background: rgba(255,255,255,0.06);">
+              <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #E8DFD5;">Hey Riddhi! It's been a while. Come back and enjoy ₹150 cashback.</p>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span style="font-size: 11px; color: #fb923c;">Win-back campaign</span>
+              <span style="font-size: 13px; font-weight: 700; color: #ffffff;">₹3.2L <span style="font-size: 9.5px; font-weight: 400; color: #9BA1AF;">attributed</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 Reviews -->
+        <div style="display: flex; flex-direction: column; gap: 16px; padding: 26px 22px; border-radius: 24px; background: linear-gradient(150deg, #2a1226 0%, #150B14 68%); border: 1px solid rgba(236,72,153,0.18);">
+          <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: #f472b6;">04 · Online Reviews &amp; Feedback</span>
+          <h3 style="margin: 0; font-size: 22px; line-height: 1.18; font-weight: 600; color: #ffffff; letter-spacing: -0.02em;">Know which dish is costing you stars</h3>
+          <p style="margin: 0; font-size: 14.5px; line-height: 1.58; color: #9BA1AF;">Happy tables go to Google. Poor ratings reach your manager, with the dish named.</p>
+          <div style="display: flex; flex-direction: column; gap: 9px; padding: 16px; border-radius: 16px; background: #1D0F1A; border: 1px solid rgba(255,255,255,0.07);">
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 12px; color: #ffffff;">Pesto Pasta</span><span style="font-size: 12px; font-weight: 600; color: #f87171;">3.5</span></div>
+            <div style="height: 1px; background: rgba(255,255,255,0.06);"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 12px; color: #ffffff;">Fried Chicken</span><span style="font-size: 12px; font-weight: 600; color: #f87171;">3.2</span></div>
+            <div style="height: 1px; background: rgba(255,255,255,0.06);"></div>
+            <div style="display: flex; align-items: center; justify-content: space-between;"><span style="font-size: 12px; color: #ffffff;">Lasagna</span><span style="font-size: 12px; font-weight: 600; color: #4ade80;">4.8</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK: REVIEW ROUTER -->
+  <div style="position: relative; display: flex; flex-direction: column; gap: 22px; padding: 60px 20px; overflow: hidden;">
+    <div style="position: absolute; bottom: -180px; left: -120px; width: 480px; height: 400px; background: radial-gradient(ellipse at center, rgba(33,53,221,0.26) 0%, rgba(8,9,12,0) 66%);"></div>
+
+    <div style="position: relative; display: flex; flex-direction: column; gap: 14px;">
+      <span style="font-size: 11.5px; font-weight: 500; letter-spacing: 0.11em; text-transform: uppercase; color: #6f86ff;">Feedback that protects your rating</span>
+      <h2 style="margin: 0; font-size: 32px; line-height: 1.12; font-weight: 600; letter-spacing: -0.028em;">
+        <span style="color: #565C6B;">Happy diners go to Google.</span><br>
+        <span style="color: #ffffff;">Unhappy ones come to you.</span>
+      </h2>
+      <p style="margin: 0; font-size: 15.5px; line-height: 1.62; color: #9BA1AF;">Four and five stars get a one-tap path to your listing. Anything lower stays private and pings your manager while the table is still warm.</p>
+    </div>
+
+    <div style="position: relative; display: flex; flex-direction: column; gap: 12px;">
+      <div style="display: flex; flex-direction: column; gap: 9px; padding: 22px 20px; border-radius: 20px; background: #0F1A14; border: 1px solid rgba(34,197,94,0.22);">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #4ade80;">4–5 stars</span>
+        <span style="font-size: 16.5px; font-weight: 600; color: #ffffff;">Sent to your Google listing</span>
+        <span style="font-size: 13.5px; line-height: 1.55; color: #9BA1AF;">One tap, review posted, coins credited automatically.</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 9px; padding: 22px 20px; border-radius: 20px; background: #1A0F12; border: 1px solid rgba(239,68,68,0.22);">
+        <span style="font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #f87171;">1–3 stars</span>
+        <span style="font-size: 16.5px; font-weight: 600; color: #ffffff;">Kept private, sent to you</span>
+        <span style="font-size: 13.5px; line-height: 1.55; color: #9BA1AF;">Reason logged, manager alerted instantly.</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px; padding: 18px 20px; border-radius: 20px; background: #12141A; border: 1px solid rgba(255,255,255,0.08);">
+        <div style="display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 12px; background: #25D366; flex-shrink: 0;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20z"></path></svg>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 13px; font-weight: 600; color: #ffffff;">Manager alert · Indiranagar</span>
+          <span style="font-size: 12px; color: #9BA1AF;">2★ — “Service was slow.” 8:42 pm.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WINNING THE TABLE BACK (brochure) -->
+  <div style="position: relative; display: flex; flex-direction: column; gap: 22px; padding: 10px 20px 56px; overflow: hidden;">
+    <div style="position: absolute; top: -100px; right: -140px; width: 420px; height: 360px; background: radial-gradient(ellipse at center, rgba(239,68,68,0.16) 0%, rgba(8,9,12,0) 66%);"></div>
+
+    <div style="position: relative; display: flex; flex-direction: column; gap: 11px;">
+      <span style="font-size: 11.5px; font-weight: 500; letter-spacing: 0.11em; text-transform: uppercase; color: #f87171;">Winning the table back</span>
+      <h3 style="margin: 0; font-size: 28px; line-height: 1.16; font-weight: 600; letter-spacing: -0.026em; color: #ffffff;">One bad plate doesn&rsquo;t have to be their last visit.</h3>
+      <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #9BA1AF;">The complaint arrives with the dish named. One tap sends an apology and a reward.</p>
+    </div>
+
+    <div style="position: relative; display: flex; flex-direction: column; gap: 12px;">
+
+      <div style="display: flex; flex-direction: column; gap: 13px; padding: 18px; border-radius: 20px; background: linear-gradient(150deg, #E33B3B 0%, #C22B2B 100%);">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+          <div style="display: flex; flex-direction: column; gap: 1px;">
+            <span style="font-size: 12.5px; font-weight: 600; color: #ffffff;">Table 14 &middot; 3rd visit</span>
+            <span style="font-size: 10.5px; color: rgba(255,255,255,0.75);">&#8377;3,204 &middot; 9:59 pm</span>
+          </div>
+          <span style="font-size: 12.5px; color: #ffffff;">&#9733;&#9733;&#9734;&#9734;&#9734;</span>
+        </div>
+        <p style="margin: 0; font-size: 14.5px; line-height: 1.42; font-weight: 500; color: #ffffff;">&ldquo;The paneer tikka came out cold and the noodles were too salty.&rdquo;</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+          <span style="font-size: 10.5px; font-weight: 500; color: #ffffff; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.2);">Reason &middot; Food</span>
+          <span style="font-size: 10.5px; font-weight: 500; color: #ffffff; padding: 5px 10px; border-radius: 999px; background: rgba(255,255,255,0.2);">Heard of us &middot; Walking by</span>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 10px; background: #14A05A; color: #ffffff; font-size: 12.5px; font-weight: 600;">Take action</div>
+      </div>
+
+      <div style="border-radius: 20px; overflow: hidden; background: #ECE5DD;">
+        <div style="display: flex; align-items: center; gap: 9px; padding: 11px 14px; background: #075E54;">
+          <div style="display: flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 999px; background: #25D366; flex-shrink: 0;"><svg width="15" height="15" viewBox="0 0 24 24" fill="#ffffff"><path d="M12 2a10 10 0 0 0-8.6 15l-1.3 4.8 5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20z"></path></svg></div>
+          <span style="font-size: 12px; font-weight: 600; color: #ffffff;">Avv&aring;&#39;s Cafe</span>
+        </div>
+        <div style="padding: 13px 12px 15px;">
+          <div style="padding: 11px 12px; border-radius: 4px 13px 13px 13px; background: #ffffff;">
+            <span style="display: block; font-size: 12px; line-height: 1.52; color: #1D2033;">Apologies for your last visit &mdash; that&rsquo;s not how we cook. We&rsquo;ve put <b>500 bonus coins</b> on your card for the next one.</span>
+            <div style="margin-top: 9px; padding-top: 8px; border-top: 1px solid #eceff3; font-size: 11.5px; font-weight: 600; color: #2135DD;">View reward &rarr;</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 11px; padding: 18px; border-radius: 20px; background: #12141A; border: 1px solid rgba(255,255,255,0.08);">
+        <span style="font-size: 12px; font-weight: 600; color: #ffffff;">Items with a <span style="color: #f87171;">negative report</span></span>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 44px 42px; gap: 8px; padding-bottom: 7px; border-bottom: 1px solid rgba(255,255,255,0.07);">
+          <span style="font-size: 9.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #565C6B;">Item</span>
+          <span style="font-size: 9.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #565C6B; text-align: right;">Compl.</span>
+          <span style="font-size: 9.5px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #565C6B; text-align: right;">Rating</span>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 44px 42px; gap: 8px;"><span style="font-size: 13px; color: #C9CDD6;">Pesto Pasta</span><span style="font-size: 13px; color: #9BA1AF; text-align: right;">20</span><span style="font-size: 13px; font-weight: 600; color: #f87171; text-align: right;">3.5</span></div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 44px 42px; gap: 8px;"><span style="font-size: 13px; color: #C9CDD6;">Fried Chicken</span><span style="font-size: 13px; color: #9BA1AF; text-align: right;">12</span><span style="font-size: 13px; font-weight: 600; color: #f87171; text-align: right;">3.2</span></div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 44px 42px; gap: 8px;"><span style="font-size: 13px; color: #C9CDD6;">Paneer Tikka</span><span style="font-size: 13px; color: #9BA1AF; text-align: right;">6</span><span style="font-size: 13px; font-weight: 600; color: #f87171; text-align: right;">3.0</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- PRICING (white sheet) -->
+  <div style="background: #ffffff; border-radius: 32px 32px 0 0; color: #1D2033;">
+    <div style="display: flex; flex-direction: column; gap: 22px; padding: 52px 20px 48px;">
+      <div style="display: flex; flex-direction: column; gap: 11px;">
+        <h2 style="margin: 0; font-size: 32px; line-height: 1.14; font-weight: 600; letter-spacing: -0.028em;">One price per outlet. <span style="color: #2135DD;">No cut of your sales.</span></h2>
+        <p style="margin: 0; font-size: 15px; line-height: 1.6; color: #6B7180;">WhatsApp messages billed separately at ₹2 per customer reached.</p>
+      </div>
+
+      <div style="position: relative; display: flex; flex-direction: column; gap: 18px; padding: 28px 24px; border-radius: 24px; background: #0D0F14; overflow: hidden; box-shadow: 0 24px 54px -28px rgba(33,53,221,0.6);">
+        <div style="position: absolute; top: -60px; right: -50px; width: 240px; height: 240px; background: radial-gradient(circle, rgba(33,53,221,0.5) 0%, rgba(13,15,20,0) 66%);"></div>
+        <div style="position: relative; display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 16.5px; font-weight: 600; color: #ffffff;">Growth</span>
+          <span style="font-size: 10.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #ffffff; background: #2135DD; padding: 5px 11px; border-radius: 999px;">Popular</span>
+        </div>
+        <div style="position: relative; display: flex; align-items: baseline; gap: 6px;">
+          <span style="font-size: 34px; font-weight: 700; letter-spacing: -0.025em; color: #ffffff;">₹[PRICE]</span>
+          <span style="font-size: 13.5px; color: #9BA1AF;">/ [month or year]</span>
+        </div>
+        <div style="position: relative; display: flex; align-items: center; justify-content: center; height: 50px; border-radius: 12px; background: #2135DD; color: #ffffff; font-size: 15.5px; font-weight: 600; box-shadow: 0 0 30px -6px rgba(74,99,255,0.9);">Book a demo</div>
+        <div style="position: relative; display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; align-items: flex-start; gap: 9px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9EC0FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size: 14px; line-height: 1.5; color: #C9CDD6;">Up to [X] outlets, unlimited cashiers</span></div>
+          <div style="display: flex; align-items: flex-start; gap: 9px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9EC0FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size: 14px; line-height: 1.5; color: #C9CDD6;">Coins, milestones &amp; branded card</span></div>
+          <div style="display: flex; align-items: flex-start; gap: 9px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9EC0FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size: 14px; line-height: 1.5; color: #C9CDD6;">Feedback &amp; Google review routing</span></div>
+          <div style="display: flex; align-items: flex-start; gap: 9px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9EC0FF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px;"><path d="M20 6 9 17l-5-5"></path></svg><span style="font-size: 14px; line-height: 1.5; color: #C9CDD6;">WhatsApp campaigns &amp; manager alerts</span></div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-radius: 18px; background: #f2f6fa;">
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 14.5px; font-weight: 600;">Starter &amp; Chain</span>
+          <span style="font-size: 13px; color: #8D9098;">One outlet, or many cities</span>
+        </div>
+        <span style="font-size: 14px; font-weight: 600; color: #2135DD;">Compare →</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TESTIMONIAL — ANIE'S COFFEE & CO -->
+  <div style="position: relative; display: flex; flex-direction: column; gap: 20px; padding: 56px 20px 40px; overflow: hidden;">
+    <div style="position: absolute; top: 0; left: 50%; width: 560px; height: 380px; margin-left: -280px; background: radial-gradient(ellipse at center, rgba(242,24,122,0.18) 0%, rgba(8,9,12,0) 66%);"></div>
+
+    <div style="position: relative; display: flex; flex-direction: column; gap: 20px; padding: 28px 22px; border-radius: 24px; background: #0F1116; border: 1px solid rgba(255,255,255,0.08);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="display: flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 14px; border: 1px dashed rgba(242,24,122,0.4); background: rgba(242,24,122,0.08); font-size: 8.5px; color: #F2187A;">[LOGO]</div>
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span style="font-size: 15px; font-weight: 600; color: #ffffff;">Anie's Coffee &amp; Co</span>
+          <span style="font-size: 12px; color: #6B7180;">Live on Zuplin</span>
+        </div>
+      </div>
+
+      <p style="margin: 0; font-size: 19px; line-height: 1.45; font-weight: 500; color: #ffffff; letter-spacing: -0.012em;">“[REAL QUOTE FROM ANIE'S — what changed after Zuplin, ideally with a number in it.]”</p>
+
+      <div style="display: flex; align-items: center; gap: 11px;">
+        <div style="display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 999px; border: 1px dashed rgba(255,255,255,0.2); font-size: 8.5px; color: #565C6B;">[PHOTO]</div>
+        <div style="display: flex; flex-direction: column; gap: 1px;">
+          <span style="font-size: 13.5px; font-weight: 600; color: #ffffff;">[NAME]</span>
+          <span style="font-size: 12px; color: #6B7180;">[ROLE], Anie's Coffee &amp; Co</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px;">
+        <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 12px; border-radius: 15px; background: rgba(242,24,122,0.08); border: 1px solid rgba(242,24,122,0.2);"><span style="font-size: 19px; font-weight: 700; color: #ffffff;">[X]%</span><span style="font-size: 10.5px; line-height: 1.35; color: #9BA1AF;">more repeat visits</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 12px; border-radius: 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);"><span style="font-size: 19px; font-weight: 700; color: #ffffff;">[X.X]★</span><span style="font-size: 10.5px; line-height: 1.35; color: #9BA1AF;">Google rating</span></div>
+        <div style="display: flex; flex-direction: column; gap: 3px; padding: 14px 12px; border-radius: 15px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);"><span style="font-size: 19px; font-weight: 700; color: #ffffff;">[X]</span><span style="font-size: 10.5px; line-height: 1.35; color: #9BA1AF;">regulars enrolled</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL CTA -->
+  <div style="position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 72px 20px 68px; overflow: hidden; text-align: center;">
+    <div style="position: absolute; bottom: -200px; left: 50%; width: 620px; height: 480px; margin-left: -310px; background: radial-gradient(ellipse at center, rgba(33,53,221,0.38) 0%, rgba(8,9,12,0) 64%);"></div>
+    <h2 style="position: relative; margin: 0; font-size: 34px; line-height: 1.12; font-weight: 600; letter-spacing: -0.03em;">
+      <span style="color: #565C6B;">Your regulars are worth more</span><br>
+      <span style="color: #ffffff;">than your discounts</span>
+    </h2>
+    <p style="position: relative; margin: 0; font-size: 15.5px; line-height: 1.55; color: #9BA1AF;">Fifteen minutes on a call and you'll know whether this fits your restaurant.</p>
+    <div style="position: relative; display: flex; flex-direction: column; gap: 10px; width: 100%; padding-top: 6px;">
+      <div style="display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 12px; background: #2135DD; font-size: 16px; font-weight: 600; box-shadow: 0 0 40px -8px rgba(74,99,255,0.95);">Book a demo</div>
+      <div style="display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); font-size: 16px; font-weight: 600;">Start free</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+</body>
+</html>

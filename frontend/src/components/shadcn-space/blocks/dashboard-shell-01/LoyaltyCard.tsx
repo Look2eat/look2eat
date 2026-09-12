@@ -46,9 +46,9 @@ function LoyaltyCard() {
     }, [loadKpis])
 
     return (
-        <div className="w-full overflow-hidden relative rounded-2xl p-10 text-xl md:text-4xl font-bold text-foreground bg-white dark:bg-[#121214] h-60  font-poppins">
+        <div className="w-full overflow-hidden relative rounded-2xl p-4 sm:p-6 md:p-10 text-xl md:text-4xl font-bold text-foreground bg-white dark:bg-[#121214] h-auto lg:h-60 font-poppins">
             {isLoading || !kpis ? (
-                <Skeleton className="h-full w-full rounded-xl" />
+                <Skeleton className="h-60 w-full rounded-xl" />
             ) : (
                 <LoyaltyStats
                     classname='bg-background dark:bg-[#1E1F27]'

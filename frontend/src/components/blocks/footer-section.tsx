@@ -19,9 +19,10 @@ const footerLinks: FooterSection[] = [
 	{
 		label: 'Product',
 		links: [
-			{ title: 'Features', href: '#features' },
-			{ title: 'Testimonials', href: '#testimonials' },
-			{ title: 'FAQs', href: '#faq' },
+			{ title: 'Features', href: '/#features' },
+			{ title: 'How it works', href: '/#how-it-works' },
+			{ title: 'FAQs', href: '/#faq' },
+			{ title: 'Pricing', href: '/#pricing' },
 		],
 	},
 	{
@@ -30,6 +31,7 @@ const footerLinks: FooterSection[] = [
 			{ title: 'Terms & Conditions', href: '/policy/terms-and-conditions' },
 			{ title: 'Privacy Policy', href: '/policy/privacy-policy' },
 			{ title: 'Data Protection Policy', href: '/policy/data-protection-policy' },
+			{ title: 'Cookie Policy', href: '/policy/cookie-policy' },
 			{ title: 'Refund Policy', href: '/policy/refund-policy' },
 		],
 	},

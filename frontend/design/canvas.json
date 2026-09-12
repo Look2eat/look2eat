@@ -1,0 +1,53 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 10500,
+      "title": "Landing page — desktop"
+    },
+    {
+      "file": "Mobile.dc.html",
+      "x": 1600,
+      "y": 0,
+      "w": 390,
+      "h": 7600,
+      "title": "Landing page — mobile"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "brief",
+      "x": 0,
+      "y": -250,
+      "w": 660,
+      "text": "Zuplin landing page — dark-first.\n\nDesign language from the HackerRank reference (dim setup lines → bright payoff line with a glowing inline glyph, white sheet over the hero, fading stepper, floating cards, CTA glow). Their green, glyphs and copy deliberately not taken.\n\nFeature content is the four pillars from the Zuplin brochure, each drawn with its OWN product visual rather than a repeated icon-title-text card — reward ladder, customer segments, campaign performance, item-level review report."
+    },
+    {
+      "id": "motion",
+      "x": 720,
+      "y": -250,
+      "w": 700,
+      "text": "MOTION SPEC (framer-motion, when we build in React)\n\nCounter stepper — NOW ANIMATED on the artboard:\n• A 13.5s CSS loop (4.5s per beat) drives both the three step headings and the three scenes in the blue stage, so each state is actually visible here: cashier entry → WhatsApp message → redeem code. Dots at the bottom track the beat.\n• In React this is NOT a timer — bind it to scroll: useScroll on the section, then map progress 0→1 to an active index 0/1/2 and drive the same three scenes with AnimatePresence (fade + 18px y, 0.4s easeOut). The timed loop is only so the artboard demonstrates all three states.\n• Fallback: freeze on beat 1 under prefers-reduced-motion (already done here).\n\nFeature cards — the stack:\n• Already works here with position: sticky and increasing top offsets (60 / 84 / 108 / 132). Cards occlude each other as you scroll.\n• Add on top: useScroll + useTransform per card — scale 1 → 0.94 and opacity 1 → 0.6 as the next card covers it, so the stack has depth.\n• Card contents: whileInView with staggerChildren 0.08, y 20 → 0, once: true.\n\nWin-back row:\n• The three cards reveal left-to-right, whileInView, stagger 0.12. The red alert card gets a one-shot 1.03 scale pulse when it enters.\n\nPartner strip:\n• CSS marquee, 30s linear infinite, duplicated set for a seamless loop, edges masked. Pauses on prefers-reduced-motion.\n\nHero:\n• Dim lines stay dim; the payoff line and glyph fade up on load, then the glyph pulses gently.\n\nWhite sheet:\n• Scrolls up over the hero, which parallaxes slightly and dims."
+    },
+    {
+      "id": "logos",
+      "x": 1600,
+      "y": -250,
+      "w": 390,
+      "text": "PARTNER LOGOS — all five are dashed placeholders (Meta, WhatsApp, Petpooja, Razorpay, and the unidentified one).\n\nI didn't draw these from memory — they're trademarked and I'd get them subtly wrong. Drop real SVGs in public/partners/ and I'll wire them in.\n\nThe fifth is spelled \"nosnia\" in your message — I couldn't identify it. Confirm the name."
+    },
+    {
+      "id": "check",
+      "x": 0,
+      "y": -600,
+      "w": 700,
+      "text": "STILL NEEDS REAL CONTENT:\n\n• Anie's Coffee & Co testimonial — the quote, the person's name and role, and the three result numbers are all bracketed. I won't write words and attribute them to a real cafe; get the quote from them.\n• Stats band — [X]% / [X]× / [X] min.\n• Plan prices.\n• Win-back row — the complaint, the ₹3,204 bill and the item table (Pesto Pasta 20 / Fried Chicken 12 / Paneer Tikka 6) are illustrative, redrawn from the brochure's sample screens. Swap in real anonymised data or leave as clearly-sample UI.\n\nAND CONFIRM BEFORE LAUNCH:\n• Petpooja integration is claimed in two places, but nothing in this repo does POS integration — the cashier types the bill by hand. Confirm it exists on the backend.\n• Meta Verified Partner badge — confirm it's actually granted."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

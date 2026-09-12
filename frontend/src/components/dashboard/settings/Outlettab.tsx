@@ -260,10 +260,10 @@ function OutletAddressDialog({ outlet, patchOutlet }: DialogProps) {
     }
 
     return (
-        <div className="flex items-center justify-between py-5">
-            <div>
+        <div className="flex flex-wrap items-center justify-between gap-3 py-5">
+            <div className="min-w-0">
                 <p className="text-base font-semibold text-gray-800 dark:text-neutral-200">Outlet Address</p>
-                <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200">{outlet.address}</p>
+                <p className="mt-0.5 text-xs text-gray-500 dark:text-neutral-200 break-words">{outlet.address}</p>
             </div>
             <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (o) { setAddress(outlet.address); setError(null); } }}>
                 <DialogTrigger render={<Button variant="outline" className="text-xs" />}>Edit</DialogTrigger>

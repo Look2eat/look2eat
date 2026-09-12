@@ -21,7 +21,7 @@ const tabsVariants = cva("", {
 });
 
 const tabsListVariants = cva(
-  "inline-flex items-center justify-center text-muted-foreground font-poppins gap-2",
+  "inline-flex items-center justify-center text-muted-foreground font-poppins gap-2 max-w-full overflow-x-auto",
   {
     variants: {
       variant: {

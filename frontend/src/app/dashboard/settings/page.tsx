@@ -3,6 +3,7 @@
 import { Suspense, useCallback } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Tabs, TabsPanel } from "@/components/ui/tabs";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { SettingsSidebar } from "../../../components/dashboard/settings/Settingssidebar";
 import { ProfileTab } from "../../../components/dashboard/settings/ProfileTab";
 import { OutletTab } from "../../../components/dashboard/settings/Outlettab";
@@ -23,6 +24,11 @@ function AccountSettingsInner() {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    // Below md there isn't room for a fixed vertical tab rail beside the
+    // panel content — SettingsSidebar switches to a horizontal scrollable
+    // tab row instead. Orientation is a real prop (drives keyboard-nav
+    // semantics), not just styling, so it has to flip in JS, not CSS.
+    const isMobile = useIsMobile();
 
     const tabParam = searchParams.get("tab");
     const activeTab = tabParam && VALID_TABS.includes(tabParam) ? tabParam : DEFAULT_TAB;
@@ -46,16 +52,16 @@ function AccountSettingsInner() {
 
                 <div className="overflow-hidden rounded-2xl bg-white dark:bg-[#121214] shadow-sm ring-1 ring-gray-100 dark:ring-gray-900">
                     <Tabs
-                        className="w-full flex-row lg:min-h-140 gap-4"
+                        className="w-full gap-4 md:min-h-140"
                         value={activeTab}
                         onValueChange={handleTabChange}
-                        orientation="vertical"
+                        orientation={isMobile ? "horizontal" : "vertical"}
                     >
-                        <SettingsSidebar />
+                        <SettingsSidebar isMobile={isMobile} />
 
                         <div className="flex-1 min-w-0">
                             {PANELS.map(({ value, title, component }) => (
-                                <TabsPanel key={value} value={value} className="p-8">
+                                <TabsPanel key={value} value={value} className="p-5 sm:p-8">
                                     <h2 className="mb-5 text-xl font-semibold text-gray-900 dark:text-white">{title}</h2>
                                     {component}
                                 </TabsPanel>

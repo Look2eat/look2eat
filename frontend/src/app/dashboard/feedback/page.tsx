@@ -14,7 +14,7 @@ export default function FeedbackPage() {
 
                     <FeedbackStats />
                 </div>
-                <div className="flex gap-6">
+                <div className="flex flex-col lg:flex-row gap-6">
                     <AvgRating />
                     <FeedbackCampaign />
                 </div>

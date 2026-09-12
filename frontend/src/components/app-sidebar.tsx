@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar"
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from "@/components/ui/sidebar"
 import Image from "next/image";
 import WelcomeCard from "./dashboard/WelcomeCard";
 import Cashier02Icon from '@iconify-react/hugeicons/cashier-02';
@@ -20,6 +20,14 @@ import { useOutlet } from "@/lib/auth/OutletContext";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const pathname = usePathname();
   const { outlets } = useOutlet();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  // Client-side nav between dashboard sub-routes doesn't remount this
+  // layout, so nothing else closes the mobile drawer after a selection —
+  // without this, picking a page leaves the Sheet open over the new page.
+  const closeOnMobileNav = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
 
   const sidebarItems = [
@@ -68,7 +76,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu>
           <SidebarMenuItem>
             <a href="#">
-              <div className="flex items-start justify-start px-2">
+              <div className="md:flex items-start justify-start px-2 hidden ">
                 <Image
                   src="/logo.svg"
                   alt="Zuplin"
@@ -100,18 +108,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     isActive={pathname === (item.activePath ?? item.href)}
-                    className="h-10 rounded-[28px] px-3 text-base font-poppins"
+                    className="h-10 rounded-[28px] px-3 text-sm md:text-base font-poppins"
                     disabled={item.disabled}
                     asChild={!item.disabled}
                   >
                     {item.disabled ? (
                       <div className="flex items-center gap-2 cursor-not-allowed opacity-50">
-                        <Icon style={{ width: "22px", height: "22px" }} />
+                        <Icon style={{ width: isMobile ? "18px" : "22px", height: isMobile ? "18px" : "22px" }} />
                         <span>{item.label}</span>
                       </div>
                     ) : (
-                      <Link href={item.href} className="flex items-center gap-2">
-                        <Icon style={{ width: "22px", height: "22px" }} />
+                      <Link href={item.href} className="flex items-center gap-2" onClick={closeOnMobileNav}>
+                        <Icon style={{ width: isMobile ? "18px" : "22px", height: isMobile ? "18px" : "22px" }} />
                         <span>{item.label}</span>
                       </Link>
                     )}

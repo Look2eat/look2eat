@@ -1,10 +1,19 @@
+import type { Metadata } from "next";
 import { Footer } from "@/components/blocks/footer-section";
+
+export const metadata: Metadata = {
+  title: "Terms & Conditions",
+  description:
+    "The terms that govern your use of the Zuplin platform.",
+  alternates: { canonical: "/policy/terms-and-conditions" },
+};
+
 
 
 export default function TermsAndConditionsPage() {
     return (
         <>
-            <div className="max-w-3xl mx-auto px-6 py-12">
+            <main className="max-w-3xl mx-auto px-6 py-12">
 
                 <h1 className="text-4xl font-bold mb-6">
                     Terms & Conditions
@@ -78,7 +87,7 @@ export default function TermsAndConditionsPage() {
 
 
 
-            </div>
+            </main>
             <Footer />
         </>
     );

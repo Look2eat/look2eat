@@ -69,7 +69,7 @@ export default function WelcomeCard() {
                 {brand?.name}
             </h2>
 
-            <h1 className="mt-4 text-2xl font-bold leading-[1.05] text-[#1D2033] dark:text-[#FDFEFF] font-poppins">
+            <h1 className="mt-4 text-lg md:text-2xl font-bold leading-[1.15] md:leading-[1.05] text-[#1D2033] dark:text-[#FDFEFF] font-poppins">
                 Welcome back,
                 <br />
                 {user.name}!
