@@ -47,13 +47,21 @@ const verifiedTestimonial: Testimonial | null = null;
    PREVIEW FALLBACK
 
    So the two sections can still be reviewed while the real content is being
-   gathered. These render in development only — a production build always
-   falls back to null, so a bracketed placeholder can never reach a visitor.
+   gathered.
 
-   Delete this block once the verified content above is filled in.
+   They show automatically in development. On a deployed build they are hidden
+   by default — a visitor should never read "[REAL QUOTE FROM ANIE'S]" — but
+   you can switch them on for a staging or review deployment by setting:
+
+       NEXT_PUBLIC_SHOW_UNVERIFIED_CONTENT=true
+
+   Leave that unset on the real production site. Delete this whole block once
+   the verified content above is filled in.
    ───────────────────────────────────────────────────────────────────────── */
 
-const PREVIEW_UNVERIFIED = process.env.NODE_ENV !== "production";
+const PREVIEW_UNVERIFIED =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PUBLIC_SHOW_UNVERIFIED_CONTENT === "true";
 
 const previewStats: Stat[] = [
   { value: "[X]%", label: "of diners on Zuplin come back within [X] days" },
