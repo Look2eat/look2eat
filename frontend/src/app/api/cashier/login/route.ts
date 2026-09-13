@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import axios, { AxiosError } from "axios";
-
-const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
-
-if (!EXPRESS_API_URL) {
-  throw new Error(
-    "EXPRESS_API_URL is not set in .env.local.",
-  );
-}
+import { expressApiUrl } from "@/lib/env";
 
 // Deliberately different cookie name from admin's l2e_session — cashier
 // and admin sessions are completely independent and can coexist in the
@@ -49,7 +42,7 @@ export async function POST(req: NextRequest) {
   let data: CashierLoginApiResponse;
   try {
     const upstream = await axios.post<CashierLoginApiResponse>(
-      `${EXPRESS_API_URL}/cashier/login`,
+      `${expressApiUrl()}/cashier/login`,
       {
         phoneNumber: body.phoneNumber,
         password: body.password,

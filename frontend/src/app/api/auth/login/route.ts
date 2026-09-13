@@ -2,14 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import axios, { AxiosError } from "axios";
 import { verifyToken, TokenVerificationError } from "@/lib/auth/verifyToken";
-
-const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
-
-if (!EXPRESS_API_URL) {
-  throw new Error(
-    "EXPRESS_API_URL is not set in .env.local. Add it and restart your dev server.",
-  );
-}
+import { expressApiUrl } from "@/lib/env";
 
 const COOKIE_NAME = "l2e_session";
 
@@ -66,7 +59,7 @@ export async function POST(req: NextRequest) {
   let data: LoginApiResponse;
   try {
     const upstream = await axios.post<LoginApiResponse>(
-      `${EXPRESS_API_URL}/auth/login`,
+      `${expressApiUrl()}/auth/login`,
       { phone: body.phone, password: body.password },
       { headers: { "Content-Type": "application/json" } },
     );

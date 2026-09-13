@@ -4,6 +4,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+// TEMPORARY env diagnostic — remove with src/components/debug/EnvCheck.tsx
+import { EnvCheck } from "@/components/debug/EnvCheck";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -87,6 +89,7 @@ export default function RootLayout({
       >
           {children}
         </ThemeProvider>
+        <EnvCheck />
       </body>
     </html>
   );
