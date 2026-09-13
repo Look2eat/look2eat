@@ -53,7 +53,7 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
   // Display as: spend ₹X to earn 1 coin
   const spendPerCoin = (1 / settings.coinRatioValue).toFixed(0);
   const earnRule = `₹${spendPerCoin} spent = 1 coin`;
-  console.log(restaurantSlug, wallet_id)
+  
 
 
   return (
@@ -130,7 +130,7 @@ export default async function PublicLoyaltyPage({ params }: PageProps) {
             walletId={wallet.id}
             feedbackAlreadyGiven={pageData.data.feedbackAlreadyGiven}
             categories={pageData.data.categories}
-            googleReviewUrl={null} // swap with brand.googleReviewUrl if your backend adds it
+            googleReviewUrl={null} 
             cardColor={"#F2187A"}
             feedbackPoints={35}
           />
