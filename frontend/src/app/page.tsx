@@ -85,7 +85,7 @@ export default function Home() {
         <StatsBand />
 
         {/* ── Dark band: the customer's own words, on a white card ── */}
-        <Testimonial />
+        <Testimonial  />
         <SectionTransition size="sm" />
 
         {/* ── Sheet 2 · light: what it costs, what you're wondering ── */}
