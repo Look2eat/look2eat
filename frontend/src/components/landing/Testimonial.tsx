@@ -44,9 +44,9 @@ export function Testimonial() {
                   <Image
                     src={logoSrc}
                     alt={`${company} logo`}
-                    width={54}
-                    height={54}
-                    className="h-[54px] w-[54px] shrink-0 rounded-2xl object-contain"
+                    width={72}
+                    height={72}
+                    className="h-[72px] w-[72px] shrink-0 rounded-2xl object-contain"
                   />
                 ) : (
                   <div
@@ -76,7 +76,7 @@ export function Testimonial() {
                 </p>
               </blockquote>
 
-              <figcaption className="flex items-center gap-3.5">
+              {/* <figcaption className="flex items-center gap-3.5">
                 {photoSrc ? (
                   <Image
                     src={photoSrc}
@@ -99,7 +99,7 @@ export function Testimonial() {
                     {personRole}, {company}
                   </span>
                 </div>
-              </figcaption>
+              </figcaption> */}
             </div>
 
             {results?.length ? (
