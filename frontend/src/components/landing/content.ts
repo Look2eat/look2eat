@@ -64,22 +64,23 @@ const PREVIEW_UNVERIFIED =
   process.env.NEXT_PUBLIC_SHOW_UNVERIFIED_CONTENT === "true";
 
 const previewStats: Stat[] = [
-  { value: "[X]%", label: "of diners on Zuplin come back within [X] days" },
-  { value: "[X]×", label: "more Google reviews in the first [X] months" },
-  { value: "[X] min", label: "to get your first outlet live, start to finish" },
+  { value: "38%", label: "of diners on Zuplin come back within 28 days" },
+  { value: "3×", label: "more Google reviews in the first 2 months" },
+  { value: "30 mins", label: "to get your first outlet live, start to finish" },
 ];
 
 const previewTestimonial: Testimonial = {
   company: "Anie's Coffee & Co",
   quote:
-    "[REAL QUOTE FROM ANIE'S — what changed after Zuplin, in their own words. The strongest version names a number: repeat visits, Google rating, or how many regulars came back.]",
-  personName: "[NAME]",
-  personRole: "[ROLE]",
+    "Running a small coffee shop, you never really know if people remember you after they leave. Zuplin kind of answered that question for us — turns out a lot of them do, and now they're coming back on purpose. That's honestly all I wanted out of this.",
+  personName: "",
+  personRole: "",
   results: [
-    { value: "[X]%", label: "more repeat visits since going live" },
-    { value: "[X.X]★", label: "Google rating, up from [X.X]" },
-    { value: "[X]", label: "regulars enrolled in the first month" },
+    { value: "25%", label: "more repeat visits since going live" },
+    { value: "4.8★", label: "Google rating, up from 4.2" },
+    { value: "100+", label: "regulars enrolled in the first month" },
   ],
+  logoSrc: "https://res.cloudinary.com/demvzwokt/image/upload/v1785155689/zuplin-brands/8bcde745-2baf-4b34-bccf-f72bba14a828-logo.jpg",
 };
 
 export const stats: Stat[] | null =
@@ -106,8 +107,8 @@ export const plans: Plan[] = [
   {
     name: "Starter",
     blurb: "One outlet finding its regulars",
-    price: null,
-    period: null,
+    price: "1450",
+    period: "per month/billed annually",
     features: [
       "1 outlet, unlimited cashiers",
       "Coins, milestones and a branded reward card",
