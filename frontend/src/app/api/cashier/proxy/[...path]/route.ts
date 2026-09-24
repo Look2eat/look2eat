@@ -1,18 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import axios, { AxiosError, type Method } from "axios";
-
-const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
-
-if (!EXPRESS_API_URL) {
-  throw new Error("EXPRESS_API_URL is not set in .env.local.");
-}
+import { expressApiUrl } from "@/lib/env";
 
 const COOKIE_NAME = "l2e_cashier_session";
 
 /**
  * Cashier-specific authenticated proxy: /api/cashier/proxy/cashier/customer/...
- * → ${EXPRESS_API_URL}/cashier/customer/...
+ * → ${expressApiUrl()}/cashier/customer/...
  *
  * Reads l2e_cashier_session (NOT l2e_session — the admin cookie) so
  * cashier and admin sessions never bleed into each other. Identical
@@ -35,7 +30,7 @@ async function handler(
 
   const targetPath = path.join("/");
   const search = req.nextUrl.search;
-  const targetUrl = `${EXPRESS_API_URL}/${targetPath}${search}`;
+  const targetUrl = `${expressApiUrl()}/${targetPath}${search}`;
 
   let body: string | undefined;
   if (req.method !== "GET" && req.method !== "HEAD") {

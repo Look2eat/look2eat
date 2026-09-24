@@ -55,13 +55,21 @@ const verifiedTestimonial: Testimonial | null = null;
 
        NEXT_PUBLIC_SHOW_UNVERIFIED_CONTENT=true
 
-   Leave that unset on the real production site. Delete this whole block once
+   On Vercel, scope that variable to Preview only — not Production — and
+   redeploy, because NEXT_PUBLIC_* values are inlined at build time rather
+   than read at runtime.
+
+   Leave it unset on the real production site. Delete this whole block once
    the verified content above is filled in.
    ───────────────────────────────────────────────────────────────────────── */
 
+/** Accepts true/1/yes in any casing, so a stray "TRUE" is not silently ignored. */
+const flagIsOn = (value: string | undefined) =>
+  value !== undefined && ["true", "1", "yes"].includes(value.trim().toLowerCase());
+
 const PREVIEW_UNVERIFIED =
   process.env.NODE_ENV !== "production" ||
-  process.env.NEXT_PUBLIC_SHOW_UNVERIFIED_CONTENT === "true";
+  flagIsOn(process.env.NEXT_PUBLIC_SHOW_UNVERIFIED_CONTENT);
 
 const previewStats: Stat[] = [
   { value: "38%", label: "of diners on Zuplin come back within 28 days" },

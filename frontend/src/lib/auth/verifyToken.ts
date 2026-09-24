@@ -1,13 +1,6 @@
 import "server-only";
 import axios, { AxiosError } from "axios";
-
-const EXPRESS_API_URL = process.env.EXPRESS_API_URL;
-
-if (!EXPRESS_API_URL) {
-  throw new Error(
-    "EXPRESS_API_URL is not set in .env.local. Add it and restart your dev server.",
-  );
-}
+import { expressApiUrl } from "@/lib/env";
 
 /**
  * Matches the REAL confirmed response of GET /auth/me — note this is
@@ -60,7 +53,7 @@ export class TokenVerificationError extends Error {
  */
 export async function verifyToken(token: string): Promise<AuthMeResponse["data"]> {
   try {
-    const res = await axios.get<AuthMeResponse>(`${EXPRESS_API_URL}/auth/me`, {
+    const res = await axios.get<AuthMeResponse>(`${expressApiUrl()}/auth/me`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

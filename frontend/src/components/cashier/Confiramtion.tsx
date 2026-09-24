@@ -19,6 +19,8 @@ interface Props {
   customerName: string;
   onConfirm: () => void;
   color?: string;
+  /** Present only when the sale was a POS order and the backend created a bill for it. */
+  billId?: string;
 }
 
 export default function RedeemConfirmationModal({
@@ -28,6 +30,7 @@ export default function RedeemConfirmationModal({
   customerName,
   onConfirm,
   color = "bg-[#322424]",
+  billId,
 }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -84,6 +87,17 @@ export default function RedeemConfirmationModal({
               <strong>{coinsEarned} PTS!</strong>   {/* ← direct from API */}
             </DialogDescription>
           </DialogHeader>
+
+          {billId && (
+            <a
+              href={`/b/${billId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-blue-600 underline underline-offset-2"
+            >
+              View bill
+            </a>
+          )}
 
           <DialogClose>
             <Button

@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import axios, { AxiosError, type Method } from "axios";
-
-const EXPRESS_API_URL =
-  process.env.EXPRESS_API_URL || "http://localhost:5001/api/v1";
+import { expressApiUrl } from "@/lib/env";
 
 const COOKIE_NAME = "l2e_session";
 
 /**
  * Generic authenticated proxy: /api/proxy/admin/brands/123/dashboard
- * forwards to ${EXPRESS_API_URL}/admin/brands/123/dashboard with
+ * forwards to ${expressApiUrl()}/admin/brands/123/dashboard with
  * Authorization: Bearer <token from httpOnly cookie> attached.
  *
  * Why a proxy instead of a route handler per endpoint: services/admin/*,
@@ -38,7 +36,7 @@ async function handler(
 
   const targetPath = path.join("/");
   const search = req.nextUrl.search; // preserves ?brandId=...&limit=50 etc.
-  const targetUrl = `${EXPRESS_API_URL}/${targetPath}${search}`;
+  const targetUrl = `${expressApiUrl()}/${targetPath}${search}`;
 
   // ------------------------------------------------------------------
   // Body + Content-Type handling
