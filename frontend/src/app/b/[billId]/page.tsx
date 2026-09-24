@@ -75,11 +75,17 @@ export default async function BillPage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-[#f2f6fa] px-4 py-8 print:bg-white print:p-0 sm:px-6">
       <div className="mx-auto max-w-2xl">
+        {/* Print stays desktop-only (see PrintButton) and phones get no
+            action here at all — a prior mobile "Download a PDF" button was
+            tried and asked to be removed rather than fixed further. */}
         <div className="mb-4 flex justify-end print:hidden">
           <PrintButton />
         </div>
 
-        <div className="overflow-hidden rounded-2xl border border-[#e6ecf3] bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none">
+        <div
+          id="bill-card"
+          className="overflow-hidden rounded-2xl border border-[#e6ecf3] bg-white shadow-sm print:rounded-none print:border-0 print:shadow-none"
+        >
           {/* ── Header ── */}
           <div className="border-b border-[#e6ecf3] px-6 py-6 text-center sm:px-10">
             <div className="mb-2 flex items-center justify-center gap-2.5">
