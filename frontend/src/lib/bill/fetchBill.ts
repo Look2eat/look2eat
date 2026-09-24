@@ -1,88 +1,74 @@
 import "server-only";
+import { cache } from "react";
 
 /**
- * Derives the Express backend's origin (protocol + host, no path) from
- * EXPRESS_API_URL, e.g. "https://backend.zuplin.in/api/v1" → "https://backend.zuplin.in".
- *
- * The bill endpoint lives at the backend's root (/b/:billId), not under the
- * versioned /api/v1 the rest of this app proxies to — so this can't reuse
- * EXPRESS_API_URL as-is. Deriving it from that same variable (rather than a
- * second hardcoded host) means Preview keeps talking to the preview backend
- * and Production to production, with nothing new to configure.
+ * The bill lives at {EXPRESS_API_URL}/public/bills/:billId — under the same
+ * versioned API path as everything else this app proxies to, unauthenticated
+ * because it's meant to be shared with a customer. Confirmed against a real
+ * response from dev.backend.zuplin.in; the shape below is transcribed
+ * directly from that sample, not guessed.
  */
-function backendOrigin(): string {
+function billsBaseUrl(): string {
   const raw = process.env.EXPRESS_API_URL || "http://localhost:5001/api/v1";
-  try {
-    return new URL(raw).origin;
-  } catch {
-    throw new Error(`EXPRESS_API_URL is not a valid URL: "${raw}"`);
-  }
+  return `${raw.replace(/\/$/, "")}/public/bills`;
 }
 
 export interface BillItem {
   name: string;
+  quantity: number;
+  unitPrice: number;
+  discount: number | null;
+  /** Line total (unitPrice × quantity, minus any discount) — NOT the unit price. */
   amount: number;
-  qty: number;
-  total: number;
+  hsnSac: string | null;
+  taxRate: number | null;
+  cgst: number | null;
+  sgst: number | null;
+  igst: number | null;
+  cess: number | null;
 }
 
 export interface Bill {
-  billId: string;
-  items: BillItem[];
-  totalAmount: number;
-  customerName?: string;
-  customerPhone?: string;
-  brandName?: string;
-  outletName?: string;
-  gstNo?: string;
-  createdAt?: string;
-}
-
-/**
- * The shapes tolerated from `GET {backendOrigin}/b/:billId`, until the
- * backend's actual response is settled. All read the same handful of
- * fields; `readBillPayload` below is the one place that needs updating if
- * the backend picks a different contract.
- */
-interface RawBillResponse {
-  success?: boolean;
-  billId?: string;
-  id?: string;
-  _id?: string;
-  items?: BillItem[];
-  totalAmount?: number;
-  amount?: number;
-  customerName?: string;
-  name?: string;
-  customerPhone?: string;
-  phone?: string;
-  brandName?: string;
-  outletName?: string;
-  gstNo?: string;
-  createdAt?: string;
-  date?: string;
-  data?: RawBillResponse;
-}
-
-function readBillPayload(raw: RawBillResponse, fallbackId: string): Bill | null {
-  // The interesting fields might be one level down under `data`.
-  const body = raw.data ?? raw;
-  if (!body.items || !Array.isArray(body.items)) return null;
-
-  const totalAmount =
-    body.totalAmount ?? body.amount ?? body.items.reduce((sum, i) => sum + (i.total ?? 0), 0);
-
-  return {
-    billId: body.billId ?? body.id ?? body._id ?? fallbackId,
-    items: body.items,
-    totalAmount,
-    customerName: body.customerName ?? body.name,
-    customerPhone: body.customerPhone ?? body.phone,
-    brandName: body.brandName,
-    outletName: body.outletName,
-    gstNo: body.gstNo,
-    createdAt: body.createdAt ?? body.date,
+  billNumber: string;
+  type: string;
+  issuedAt: string;
+  business: {
+    name: string;
+    outlet: string;
+    address: string | null;
+    phone: string | null;
+    gstin: string | null;
+    state: string | null;
+    pincode: string | null;
+    logoUrl: string | null;
   };
+  customer: {
+    name: string | null;
+    phone: string | null;
+    email: string | null;
+    gstin: string | null;
+    address: string | null;
+  };
+  items: BillItem[];
+  amounts: {
+    subtotal: number;
+    discount: number | null;
+    taxableAmount: number | null;
+    taxAmount: number | null;
+    total: number;
+    paymentMethod: string | null;
+  };
+  loyalty: {
+    coinsEarned: number | null;
+    coinsRedeemed: number | null;
+    balance: number | null;
+    rewardName: string | null;
+    cashbackApplied: number | null;
+  } | null;
+}
+
+interface RawBillResponse {
+  data?: Bill;
 }
 
 export type FetchBillResult =
@@ -90,13 +76,8 @@ export type FetchBillResult =
   | { status: "not-found" }
   | { status: "error"; message: string };
 
-/**
- * Fetches a bill straight from the Express backend — this page is public
- * and needs no cashier/admin session, so it skips the authenticated
- * /api/proxy routes entirely rather than adding a pointless hop through one.
- */
-export async function fetchBill(billId: string): Promise<FetchBillResult> {
-  const url = `${backendOrigin()}/b/${encodeURIComponent(billId)}`;
+async function fetchBillUncached(billId: string): Promise<FetchBillResult> {
+  const url = `${billsBaseUrl()}/${encodeURIComponent(billId)}`;
 
   let res: Response;
   try {
@@ -115,7 +96,14 @@ export async function fetchBill(billId: string): Promise<FetchBillResult> {
     return { status: "error", message: "Billing server sent an invalid response." };
   }
 
-  const bill = readBillPayload(raw, billId);
-  if (!bill) return { status: "not-found" };
-  return { status: "ok", bill };
+  if (!raw.data || !Array.isArray(raw.data.items)) return { status: "not-found" };
+  return { status: "ok", bill: raw.data };
 }
+
+/**
+ * Memoized per request: generateMetadata and the page body both need the
+ * same bill, and without this they'd fire two identical network calls
+ * (this fetch is deliberately `cache: "no-store"`, so Next's own fetch
+ * dedup doesn't apply — React's `cache()` covers exactly this case).
+ */
+export const fetchBill = cache(fetchBillUncached);
